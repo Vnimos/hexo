@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="jenkins," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Jenkins Job(Tomcat_check)1234567891011121314151617181920212223242526272829303132333435363738394041424344454647#!/bin/bash#######used for jenkins job:Tomcat_check######ATTEMPTS=20FAILED=0file=$JENKINS_">
+<meta name="keywords" content="jenkins">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过shell监控URL">
+<meta property="og:url" content="http://www.vnimos.cn/2017/04/06/url-check/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="Jenkins Job(Tomcat_check)1234567891011121314151617181920212223242526272829303132333435363738394041424344454647#!/bin/bash#######used for jenkins job:Tomcat_check######ATTEMPTS=20FAILED=0file=$JENKINS_">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.vnimos.cn/images/shell/jenkins_check.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/shell/check_single.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/shell/check_all.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/shell/Version.png">
+<meta property="og:updated_time" content="2018-03-17T09:05:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过shell监控URL">
+<meta name="twitter:description" content="Jenkins Job(Tomcat_check)1234567891011121314151617181920212223242526272829303132333435363738394041424344454647#!/bin/bash#######used for jenkins job:Tomcat_check######ATTEMPTS=20FAILED=0file=$JENKINS_">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/shell/jenkins_check.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2017/04/06/url-check/"/>
+
+
+
+
+
+	  <title>通过shell监控URL | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/04/06/url-check/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通过shell监控URL</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-06T10:51:29+08:00">
+                2017-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/04/06/url-check/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/04/06/url-check/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/04/06/url-check/" class="leancloud_visitors" data-flag-title="通过shell监控URL">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Jenkins-Job-Tomcat-check"><a href="#Jenkins-Job-Tomcat-check" class="headerlink" title="Jenkins Job(Tomcat_check)"></a>Jenkins Job(Tomcat_check)</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">######</span><br><span class="line">#used for jenkins job:Tomcat_check</span><br><span class="line">######</span><br><span class="line"></span><br><span class="line">ATTEMPTS=20</span><br><span class="line">FAILED=0</span><br><span class="line">file=$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/check</span><br><span class="line">log=$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/log</span><br><span class="line"></span><br><span class="line">check()&#123;</span><br><span class="line">    echo \&lt;h3\&gt; `date` &gt;&gt; $file</span><br><span class="line">    #check函数必须指定参数（URL），否则退出函数（检测结束）</span><br><span class="line">    while [ $# != 0 ]</span><br><span class="line">    do</span><br><span class="line">        env=`grep &quot;$1&quot; /data/ztjy/$NAME/url | grep -v &quot;^#&quot; | awk &apos;&#123;print $1&#125;&apos;`</span><br><span class="line">        IP=`echo $1 | awk -F &quot;/&quot; &apos;&#123;print $3&#125;&apos; |awk -F &apos;:&apos; &apos;&#123;print $1&#125;&apos;`</span><br><span class="line">        curl -skf -m 1 $1 &gt; /dev/null</span><br><span class="line"></span><br><span class="line">        #如果返回正常，则显示对应的版本号</span><br><span class="line">        if [ $? -eq 0 ];then</span><br><span class="line">            ver=`curl -skf -m 1 $1 |grep -i &quot;v&quot; |head -1|dos2unix`</span><br><span class="line">            echo \&lt;br\&gt; $env: \&lt;a href=$1\&gt;$IP\&lt;\/a\&gt; ++ $ver &gt;&gt; $file</span><br><span class="line">            echo $1 is OK! &gt;&gt; $log</span><br><span class="line">            FAILED=0</span><br><span class="line">            shift</span><br><span class="line">            continue</span><br><span class="line"></span><br><span class="line">        #如果返回异常，则标注版本号为ERROR并以红色显示</span><br><span class="line">        else</span><br><span class="line">            FAILED=$(($FAILED + 1))</span><br><span class="line">            TIMES=$(($ATTEMPTS - $FAILED + 1))</span><br><span class="line">            echo &quot;Waiting for check the URL: $1, retrying after 10 seconds for $TIMES times...&quot; &gt;&gt; $log</span><br><span class="line">            sleep 10</span><br><span class="line">            if [ $ATTEMPTS -gt $FAILED ];then</span><br><span class="line">                continue</span><br><span class="line">            else</span><br><span class="line">                echo &quot;Failed to check the web-$1&quot; &gt;&gt; $log</span><br><span class="line">            fi</span><br><span class="line"></span><br><span class="line">            echo \&lt;br\&gt; $env: \&lt;a href=$1\&gt;$IP\&lt;\/a\&gt; ++ \&lt;font color=&apos;Red&apos;\&gt;Error\&lt;\/font\&gt; &gt;&gt; $file</span><br><span class="line">            FAILED=0</span><br><span class="line">            shift</span><br><span class="line">            continue</span><br><span class="line">        fi</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">######</span><br><span class="line">#used for jenkins job:Tomcat_check</span><br><span class="line">######</span><br><span class="line"></span><br><span class="line">NAME=$1</span><br><span class="line"></span><br><span class="line">. /data/ztjy/functions</span><br><span class="line">#定义URL作为参数，可循环对多个url进行检测</span><br><span class="line">args=`cat /data/ztjy/$NAME/url | grep -v &quot;^#&quot; | awk &apos;&#123;print $2&#125;&apos;`</span><br><span class="line">check $args</span><br><span class="line"></span><br><span class="line">Maxver=`awk -F &quot;+&quot; &apos;&#123;print $3&#125;&apos; $file | grep -i v | sort |tail -1`</span><br><span class="line">Minver=`awk -F &quot;+&quot; &apos;&#123;print $3&#125;&apos; $file | grep -i v | sort |head -1`</span><br><span class="line">#大版本号则显示为橙色，小版本号则显示为绿色</span><br><span class="line">sed -i &quot;s/$Maxver/ &lt;font color=&apos;Orange&apos;&gt;$Maxver&lt;\/font&gt;/g&quot; $file</span><br><span class="line">sed -i &quot;s/$Minver/ &lt;font color=&apos;SeaGreen&apos;&gt;$Minver&lt;\/font&gt;/g&quot; $file</span><br></pre></td></tr></table></figure>
+<p>执行以上脚本时需要指定预检测的服务<code>/data/ztjy/check.sh $Service</code><br><img src="/images/shell/jenkins_check.png" alt=""></p>
+<hr>
+<h1 id="URL-check"><a href="#URL-check" class="headerlink" title="URL check"></a>URL check</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">DIR=/data/Version</span><br><span class="line">#列出所有服务</span><br><span class="line">NAME=`ls -l /data/ztjy |grep ^d|awk &apos;&#123;print $9&#125;&apos;`</span><br><span class="line">#定义check函数，用于通过curl循环检测指定服务的所有URL</span><br><span class="line">check()&#123;</span><br><span class="line">    &gt; $DIR/$i.htm</span><br><span class="line">    echo &quot;&lt;h1&gt; $i &lt;/h1&gt;&quot; &gt;&gt; $DIR/$i.htm</span><br><span class="line">    echo &quot;&lt;h3/&gt; `date`&quot; &gt;&gt; $DIR/$i.htm</span><br><span class="line">    while [ $# != 0 ]</span><br><span class="line">    do</span><br><span class="line">        env=`grep &quot;$1&quot; /data/ztjy/$i/url | grep -v &quot;^#&quot;| awk &apos;&#123;print $1&#125;&apos;`</span><br><span class="line">        IP=`echo $1 | awk -F &quot;/&quot; &apos;&#123;print $3&#125;&apos; |awk -F &apos;:&apos; &apos;&#123;print $1&#125;&apos;`</span><br><span class="line">        ver=`curl -skf -m 5 $1 |grep -i &quot;v&quot; |head -1|dos2unix|sed &apos;1 s/^\xef\xbb\xbf//&apos;`</span><br><span class="line">        curl -skf -m 5  $1 &gt; /dev/null </span><br><span class="line">        if [ $? -eq 0 ];then</span><br><span class="line">            echo \&lt;br\&gt; $env: \&lt;a href=$1 target=&quot;_blank&quot; \&gt;$IP\&lt;\/a\&gt; ++ $ver &gt;&gt; $DIR/$i.htm</span><br><span class="line">            echo $1 is OK ! </span><br><span class="line">            shift</span><br><span class="line">            continue</span><br><span class="line">        else</span><br><span class="line">            echo \&lt;br\&gt; $env: \&lt;a href=$1\&gt;$IP\&lt;\/a\&gt; ++ \&lt;font color=&apos;Red&apos;\&gt;Error\&lt;\/font\&gt; &gt;&gt; $DIR/$i.htm</span><br><span class="line">            echo -e &quot;\033[31m$1 is Failue !\033[0m&quot;</span><br><span class="line">            shift</span><br><span class="line">            continue</span><br><span class="line">        fi</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#定义main函数，用于调用check函数</span><br><span class="line">main()&#123;</span><br><span class="line">        for i in $NAME</span><br><span class="line">        do</span><br><span class="line">                args=`cat /data/ztjy/$i/url | grep -v &quot;^#&quot; | awk &apos;&#123;print $2&#125;&apos;`</span><br><span class="line">                echo -e &quot;\033[32 ========================= $i ========================= \033[0m&quot;</span><br><span class="line">                check $args</span><br><span class="line">                Maxver=`awk -F &quot;+&quot; &apos;&#123;print $3&#125;&apos; $DIR/$i.htm | grep -i v | sort |tail -1`</span><br><span class="line">                Minver=`awk -F &quot;+&quot; &apos;&#123;print $3&#125;&apos; $DIR/$i.htm | grep -i v | sort |head -1`</span><br><span class="line">                sed -i &quot;s/$Maxver/ &lt;font color=&apos;Orange&apos;&gt;$Maxver&lt;\/font&gt;/g&quot; $DIR/$i.htm</span><br><span class="line">                sed -i &quot;s/$Minver/ &lt;font color=&apos;SeaGreen&apos;&gt;$Minver&lt;\/font&gt;/g&quot; $DIR/$i.htm</span><br><span class="line">                #/bin/cp $DIR/$i.htm $DIR/$i.html</span><br><span class="line">        done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#脚本执行入口</span><br><span class="line">if [ $# -eq 1 ];then</span><br><span class="line">    echo $NAME |grep $1 &gt; /dev/null</span><br><span class="line">    if [ $? -ne 0 ];then</span><br><span class="line">                echo &quot;args error&quot;</span><br><span class="line">    else</span><br><span class="line">                NAME=$1</span><br><span class="line">                main</span><br><span class="line">        fi</span><br><span class="line">else</span><br><span class="line">        main</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<p>执行以上脚本时可指定预检测的服务<code>/data/version.sh $Service</code>，不指定则检测所有服务<br><img src="/images/shell/check_single.png" alt=""><br><img src="/images/shell/check_all.png" alt=""></p>
+<h1 id="Version-check"><a href="#Version-check" class="headerlink" title="Version check"></a>Version check</h1><hr>
+<blockquote>
+<p>由于URL检测结果同时保存为html文件，故可以将其合并一起做成web页面进行监控，且同时可以显示所有服务中每个节点对应的版本号</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">title</span>&gt;</span>掌通家园Version<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 定时刷新页面 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">meta</span> <span class="attr">http-equiv</span>=<span class="string">"refresh"</span> <span class="attr">content</span>=<span class="string">"30"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 定义当前时间 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined">var myDate = new Date();document.write(myDate.toLocaleString())</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">table</span> <span class="attr">width</span>=<span class="string">"100%"</span> <span class="attr">border</span>=<span class="string">"1"</span> <span class="attr">cellpadding</span>=<span class="string">"2"</span> <span class="attr">cellspacing</span>=<span class="string">"1"</span> <span class="attr">style</span>=<span class="string">"table-layout:fixed;"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">tbody</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">300</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/51110.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">300</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/51110-web.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">300</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/Admanage.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">300</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/AfficheServer.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">450</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/AgentServer.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">450</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/AMS.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">450</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/AuthAdmin.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">td</span>&gt;</span><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">frameborder</span>=<span class="string">no</span> <span class="attr">height</span>=<span class="string">450</span> <span class="attr">width</span>=<span class="string">500</span> <span class="attr">src</span>=<span class="string">"http://10.1.10.62/Version/AuthServer.htm"</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>/&gt;</span><span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">...</span><br><span class="line"><span class="tag">&lt;/<span class="name">tbody</span>&gt;</span><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><img src="/images/shell/Version.png" alt=""></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/jenkins/" rel="tag"># jenkins</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/04/ansible-loops/" rel="next" title="Ansible Playbook循环">
+                <i class="fa fa-chevron-left"></i> Ansible Playbook循环
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/11/ansible-filters/" rel="prev" title="Ansible Filters">
+                Ansible Filters <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jenkins-Job-Tomcat-check"><span class="nav-number">1.</span> <span class="nav-text">Jenkins Job(Tomcat_check)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#URL-check"><span class="nav-number">2.</span> <span class="nav-text">URL check</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Version-check"><span class="nav-number">3.</span> <span class="nav-text">Version check</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

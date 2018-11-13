@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker,kubernetes," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="在完成科学上网的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。  部署方案   hostname IP 角色 组件     k8s-master01 10.200.112.111 master keepalived、nginx、etcd、kubelet、kube-apiserver   k8s-master02 10.200.112.112 master keepa">
+<meta name="keywords" content="docker,kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用kubeadm部署Kubernetes1.11.3 HA">
+<meta property="og:url" content="http://www.vnimos.cn/2018/10/19/k8s-ha-kubeadm/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="在完成科学上网的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。  部署方案   hostname IP 角色 组件     k8s-master01 10.200.112.111 master keepalived、nginx、etcd、kubelet、kube-apiserver   k8s-master02 10.200.112.112 master keepa">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.vnimos.cn/images/kubernetes/k8s_ha.png">
+<meta property="og:updated_time" content="2018-11-09T08:30:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用kubeadm部署Kubernetes1.11.3 HA">
+<meta name="twitter:description" content="在完成科学上网的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。  部署方案   hostname IP 角色 组件     k8s-master01 10.200.112.111 master keepalived、nginx、etcd、kubelet、kube-apiserver   k8s-master02 10.200.112.112 master keepa">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/kubernetes/k8s_ha.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2018/10/19/k8s-ha-kubeadm/"/>
+
+
+
+
+
+	  <title>使用kubeadm部署Kubernetes1.11.3 HA | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/10/19/k8s-ha-kubeadm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用kubeadm部署Kubernetes1.11.3 HA</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-19T11:35:01+08:00">
+                2018-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/10/19/k8s-ha-kubeadm/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/10/19/k8s-ha-kubeadm/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/10/19/k8s-ha-kubeadm/" class="leancloud_visitors" data-flag-title="使用kubeadm部署Kubernetes1.11.3 HA">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>在完成<a href="https://vnimos.cn/2017/12/14/docker-http-proxy/" title="科学上网" target="_blank" rel="noopener">科学上网</a>的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。</p>
+</blockquote>
+<h1 id="部署方案"><a href="#部署方案" class="headerlink" title="部署方案"></a>部署方案</h1><table>
+<thead>
+<tr>
+<th>hostname</th>
+<th>IP</th>
+<th>角色</th>
+<th>组件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k8s-master01</td>
+<td>10.200.112.111</td>
+<td>master</td>
+<td>keepalived、nginx、etcd、kubelet、kube-apiserver</td>
+</tr>
+<tr>
+<td>k8s-master02</td>
+<td>10.200.112.112</td>
+<td>master</td>
+<td>keepalived、nginx、etcd、kubelet、kube-apiserver</td>
+</tr>
+<tr>
+<td>k8s-master03</td>
+<td>10.200.112.113</td>
+<td>master</td>
+<td>keepalived、nginx、etcd、kubelet、kube-apiserver</td>
+</tr>
+<tr>
+<td>k8s-node01</td>
+<td>10.200.112.114</td>
+<td>node</td>
+<td>kubelet、kube-proxy</td>
+</tr>
+<tr>
+<td></td>
+<td>10.200.112.100</td>
+<td>master-vip</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+<a id="more"></a>
+<p><img src="/images/kubernetes/k8s_ha.png" alt=""></p>
+<h2 id="openstack上创建实例"><a href="#openstack上创建实例" class="headerlink" title="openstack上创建实例"></a>openstack上创建实例</h2><blockquote>
+<p>以boot from volume方式创建4个docker实例（已初始化安装docker-ce-18.03.1），并指定固定IP，手动创建k8s-master-vip的port端口，避免该IP被分配到其他虚拟机中</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cinder snapshot-list</span><br><span class="line">+--------------------------------------+--------------------------------------+-----------+------------------------------------------+------+</span><br><span class="line">| ID                                   | Volume ID                            | Status    | Name                                     | Size |</span><br><span class="line">+--------------------------------------+--------------------------------------+-----------+------------------------------------------+------+</span><br><span class="line">| 9d696ab5-8368-4720-9ab1-0fa83508eecc | e6c18478-34b1-4ab0-a91b-109f30085ac2 | available | snapshot for centos7.5-docker-ce-18.03.1 | 50   |</span><br><span class="line">+--------------------------------------+--------------------------------------+-----------+------------------------------------------+------+</span><br><span class="line"><span class="meta">#</span> cinder create --snapshot-id 9d696ab5-8368-4720-9ab1-0fa83508eecc --name opsbase-k8s-master01</span><br><span class="line"><span class="meta">#</span> cinder create --snapshot-id 9d696ab5-8368-4720-9ab1-0fa83508eecc --name opsbase-k8s-master02</span><br><span class="line"><span class="meta">#</span> cinder create --snapshot-id 9d696ab5-8368-4720-9ab1-0fa83508eecc --name opsbase-k8s-master03</span><br><span class="line"><span class="meta">#</span> cinder create --snapshot-id 9d696ab5-8368-4720-9ab1-0fa83508eecc --name opsbase-k8s-node01</span><br><span class="line"><span class="meta">#</span> cinder list --status available</span><br><span class="line">+--------------------------------------+-----------+----------------------+------+-------------+----------+-------------+</span><br><span class="line">| ID                                   | Status    | Name                 | Size | Volume Type | Bootable | Attached to |</span><br><span class="line">+--------------------------------------+-----------+----------------------+------+-------------+----------+-------------+</span><br><span class="line">| 0379ed28-a124-43bf-98e2-e31400c79bad | available | opsbase-k8s-master02 | 50   | -           | true     |             |</span><br><span class="line">| 5647c318-1d2e-4c5d-9313-9110e9668a68 | available | opsbase-k8s-node01   | 50   | -           | true     |             |</span><br><span class="line">| a14d54d2-81d1-4aa4-87c9-9b776b4fb179 | available | opsbase-k8s-master01 | 50   | -           | true     |             |</span><br><span class="line">| a59340dd-7702-4a5c-89e9-2da1db8bf226 | available | opsbase-k8s-master03 | 50   | -           | true     |             |</span><br><span class="line">+--------------------------------------+-----------+----------------------+------+-------------+----------+-------------+</span><br><span class="line"><span class="meta">#</span> openstack server create --volume opsbase-k8s-master01 --flavor m5.medium --security-group public --key-name devops --config-drive True --nic net-id=net_external,v4-fixed-ip=10.200.112.111 opsbase-k8s-master01</span><br><span class="line"><span class="meta">#</span> openstack server create --volume opsbase-k8s-master02 --flavor m5.medium --security-group public --key-name devops --config-drive True --nic net-id=net_external,v4-fixed-ip=10.200.112.112 opsbase-k8s-master02</span><br><span class="line"><span class="meta">#</span> openstack server create --volume opsbase-k8s-master03 --flavor m5.medium --security-group public --key-name devops --config-drive True --nic net-id=net_external,v4-fixed-ip=10.200.112.113 opsbase-k8s-master03</span><br><span class="line"><span class="meta">#</span> openstack server create --volume opsbase-k8s-node01 --flavor m5.medium --security-group public --key-name devops --config-drive True --nic net-id=net_external,v4-fixed-ip=10.200.112.114 opsbase-k8s-node01</span><br><span class="line"><span class="meta">#</span> openstack port create --network net_external --project Operation --fixed-ip subnet=2add8374-be0f-4834-ad4c-486b5317ab87,ip-address=10.200.112.110 k8s-master-vip</span><br></pre></td></tr></table></figure>
+<h2 id="openstack上禁用master节点的安全组"><a href="#openstack上禁用master节点的安全组" class="headerlink" title="openstack上禁用master节点的安全组"></a>openstack上禁用master节点的安全组</h2><blockquote>
+<p>由于OpenStack Neutron的安全组默认会对每个网口开启MAC/IP过滤功能（防arp欺骗），不是该网口的MAC/IP发出的包会被宿主机丢弃。因此需要将3个运行keepalived的master节点的安全组禁用，否则keepalived的backup节点无法通过收到vrrp的通告报文，将导致3个节点都是master。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> openstack port list|grep 10.200.112.11[1-3]</span><br><span class="line">| 7511287f-2390-42de-becf-86c3e468bc87 |                                                 | fa:16:3e:a5:53:41 | ip_address='10.200.112.112', subnet_id='2add8374-be0f-4834-ad4c-486b5317ab87' | ACTIVE |</span><br><span class="line">| b82137f2-19c0-41ef-b534-8ba224a80a57 |                                                 | fa:16:3e:eb:01:5c | ip_address='10.200.112.113', subnet_id='2add8374-be0f-4834-ad4c-486b5317ab87' | ACTIVE |</span><br><span class="line">| b9a017e7-b4bd-4596-a063-f5906e1eec4e |                                                 | fa:16:3e:5f:11:06 | ip_address='10.200.112.111', subnet_id='2add8374-be0f-4834-ad4c-486b5317ab87' | ACTIVE |</span><br><span class="line"><span class="meta">#</span> openstack port set --no-security-group --disable-port-security b9a017e7-b4bd-4596-a063-f5906e1eec4e</span><br><span class="line"><span class="meta">#</span> openstack port set --no-security-group --disable-port-security 7511287f-2390-42de-becf-86c3e468bc87</span><br><span class="line"><span class="meta">#</span> openstack port set --no-security-group --disable-port-security b82137f2-19c0-41ef-b534-8ba224a80a57</span><br></pre></td></tr></table></figure>
+<h1 id="环境准备-all-node"><a href="#环境准备-all-node" class="headerlink" title="环境准备[all_node]"></a>环境准备<code>[all_node]</code></h1><h2 id="版本信息"><a href="#版本信息" class="headerlink" title="版本信息"></a>版本信息</h2><ul>
+<li><p>Linux版本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cat /etc/redhat-release</span><br><span class="line">CentOS Linux release 7.5.1804 (Core)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>内核版本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> uname -r</span><br><span class="line">4.18.11-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>docker版本<br><code>docker-ce-18.06</code>存在http代理失败的问题</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> docker -v</span><br><span class="line">Docker version 18.03.1-ce, build 9ee9f40</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="配置docker-http代理"><a href="#配置docker-http代理" class="headerlink" title="配置docker http代理"></a>配置docker http代理</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> vim /etc/hosts</span><br><span class="line">10.200.112.111  opsbase-k8s-master01</span><br><span class="line">10.200.112.112  opsbase-k8s-master02</span><br><span class="line">10.200.112.113  opsbase-k8s-master03</span><br><span class="line">10.200.112.114  opsbase-k8s-node01</span><br><span class="line"><span class="meta">#</span> mkdir /etc/systemd/system/docker.service.d/</span><br><span class="line"><span class="meta">#</span> cd /etc/systemd/system/docker.service.d/</span><br><span class="line"><span class="meta">#</span> cat &gt; http-proxy.conf &lt;&lt;EOF</span><br><span class="line">[Service]</span><br><span class="line">Environment="HTTP_PROXY=http://10.200.112.21:8118/" "NO_PROXY=localhost,127.0.0.1,10.200.112.111,10.200.112.112,10.200.112.113"</span><br><span class="line">EOF</span><br><span class="line"><span class="meta">#</span> cat &gt; https-proxy.conf &lt;&lt;EOF</span><br><span class="line">[Service]</span><br><span class="line">Environment="HTTPS_PROXY=http://10.200.112.21:8118/" "NO_PROXY=localhost,127.0.0.1,10.200.112.111,10.200.112.112,10.200.112.113"</span><br><span class="line">EOF</span><br><span class="line"><span class="meta">#</span> systemctl daemon-reload</span><br><span class="line"><span class="meta">#</span> systemctl restart docker</span><br><span class="line"><span class="meta">#</span> docker info|grep -i proxy</span><br><span class="line">HTTP Proxy: http://10.200.112.21:8118/</span><br><span class="line">HTTPS Proxy: http://10.200.112.21:8118/</span><br><span class="line">No Proxy: localhost,127.0.0.1,10.200.112.111,10.200.112.112,10.200.112.113</span><br></pre></td></tr></table></figure>
+<h2 id="安装所需软件"><a href="#安装所需软件" class="headerlink" title="安装所需软件"></a>安装所需软件</h2><blockquote>
+<p>可使用阿里云的kubernetes源</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cat &gt; /etc/yum.repos.d/kubernetes.repo &lt;&lt;EOF</span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">repo_gpgcheck=1</span><br><span class="line">gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br><span class="line">EOF</span><br><span class="line"><span class="meta">#</span> yum -y install kubelet-1.11.3 kubeadm-1.11.3 kubectl-1.11.3</span><br><span class="line"><span class="meta">#</span> yum list kubeadm kubelet kubectl</span><br><span class="line">Installed Packages</span><br><span class="line">kubeadm.x86_64                   1.11.3-0                         @kubernetes</span><br><span class="line">kubectl.x86_64                   1.11.3-0                         @kubernetes</span><br><span class="line">kubelet.x86_64                   1.11.3-0                         @kubernetes</span><br><span class="line"><span class="meta">#</span> systemctl enable kubelet</span><br></pre></td></tr></table></figure>
+<h2 id="开启ipvs"><a href="#开启ipvs" class="headerlink" title="开启ipvs"></a>开启ipvs</h2><blockquote>
+<p>从kubernetes1.8版本开始，新增了kube-proxy对ipvs的支持，并在1.11版本中实现了GA(General Availability)。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> yum -y install ipvsadm</span><br><span class="line"><span class="meta">#</span> modprobe ip_vs</span><br><span class="line"><span class="meta">#</span> modprobe ip_vs_rr</span><br><span class="line"><span class="meta">#</span> modprobe ip_vs_wrr</span><br><span class="line"><span class="meta">#</span> modprobe ip_vs_sh</span><br><span class="line"><span class="meta">#</span> modprobe nf_conntrack_ipv4</span><br><span class="line"><span class="meta">#</span> lsmod |grep ip_vs</span><br><span class="line">ip_vs_sh               16384  0 </span><br><span class="line">ip_vs_wrr              16384  0 </span><br><span class="line">ip_vs_rr               16384  0 </span><br><span class="line">ip_vs                 151552  6 ip_vs_rr,ip_vs_sh,ip_vs_wrr</span><br><span class="line">nf_conntrack          135168  2 nf_conntrack_ipv4,ip_vs</span><br><span class="line">libcrc32c              16384  3 nf_conntrack,xfs,ip_vs</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> cat &gt; /etc/modules-load.d/ipvs.conf &lt;&lt;EOF</span><br><span class="line">ip_vs</span><br><span class="line">ip_vs_rr</span><br><span class="line">ip_vs_wrr</span><br><span class="line">ip_vs_sh</span><br><span class="line">nf_conntrack_ipv4</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h2 id="获取所需docker镜像"><a href="#获取所需docker镜像" class="headerlink" title="获取所需docker镜像"></a>获取所需docker镜像</h2><h3 id="通过kubeadm获取基础组件镜像清单"><a href="#通过kubeadm获取基础组件镜像清单" class="headerlink" title="通过kubeadm获取基础组件镜像清单"></a>通过kubeadm获取基础组件镜像清单</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> kubeadm config images list --kubernetes-version=v1.11.3</span><br><span class="line">k8s.gcr.io/kube-apiserver-amd64:v1.11.3</span><br><span class="line">k8s.gcr.io/kube-controller-manager-amd64:v1.11.3</span><br><span class="line">k8s.gcr.io/kube-scheduler-amd64:v1.11.3</span><br><span class="line">k8s.gcr.io/kube-proxy-amd64:v1.11.3</span><br><span class="line">k8s.gcr.io/pause:3.1</span><br><span class="line">k8s.gcr.io/etcd-amd64:3.2.18</span><br><span class="line">k8s.gcr.io/coredns:1.1.3</span><br></pre></td></tr></table></figure>
+<h3 id="通过kubeadm拉取基础镜像"><a href="#通过kubeadm拉取基础镜像" class="headerlink" title="通过kubeadm拉取基础镜像"></a>通过kubeadm拉取基础镜像</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> kubeadm config images pull --kubernetes-version=v1.11.3</span><br><span class="line">[config/images] Pulled k8s.gcr.io/kube-apiserver:v1.11.3</span><br><span class="line">[config/images] Pulled k8s.gcr.io/kube-controller-manager:v1.11.3</span><br><span class="line">[config/images] Pulled k8s.gcr.io/kube-scheduler:v1.11.3</span><br><span class="line">[config/images] Pulled k8s.gcr.io/kube-proxy:v1.11.3</span><br><span class="line">[config/images] Pulled k8s.gcr.io/pause:3.1</span><br><span class="line">[config/images] Pulled k8s.gcr.io/etcd:3.2.18</span><br><span class="line">[config/images] Pulled k8s.gcr.io/coredns:1.1.3</span><br></pre></td></tr></table></figure>
+<h1 id="配置nginx和keepalived-master"><a href="#配置nginx和keepalived-master" class="headerlink" title="配置nginx和keepalived[master]"></a>配置nginx和keepalived<code>[master]</code></h1><h2 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h2><blockquote>
+<p>nginx实现master节点的4层TCP反向代理</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> mkdir /root/k8s-cluster</span><br><span class="line"><span class="meta">#</span> cat &gt; /root/k8s-cluster/nginx.conf &lt;&lt;EOF</span><br><span class="line">user  nginx;</span><br><span class="line">worker_processes  1;</span><br><span class="line">error_log  /var/log/nginx/error.log warn;</span><br><span class="line">pid        /var/run/nginx.pid;</span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line">stream &#123;</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 8443;</span><br><span class="line">        proxy_pass k8s-master;</span><br><span class="line">    &#125;</span><br><span class="line">    upstream k8s-master &#123;</span><br><span class="line">        server 10.200.112.111:6443;</span><br><span class="line">        server 10.200.112.112:6443;</span><br><span class="line">        server 10.200.112.113:6443;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> docker run -d --name k8s-nginx -v /root/k8s-cluster/nginx.conf:/etc/nginx/nginx.conf -p 8443:8443 --restart always nginx</span><br></pre></td></tr></table></figure>
+<h2 id="keepalived"><a href="#keepalived" class="headerlink" title="keepalived"></a>keepalived</h2><blockquote>
+<p>keepalived实现k8s-master节点的kube-apiserver服务之间的failover。（必须先启用ip_vs）</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> docker run -d --name k8s-keepalived --restart=always --net=host --cap-add=NET_ADMIN \</span><br><span class="line">-e KEEPALIVED_INTERFACE=eth0 \</span><br><span class="line">-e KEEPALIVED_VIRTUAL_IPS="#PYTHON2BASH:['10.200.112.110']" \</span><br><span class="line">-e KEEPALIVED_UNICAST_PEERS="#PYTHON2BASH:['10.200.112.111,'10.200.112.112','10.200.112.113']" \</span><br><span class="line">-e KEEPALIVED_PASSWORD=kubernetes \</span><br><span class="line">osixia/keepalived</span><br></pre></td></tr></table></figure>
+<h1 id="配置master-master"><a href="#配置master-master" class="headerlink" title="配置master[master]"></a>配置master<code>[master]</code></h1><h2 id="k8s-master01"><a href="#k8s-master01" class="headerlink" title="k8s-master01"></a>k8s-master01</h2><h3 id="生成配置文件"><a href="#生成配置文件" class="headerlink" title="生成配置文件"></a>生成配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cat &gt; /root/k8s-cluster/kubeadm-config.yaml &lt;&lt;EOF</span><br><span class="line">apiVersion: kubeadm.k8s.io/v1alpha2</span><br><span class="line">kind: MasterConfiguration</span><br><span class="line">kubernetesVersion: v1.11.3</span><br><span class="line">apiServerCertSANs:</span><br><span class="line">- "opsbase-k8s-master01"</span><br><span class="line">- "opsbase-k8s-master02"</span><br><span class="line">- "opsbase-k8s-master03"</span><br><span class="line">- "10.200.112.110"</span><br><span class="line">- "10.200.112.111"</span><br><span class="line">- "10.200.112.112"</span><br><span class="line">- "10.200.112.113"</span><br><span class="line">- "127.0.0.1"</span><br><span class="line">api:</span><br><span class="line">  advertiseAddress: 10.200.112.111</span><br><span class="line">  controlPlaneEndpoint: 10.200.112.110:8443</span><br><span class="line">etcd:</span><br><span class="line">  local:</span><br><span class="line">    extraArgs:</span><br><span class="line">      listen-client-urls: "https://127.0.0.1:2379,https://10.200.112.111:2379"</span><br><span class="line">      advertise-client-urls: "https://10.200.112.111:2379"</span><br><span class="line">      listen-peer-urls: "https://10.200.112.111:2380"</span><br><span class="line">      initial-advertise-peer-urls: "https://10.200.112.111:2380"</span><br><span class="line">      initial-cluster: "opsbase-k8s-master01=https://10.200.112.111:2380"</span><br><span class="line">    serverCertSANs:</span><br><span class="line">      - opsbase-k8s-master01</span><br><span class="line">      - 10.200.112.111</span><br><span class="line">    peerCertSANs:</span><br><span class="line">      - opsbase-k8s-master01</span><br><span class="line">      - 10.200.112.111</span><br><span class="line">networking:</span><br><span class="line">    podSubnet: "10.244.0.0/16"</span><br><span class="line">kubeProxy:</span><br><span class="line">  config:</span><br><span class="line">    #mode: ipvs</span><br><span class="line">    mode: iptables</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h3 id="初始化kubernetes集群"><a href="#初始化kubernetes集群" class="headerlink" title="初始化kubernetes集群"></a>初始化kubernetes集群</h3><blockquote>
+<p>若初始化失败需要通过<code>kubeadm reset</code>清理环境后重新初始化。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> kubeadm init --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line">[endpoint] WARNING: port specified in api.controlPlaneEndpoint overrides api.bindPort in the controlplane address</span><br><span class="line">[init] using Kubernetes version: v1.11.3</span><br><span class="line">[preflight] running pre-flight checks</span><br><span class="line">I1018 17:37:54.958292   15912 kernel_validator.go:81] Validating kernel version</span><br><span class="line">I1018 17:37:54.958578   15912 kernel_validator.go:96] Validating kernel config</span><br><span class="line">        [WARNING SystemVerification]: docker version is greater than the most recently validated version. Docker version: 18.03.1-ce. Max validated version: 17.03</span><br><span class="line">[preflight/images] Pulling images required for setting up a Kubernetes cluster</span><br><span class="line">[preflight/images] This might take a minute or two, depending on the speed of your internet connection</span><br><span class="line">[preflight/images] You can also perform this action in beforehand using 'kubeadm config images pull'</span><br><span class="line">[kubelet] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"</span><br><span class="line">[kubelet] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"</span><br><span class="line">[preflight] Activating the kubelet service</span><br><span class="line">[certificates] Generated ca certificate and key.</span><br><span class="line">[certificates] Generated apiserver certificate and key.</span><br><span class="line">[certificates] apiserver serving cert is signed for DNS names [opsbase-k8s-master01 kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local opsbase-k8s-master01 opsbase-k8s-master02 opsbase-k8s-master03] and IPs [10.96.0.1 10.200.112.111 10.200.112.110 10.200.112.110 10.200.112.111 10.200.112.112 10.200.112.113 127.0.0.1]</span><br><span class="line">[certificates] Generated apiserver-kubelet-client certificate and key.</span><br><span class="line">[certificates] Generated sa key and public key.</span><br><span class="line">[certificates] Generated front-proxy-ca certificate and key.</span><br><span class="line">[certificates] Generated front-proxy-client certificate and key.</span><br><span class="line">[certificates] Generated etcd/ca certificate and key.</span><br><span class="line">[certificates] Generated etcd/server certificate and key.</span><br><span class="line">[certificates] etcd/server serving cert is signed for DNS names [opsbase-k8s-master01 localhost opsbase-k8s-master01] and IPs [127.0.0.1 ::1 10.200.112.111]</span><br><span class="line">[certificates] Generated etcd/peer certificate and key.</span><br><span class="line">[certificates] etcd/peer serving cert is signed for DNS names [opsbase-k8s-master01 localhost opsbase-k8s-master01] and IPs [10.200.112.111 127.0.0.1 ::1 10.200.112.111]</span><br><span class="line">[certificates] Generated etcd/healthcheck-client certificate and key.</span><br><span class="line">[certificates] Generated apiserver-etcd-client certificate and key.</span><br><span class="line">[certificates] valid certificates and keys now exist in "/etc/kubernetes/pki"</span><br><span class="line">[endpoint] WARNING: port specified in api.controlPlaneEndpoint overrides api.bindPort in the controlplane address</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: "/etc/kubernetes/admin.conf"</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: "/etc/kubernetes/kubelet.conf"</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: "/etc/kubernetes/controller-manager.conf"</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: "/etc/kubernetes/scheduler.conf"</span><br><span class="line">[controlplane] wrote Static Pod manifest for component kube-apiserver to "/etc/kubernetes/manifests/kube-apiserver.yaml"</span><br><span class="line">[controlplane] wrote Static Pod manifest for component kube-controller-manager to "/etc/kubernetes/manifests/kube-controller-manager.yaml"</span><br><span class="line">[controlplane] wrote Static Pod manifest for component kube-scheduler to "/etc/kubernetes/manifests/kube-scheduler.yaml"</span><br><span class="line">[etcd] Wrote Static Pod manifest for a local etcd instance to "/etc/kubernetes/manifests/etcd.yaml"</span><br><span class="line">[init] waiting for the kubelet to boot up the control plane as Static Pods from directory "/etc/kubernetes/manifests" </span><br><span class="line">[init] this might take a minute or longer if the control plane images have to be pulled</span><br><span class="line">[apiclient] All control plane components are healthy after 41.505348 seconds</span><br><span class="line">[uploadconfig] storing the configuration used in ConfigMap "kubeadm-config" in the "kube-system" Namespace</span><br><span class="line">[kubelet] Creating a ConfigMap "kubelet-config-1.11" in namespace kube-system with the configuration for the kubelets in the cluster</span><br><span class="line">[markmaster] Marking the node opsbase-k8s-master01 as master by adding the label "node-role.kubernetes.io/master=''"</span><br><span class="line">[markmaster] Marking the node opsbase-k8s-master01 as master by adding the taints [node-role.kubernetes.io/master:NoSchedule]</span><br><span class="line">[patchnode] Uploading the CRI Socket information "/var/run/dockershim.sock" to the Node API object "opsbase-k8s-master01" as an annotation</span><br><span class="line">[bootstraptoken] using token: qis1en.sh1k760bz9bei877</span><br><span class="line">[bootstraptoken] configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials</span><br><span class="line">[bootstraptoken] configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token</span><br><span class="line">[bootstraptoken] configured RBAC rules to allow certificate rotation for all node client certificates in the cluster</span><br><span class="line">[bootstraptoken] creating the "cluster-info" ConfigMap in the "kube-public" namespace</span><br><span class="line">[addons] Applied essential addon: CoreDNS</span><br><span class="line">[endpoint] WARNING: port specified in api.controlPlaneEndpoint overrides api.bindPort in the controlplane address</span><br><span class="line">[addons] Applied essential addon: kube-proxy</span><br><span class="line"></span><br><span class="line">Your Kubernetes master has initialized successfully!</span><br><span class="line"></span><br><span class="line">To start using your cluster, you need to run the following as a regular user:</span><br><span class="line"></span><br><span class="line">  mkdir -p $HOME/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"></span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:</span><br><span class="line">  https://kubernetes.io/docs/concepts/cluster-administration/addons/</span><br><span class="line"></span><br><span class="line">You can now join any number of machines by running the following on each node</span><br><span class="line">as root:</span><br><span class="line"></span><br><span class="line">  kubeadm join 10.200.112.110:8443 --token qis1en.sh1k760bz9bei877 --discovery-token-ca-cert-hash sha256:5e2687c96590e28392c193e355cb6000adf7ce35891df4fad5809ca33316b738</span><br></pre></td></tr></table></figure>
+<h3 id="配置使用kubectl"><a href="#配置使用kubectl" class="headerlink" title="配置使用kubectl"></a>配置使用kubectl</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> su - kubernetes</span><br><span class="line"><span class="meta">$</span> mkdir -p $HOME/.kube</span><br><span class="line"><span class="meta">$</span> sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line"><span class="meta">$</span> sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"><span class="meta">$</span> kubectl get pods -n kube-system -o wide</span><br><span class="line">NAME                                           READY     STATUS    RESTARTS   AGE       IP               NODE                   NOMINATED NODE</span><br><span class="line">coredns-78fcdf6894-f2448                       0/1       Pending   0          6m        &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">coredns-78fcdf6894-hlsfn                       0/1       Pending   0          6m        &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master01                      1/1       Running   0          6m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master01            1/1       Running   0          6m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master01   1/1       Running   0          6m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-proxy-gd2p4                               1/1       Running   0          6m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master01            1/1       Running   0          5m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line"><span class="meta">#</span> netstat -lntp</span><br><span class="line">Active Internet connections (only servers)</span><br><span class="line">Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name</span><br><span class="line">tcp        0      0 127.0.0.1:33057         0.0.0.0:*               LISTEN      3049/kubelet</span><br><span class="line">tcp        0      0 127.0.0.1:10248         0.0.0.0:*               LISTEN      3049/kubelet</span><br><span class="line">tcp        0      0 127.0.0.1:10249         0.0.0.0:*               LISTEN      3713/kube-proxy</span><br><span class="line">tcp        0      0 127.0.0.1:10251         0.0.0.0:*               LISTEN      3385/kube-scheduler</span><br><span class="line">tcp        0      0 127.0.0.1:2379          0.0.0.0:*               LISTEN      3349/etcd</span><br><span class="line">tcp        0      0 10.200.112.111:2379     0.0.0.0:*               LISTEN      3349/etcd</span><br><span class="line">tcp        0      0 127.0.0.1:10252         0.0.0.0:*               LISTEN      3342/kube-controlle</span><br><span class="line">tcp        0      0 10.200.112.111:2380     0.0.0.0:*               LISTEN      3349/etcd</span><br><span class="line">tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      1068/sshd</span><br><span class="line">tcp6       0      0 :::8443                 :::*                    LISTEN      1301/docker-proxy</span><br><span class="line">tcp6       0      0 :::10250                :::*                    LISTEN      3049/kubelet</span><br><span class="line">tcp6       0      0 :::6443                 :::*                    LISTEN      3394/kube-apiserver</span><br><span class="line">tcp6       0      0 :::10256                :::*                    LISTEN      3713/kube-proxy</span><br><span class="line">tcp6       0      0 :::22                   :::*                    LISTEN      1068/sshd</span><br></pre></td></tr></table></figure>
+<h3 id="打包相关证书到其他master节点"><a href="#打包相关证书到其他master节点" class="headerlink" title="打包相关证书到其他master节点"></a>打包相关证书到其他master节点</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cd /etc/kubernetes</span><br><span class="line"><span class="meta">#</span> tar zcf k8s-key.tar.gz admin.conf pki/ca.* pki/sa.* pki/front-proxy-ca.* pki/etcd/ca.*</span><br><span class="line"><span class="meta">#</span> scp k8s-key.tar.gz opsbase-k8s-master02:/etc/kubernetes/</span><br><span class="line"><span class="meta">#</span> scp k8s-key.tar.gz opsbase-k8s-master03:/etc/kubernetes/</span><br></pre></td></tr></table></figure>
+<h2 id="k8s-master02"><a href="#k8s-master02" class="headerlink" title="k8s-master02"></a>k8s-master02</h2><h3 id="生成配置文件-1"><a href="#生成配置文件-1" class="headerlink" title="生成配置文件"></a>生成配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cat &gt; /root/k8s-cluster/kubeadm-config.yaml &lt;&lt;EOF</span><br><span class="line">apiVersion: kubeadm.k8s.io/v1alpha2</span><br><span class="line">kind: MasterConfiguration</span><br><span class="line">kubernetesVersion: v1.11.3</span><br><span class="line">apiServerCertSANs:</span><br><span class="line">- "opsbase-k8s-master01"</span><br><span class="line">- "opsbase-k8s-master02"</span><br><span class="line">- "opsbase-k8s-master03"</span><br><span class="line">- "10.200.112.110"</span><br><span class="line">- "10.200.112.111"</span><br><span class="line">- "10.200.112.112"</span><br><span class="line">- "10.200.112.113"</span><br><span class="line">- "127.0.0.1"</span><br><span class="line">api:</span><br><span class="line">  advertiseAddress: 10.200.112.112</span><br><span class="line">  controlPlaneEndpoint: 10.200.112.110:8443</span><br><span class="line">etcd:</span><br><span class="line">  local:</span><br><span class="line">    extraArgs:</span><br><span class="line">      listen-client-urls: "https://127.0.0.1:2379,https://10.200.112.112:2379"</span><br><span class="line">      advertise-client-urls: "https://10.200.112.112:2379"</span><br><span class="line">      listen-peer-urls: "https://10.200.112.112:2380"</span><br><span class="line">      initial-advertise-peer-urls: "https://10.200.112.112:2380"</span><br><span class="line">      initial-cluster: "opsbase-k8s-master01=https://10.200.112.111:2380,opsbase-k8s-master02=https://10.200.112.112:2380"</span><br><span class="line">      initial-cluster-state: existing</span><br><span class="line">    serverCertSANs:</span><br><span class="line">      - opsbase-k8s-master02</span><br><span class="line">      - 10.200.112.112</span><br><span class="line">    peerCertSANs:</span><br><span class="line">      - opsbase-k8s-master02</span><br><span class="line">      - 10.200.112.112</span><br><span class="line">networking:</span><br><span class="line">    podSubnet: "10.244.0.0/16"</span><br><span class="line">kubeProxy:</span><br><span class="line">  config:</span><br><span class="line">    #mode: ipvs</span><br><span class="line">    mode: iptables</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h3 id="配置kubelet"><a href="#配置kubelet" class="headerlink" title="配置kubelet"></a>配置kubelet</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> tar zxf /etc/kubernetes/k8s-key.tar.gz -C /etc/kubernetes/</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase certs all --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase kubelet config write-to-disk --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase kubelet write-env-file --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase kubeconfig kubelet --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> systemctl start kubelet</span><br><span class="line"><span class="meta">#</span> kubectl get pods -n kube-system -o wide</span><br><span class="line">NAME                                           READY     STATUS    RESTARTS   AGE       IP               NODE                   NOMINATED NODE</span><br><span class="line">coredns-78fcdf6894-4q2fs                       0/1       Pending   0          11m       &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">coredns-78fcdf6894-tsql9                       0/1       Pending   0          11m       &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master01                      1/1       Running   0          10m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master01            1/1       Running   0          11m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master01   1/1       Running   0          11m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-proxy-b5p88                               1/1       Running   0          8m        10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-proxy-dz9qq                               1/1       Running   0          11m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master01            1/1       Running   0          11m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="添加etcd到集群中"><a href="#添加etcd到集群中" class="headerlink" title="添加etcd到集群中"></a>添加etcd到集群中</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> export CP0_IP="10.200.112.111"</span><br><span class="line"><span class="meta">#</span> export CP0_HOSTNAME="opsbase-k8s-master01"</span><br><span class="line"><span class="meta">#</span> export CP1_IP="10.200.112.112"</span><br><span class="line"><span class="meta">#</span> export CP1_HOSTNAME="opsbase-k8s-master02"</span><br><span class="line"><span class="meta">#</span> export KUBECONFIG=/etc/kubernetes/admin.conf</span><br><span class="line"><span class="meta">#</span> kubectl exec -n kube-system etcd-$&#123;CP0_HOSTNAME&#125; -- etcdctl --ca-file /etc/kubernetes/pki/etcd/ca.crt --cert-file /etc/kubernetes/pki/etcd/peer.crt --key-file /etc/kubernetes/pki/etcd/peer.key --endpoints=https://$&#123;CP0_IP&#125;:2379 member add $&#123;CP1_HOSTNAME&#125; https://$&#123;CP1_IP&#125;:2380</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase etcd local --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                                           READY     STATUS    RESTARTS   AGE       IP               NODE                   NOMINATED NODE</span><br><span class="line">coredns-78fcdf6894-4q2fs                       0/1       Pending   0          1h        &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">coredns-78fcdf6894-tsql9                       0/1       Pending   0          1h        &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master01                      1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master02                      1/1       Running   0          15s       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master01            1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master01   1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-proxy-b5p88                               1/1       Running   0          1h        10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-proxy-dz9qq                               1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master01            1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="启动master节点服务"><a href="#启动master节点服务" class="headerlink" title="启动master节点服务"></a>启动master节点服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> kubeadm alpha phase kubeconfig all --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase controlplane all --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase mark-master --config /root/k8s-cluster/kubeadm-config.yaml</span><br></pre></td></tr></table></figure>
+<h3 id="配置使用kubectl-可选"><a href="#配置使用kubectl-可选" class="headerlink" title="配置使用kubectl(可选)"></a>配置使用kubectl(可选)</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> su - kubernetes</span><br><span class="line"><span class="meta">$</span> mkdir -p $HOME/.kube</span><br><span class="line"><span class="meta">$</span> sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line"><span class="meta">$</span> sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"><span class="meta">$</span> kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                                           READY     STATUS    RESTARTS   AGE       IP               NODE                   NOMINATED NODE</span><br><span class="line">coredns-78fcdf6894-4q2fs                       0/1       Pending   0          1h        &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">coredns-78fcdf6894-tsql9                       0/1       Pending   0          1h        &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master01                      1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master02                      1/1       Running   0          4m        10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master01            1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master02            1/1       Running   0          1m        10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master01   1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master02   1/1       Running   0          1m        10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-proxy-b5p88                               1/1       Running   0          1h        10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-proxy-dz9qq                               1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master01            1/1       Running   0          1h        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master02            1/1       Running   0          1m        10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="k8s-master03"><a href="#k8s-master03" class="headerlink" title="k8s-master03"></a>k8s-master03</h2><h3 id="生成配置文件-2"><a href="#生成配置文件-2" class="headerlink" title="生成配置文件"></a>生成配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cat &gt; /root/k8s-cluster/kubeadm-config.yaml &lt;&lt;EOF</span><br><span class="line">apiVersion: kubeadm.k8s.io/v1alpha2</span><br><span class="line">kind: MasterConfiguration</span><br><span class="line">kubernetesVersion: v1.11.3</span><br><span class="line">apiServerCertSANs:</span><br><span class="line">- "opsbase-k8s-master01"</span><br><span class="line">- "opsbase-k8s-master02"</span><br><span class="line">- "opsbase-k8s-master03"</span><br><span class="line">- "10.200.112.110"</span><br><span class="line">- "10.200.112.111"</span><br><span class="line">- "10.200.112.112"</span><br><span class="line">- "10.200.112.113"</span><br><span class="line">- "127.0.0.1"</span><br><span class="line">api:</span><br><span class="line">  advertiseAddress: 10.200.112.113</span><br><span class="line">  controlPlaneEndpoint: 10.200.112.110:8443</span><br><span class="line">etcd:</span><br><span class="line">  local:</span><br><span class="line">    extraArgs:</span><br><span class="line">      listen-client-urls: "https://127.0.0.1:2379,https://10.200.112.113:2379"</span><br><span class="line">      advertise-client-urls: "https://10.200.112.113:2379"</span><br><span class="line">      listen-peer-urls: "https://10.200.112.113:2380"</span><br><span class="line">      initial-advertise-peer-urls: "https://10.200.112.113:2380"</span><br><span class="line">      initial-cluster: "opsbase-k8s-master01=https://10.200.112.111:2380,opsbase-k8s-master02=https://10.200.112.112:2380,opsbase-k8s-master03=https://10.200.112.113:2380"</span><br><span class="line">      initial-cluster-state: existing</span><br><span class="line">    serverCertSANs:</span><br><span class="line">      - opsbase-k8s-master03</span><br><span class="line">      - 10.200.112.113</span><br><span class="line">    peerCertSANs:</span><br><span class="line">      - opsbase-k8s-master03</span><br><span class="line">      - 10.200.112.113</span><br><span class="line">networking:</span><br><span class="line">    podSubnet: "10.244.0.0/16"</span><br><span class="line">kubeProxy:</span><br><span class="line">  config:</span><br><span class="line">    #mode: ipvs</span><br><span class="line">    mode: iptables</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h3 id="配置kubelet-1"><a href="#配置kubelet-1" class="headerlink" title="配置kubelet"></a>配置kubelet</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> tar zxf /etc/kubernetes/k8s-key.tar.gz -C /etc/kubernetes/</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase certs all --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase kubelet config write-to-disk --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase kubelet write-env-file --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase kubeconfig kubelet --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> systemctl start kubelet</span><br></pre></td></tr></table></figure>
+<h3 id="添加etcd到集群中-1"><a href="#添加etcd到集群中-1" class="headerlink" title="添加etcd到集群中"></a>添加etcd到集群中</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> export CP0_IP="10.200.112.111"</span><br><span class="line"><span class="meta">#</span> export CP0_HOSTNAME="opsbase-k8s-master01"</span><br><span class="line"><span class="meta">#</span> export CP2_IP="10.200.112.113"</span><br><span class="line"><span class="meta">#</span> export CP2_HOSTNAME="opsbase-k8s-master03"</span><br><span class="line"><span class="meta">#</span> export KUBECONFIG=/etc/kubernetes/admin.conf</span><br><span class="line"><span class="meta">#</span> kubectl exec -n kube-system etcd-$&#123;CP0_HOSTNAME&#125; -- etcdctl --ca-file /etc/kubernetes/pki/etcd/ca.crt --cert-file /etc/kubernetes/pki/etcd/peer.crt --key-file /etc/kubernetes/pki/etcd/peer.key --endpoints=https://$&#123;CP0_IP&#125;:2379 member add $&#123;CP2_HOSTNAME&#125; https://$&#123;CP2_IP&#125;:2380</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase etcd local --config /root/k8s-cluster/kubeadm-config.yaml</span><br></pre></td></tr></table></figure>
+<h3 id="启动master节点服务-1"><a href="#启动master节点服务-1" class="headerlink" title="启动master节点服务"></a>启动master节点服务</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> kubeadm alpha phase kubeconfig all --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase controlplane all --config /root/k8s-cluster/kubeadm-config.yaml</span><br><span class="line"><span class="meta">#</span> kubeadm alpha phase mark-master --config /root/k8s-cluster/kubeadm-config.yaml</span><br></pre></td></tr></table></figure>
+<h3 id="配置使用kubectl-可选-1"><a href="#配置使用kubectl-可选-1" class="headerlink" title="配置使用kubectl(可选)"></a>配置使用kubectl(可选)</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> su - kubernetes</span><br><span class="line"><span class="meta">$</span> mkdir -p $HOME/.kube</span><br><span class="line"><span class="meta">$</span> sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line"><span class="meta">$</span> sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"><span class="meta">$</span> kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                                           READY     STATUS    RESTARTS   AGE       IP               NODE                   NOMINATED NODE</span><br><span class="line">coredns-78fcdf6894-4q2fs                       0/1       Pending   0          14h       &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">coredns-78fcdf6894-tsql9                       0/1       Pending   0          14h       &lt;none&gt;           &lt;none&gt;                 &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master01                      1/1       Running   0          14h       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master02                      1/1       Running   0          13h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master03                      1/1       Running   0          1m        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master01            1/1       Running   0          14h       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master02            1/1       Running   0          13h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master03            1/1       Running   0          19s       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master01   1/1       Running   0          14h       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master02   1/1       Running   0          13h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master03   1/1       Running   0          19s       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-proxy-b5p88                               1/1       Running   0          14h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-proxy-dz9qq                               1/1       Running   0          14h       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-proxy-vppm4                               1/1       Running   0          13h       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master01            1/1       Running   0          14h       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master02            1/1       Running   0          13h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master03            1/1       Running   0          19s       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="部署Pod网络（Fannel）-any-master"><a href="#部署Pod网络（Fannel）-any-master" class="headerlink" title="部署Pod网络（Fannel）[any master]"></a>部署Pod网络（Fannel）<code>[any master]</code></h1><blockquote>
+<p>确保Pod网络的<code>Network</code>与kubeadm配置的<code>podSubnet</code>一致</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">$ wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br><span class="line">$ grep -w Network kube-flannel.yml</span><br><span class="line">      &quot;Network&quot;: &quot;10.244.0.0/16&quot;,</span><br><span class="line">$ kubectl apply -f kube-flannel.yml</span><br><span class="line">clusterrole.rbac.authorization.k8s.io/flannel created</span><br><span class="line">clusterrolebinding.rbac.authorization.k8s.io/flannel created</span><br><span class="line">serviceaccount/flannel created</span><br><span class="line">configmap/kube-flannel-cfg created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-amd64 created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-arm64 created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-arm created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-ppc64le created</span><br><span class="line">daemonset.extensions/kube-flannel-ds-s390x created</span><br><span class="line">$ kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                                           READY     STATUS    RESTARTS   AGE       IP               NODE                   NOMINATED NODE</span><br><span class="line">coredns-78fcdf6894-4q2fs                       1/1       Running   0          17h       10.244.1.3       opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">coredns-78fcdf6894-tsql9                       1/1       Running   0          17h       10.244.1.2       opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master01                      1/1       Running   0          1m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master02                      1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master03                      1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master01            1/1       Running   0          1m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master02            1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master03            1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master01   1/1       Running   0          1m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master02   1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master03   1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-flannel-ds-amd64-2sgds                    1/1       Running   0          13m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-flannel-ds-amd64-htzbs                    1/1       Running   0          13m       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-flannel-ds-amd64-vh52z                    1/1       Running   0          13m       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-proxy-b5p88                               1/1       Running   0          17h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-proxy-dz9qq                               1/1       Running   0          17h       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-proxy-vppm4                               1/1       Running   0          16h       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master01            1/1       Running   0          1m        10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master02            1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master03            1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">$ kubectl get node</span><br><span class="line">NAME                   STATUS    ROLES     AGE       VERSION</span><br><span class="line">opsbase-k8s-master01   Ready     master    17h       v1.11.3</span><br><span class="line">opsbase-k8s-master02   Ready     master    17h       v1.11.3</span><br><span class="line">opsbase-k8s-master03   Ready     master    16h       v1.11.3</span><br></pre></td></tr></table></figure>
+<h1 id="部署node节点-node"><a href="#部署node节点-node" class="headerlink" title="部署node节点[node]"></a>部署node节点<code>[node]</code></h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> kubeadm join 10.200.112.110:8443 --token qis1en.sh1k760bz9bei877 --discovery-token-ca-cert-hash sha256:5e2687c96590e28392c193e355cb6000adf7ce35891df4fad5809ca33316b738</span><br><span class="line">[preflight] running pre-flight checks</span><br><span class="line">I1019 11:19:23.210371    2182 kernel_validator.go:81] Validating kernel version</span><br><span class="line">I1019 11:19:23.210598    2182 kernel_validator.go:96] Validating kernel config</span><br><span class="line">        [WARNING SystemVerification]: docker version is greater than the most recently validated version. Docker version: 18.03.1-ce. Max validated version: 17.03</span><br><span class="line">[discovery] Trying to connect to API Server "10.200.112.110:8443"</span><br><span class="line">[discovery] Created cluster-info discovery client, requesting info from "https://10.200.112.110:8443"</span><br><span class="line">[discovery] Requesting info from "https://10.200.112.110:8443" again to validate TLS against the pinned public key</span><br><span class="line">[discovery] Cluster info signature and contents are valid and TLS certificate validates against pinned roots, will use API Server "10.200.112.110:8443"</span><br><span class="line">[discovery] Successfully established connection with API Server "10.200.112.110:8443"</span><br><span class="line">[kubelet] Downloading configuration for the kubelet from the "kubelet-config-1.11" ConfigMap in the kube-system namespace</span><br><span class="line">[kubelet] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"</span><br><span class="line">[kubelet] Writing kubelet environment file with flags to file "/var/lib/kubelet/kubeadm-flags.env"</span><br><span class="line">[preflight] Activating the kubelet service</span><br><span class="line">[tlsbootstrap] Waiting for the kubelet to perform the TLS Bootstrap...</span><br><span class="line">[patchnode] Uploading the CRI Socket information "/var/run/dockershim.sock" to the Node API object "opsbase-k8s-node01" as an annotation</span><br><span class="line"></span><br><span class="line">This node has joined the cluster:</span><br><span class="line">* Certificate signing request was sent to master and a response</span><br><span class="line">  was received.</span><br><span class="line">* The Kubelet was informed of the new secure connection details.</span><br><span class="line"></span><br><span class="line">Run 'kubectl get nodes' on the master to see this node join the cluster.</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get node</span><br><span class="line">NAME                   STATUS    ROLES     AGE       VERSION</span><br><span class="line">opsbase-k8s-master01   Ready     master    17h       v1.11.3</span><br><span class="line">opsbase-k8s-master02   Ready     master    17h       v1.11.3</span><br><span class="line">opsbase-k8s-master03   Ready     master    16h       v1.11.3</span><br><span class="line">opsbase-k8s-node01     Ready     &lt;none&gt;    1m        v1.11.3</span><br><span class="line">$  kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                                           READY     STATUS    RESTARTS   AGE       IP               NODE                   NOMINATED NODE</span><br><span class="line">coredns-78fcdf6894-4q2fs                       1/1       Running   0          17h       10.244.1.3       opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">coredns-78fcdf6894-tsql9                       1/1       Running   0          17h       10.244.1.2       opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master01                      1/1       Running   0          23m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master02                      1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">etcd-opsbase-k8s-master03                      1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master01            1/1       Running   0          23m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master02            1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-apiserver-opsbase-k8s-master03            1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master01   1/1       Running   0          23m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master02   1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-controller-manager-opsbase-k8s-master03   1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-flannel-ds-amd64-2sgds                    1/1       Running   0          35m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-flannel-ds-amd64-htzbs                    1/1       Running   0          35m       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-flannel-ds-amd64-rn8kj                    1/1       Running   4          5m        10.200.112.114   opsbase-k8s-node01     &lt;none&gt;</span><br><span class="line">kube-flannel-ds-amd64-vh52z                    1/1       Running   0          35m       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-proxy-5st7w                               1/1       Running   0          5m        10.200.112.114   opsbase-k8s-node01     &lt;none&gt;</span><br><span class="line">kube-proxy-b5p88                               1/1       Running   0          17h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-proxy-dz9qq                               1/1       Running   0          17h       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-proxy-vppm4                               1/1       Running   0          16h       10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master01            1/1       Running   0          23m       10.200.112.111   opsbase-k8s-master01   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master02            1/1       Running   0          16h       10.200.112.112   opsbase-k8s-master02   &lt;none&gt;</span><br><span class="line">kube-scheduler-opsbase-k8s-master03            1/1       Running   0          2h        10.200.112.113   opsbase-k8s-master03   &lt;none&gt;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+            <a href="/tags/kubernetes/" rel="tag"># kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/openstack-nova-nested/" rel="next" title="openstack中启用虚拟机嵌套">
+                <i class="fa fa-chevron-left"></i> openstack中启用虚拟机嵌套
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/09/gitbook-document/" rel="prev" title="使用gitbook+gitlab构建文档中心">
+                使用gitbook+gitlab构建文档中心 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#部署方案"><span class="nav-number">1.</span> <span class="nav-text">部署方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#openstack上创建实例"><span class="nav-number">1.1.</span> <span class="nav-text">openstack上创建实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#openstack上禁用master节点的安全组"><span class="nav-number">1.2.</span> <span class="nav-text">openstack上禁用master节点的安全组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#环境准备-all-node"><span class="nav-number">2.</span> <span class="nav-text">环境准备[all_node]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#版本信息"><span class="nav-number">2.1.</span> <span class="nav-text">版本信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置docker-http代理"><span class="nav-number">2.2.</span> <span class="nav-text">配置docker http代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装所需软件"><span class="nav-number">2.3.</span> <span class="nav-text">安装所需软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开启ipvs"><span class="nav-number">2.4.</span> <span class="nav-text">开启ipvs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取所需docker镜像"><span class="nav-number">2.5.</span> <span class="nav-text">获取所需docker镜像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过kubeadm获取基础组件镜像清单"><span class="nav-number">2.5.1.</span> <span class="nav-text">通过kubeadm获取基础组件镜像清单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过kubeadm拉取基础镜像"><span class="nav-number">2.5.2.</span> <span class="nav-text">通过kubeadm拉取基础镜像</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置nginx和keepalived-master"><span class="nav-number">3.</span> <span class="nav-text">配置nginx和keepalived[master]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx"><span class="nav-number">3.1.</span> <span class="nav-text">nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#keepalived"><span class="nav-number">3.2.</span> <span class="nav-text">keepalived</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置master-master"><span class="nav-number">4.</span> <span class="nav-text">配置master[master]</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#k8s-master01"><span class="nav-number">4.1.</span> <span class="nav-text">k8s-master01</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成配置文件"><span class="nav-number">4.1.1.</span> <span class="nav-text">生成配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化kubernetes集群"><span class="nav-number">4.1.2.</span> <span class="nav-text">初始化kubernetes集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置使用kubectl"><span class="nav-number">4.1.3.</span> <span class="nav-text">配置使用kubectl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#打包相关证书到其他master节点"><span class="nav-number">4.1.4.</span> <span class="nav-text">打包相关证书到其他master节点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#k8s-master02"><span class="nav-number">4.2.</span> <span class="nav-text">k8s-master02</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成配置文件-1"><span class="nav-number">4.2.1.</span> <span class="nav-text">生成配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kubelet"><span class="nav-number">4.2.2.</span> <span class="nav-text">配置kubelet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加etcd到集群中"><span class="nav-number">4.2.3.</span> <span class="nav-text">添加etcd到集群中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动master节点服务"><span class="nav-number">4.2.4.</span> <span class="nav-text">启动master节点服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置使用kubectl-可选"><span class="nav-number">4.2.5.</span> <span class="nav-text">配置使用kubectl(可选)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#k8s-master03"><span class="nav-number">4.3.</span> <span class="nav-text">k8s-master03</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生成配置文件-2"><span class="nav-number">4.3.1.</span> <span class="nav-text">生成配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置kubelet-1"><span class="nav-number">4.3.2.</span> <span class="nav-text">配置kubelet</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加etcd到集群中-1"><span class="nav-number">4.3.3.</span> <span class="nav-text">添加etcd到集群中</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动master节点服务-1"><span class="nav-number">4.3.4.</span> <span class="nav-text">启动master节点服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置使用kubectl-可选-1"><span class="nav-number">4.3.5.</span> <span class="nav-text">配置使用kubectl(可选)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署Pod网络（Fannel）-any-master"><span class="nav-number">5.</span> <span class="nav-text">部署Pod网络（Fannel）[any master]</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署node节点-node"><span class="nav-number">6.</span> <span class="nav-text">部署node节点[node]</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,2496 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="openstack docker devops">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vnimos&#39;s blog">
+<meta property="og:url" content="http://www.vnimos.cn/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="openstack docker devops">
+<meta property="og:locale" content="zh-Hans">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vnimos&#39;s blog">
+<meta name="twitter:description" content="openstack docker devops">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/"/>
+
+
+
+
+
+	  <title>Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+   page-home 
+ ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+  <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/11/09/gitbook-document/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/11/09/gitbook-document/" itemprop="url">使用gitbook+gitlab构建文档中心</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-09T16:32:01+08:00">
+                2018-11-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cicd/" itemprop="url" rel="index">
+                    <span itemprop="name">cicd</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/11/09/gitbook-document/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/11/09/gitbook-document/" class="cy_cmt_count" data-xid="2018/11/09/gitbook-document/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/11/09/gitbook-document/" class="leancloud_visitors" data-flag-title="使用gitbook+gitlab构建文档中心">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="文档中心"><a href="#文档中心" class="headerlink" title="文档中心"></a>文档中心</h1><h2 id="实现要求"><a href="#实现要求" class="headerlink" title="实现要求"></a>实现要求</h2><blockquote>
+<p>在gitlab上创建一个project <code>&quot;document&quot;</code>，用于指定需要通过gitbook构建的project文档，实现自动拉取gitlab上需要构建的project，并通过gitbook对每个project文档生成一本书。其中document中创建一个config的配置文件，格式如下</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#  git项目路径                          项目分支        文档名称            文档分类路径</span><br><span class="line">git@gitlab.xxx.com:&lt;project1&gt;.git      master         &lt;document1_name&gt;     项目文档</span><br><span class="line">git@gitlab.xxx.com:&lt;project2&gt;.git      master         &lt;document2_name&gt;     接口文档</span><br></pre></td></tr></table></figure>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><blockquote>
+<p>通过以下shell脚本将获取config文件的配置，并自动循环拉取gitlab中的指定文档，若文档有更新则自动通过<code>gitbook build</code>构建成一本书，并通过<code>rsync</code>同步到”文档分类路径”中指定的路径下，通过<code>nginx</code>发布web页面（避免build过程中导致页面无法访问）。同时，在构建每一本书的时候会自动按照文档分类将该书的链接添加到<code>summary/README.md</code>文件中，用于生成首页。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/sh</span><br><span class="line">DOCUMENT_CONFIG_DIR=document</span><br><span class="line">DOCUMENT_REPO=git@gitlab.xxx.com:server/document.git</span><br><span class="line"></span><br><span class="line">NUM=1</span><br><span class="line">DOCUMENT_GIT_DIR=`pwd`</span><br><span class="line">DOCUMENT_BUILD_DIR="/home/gitlab-runner/gitbook_build"</span><br><span class="line">DOCUMENT_DIR="/home/gitlab-runner/gitbook"</span><br><span class="line"></span><br><span class="line">index_init()&#123;</span><br><span class="line"><span class="meta">&gt;</span> $DOCUMENT_GIT_DIR/summary/README.md</span><br><span class="line">for i in `grep -v ^"#" $DOCUMENT_CONFIG_DIR/config|grep -v ^"$"|awk '&#123;print $NF&#125;'|uniq`</span><br><span class="line">do</span><br><span class="line">    echo "# $i" &gt;&gt; $DOCUMENT_GIT_DIR/summary/README.md</span><br><span class="line">    echo "" &gt;&gt; $DOCUMENT_GIT_DIR/summary/README.md</span><br><span class="line">done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">books_build_sync()&#123;</span><br><span class="line">cd $DOCUMENT_GIT_DIR</span><br><span class="line">for dir in `grep -v ^"#" $DOCUMENT_CONFIG_DIR/config|grep -v ^"$" |awk -F[./] '&#123;print $4&#125;'`</span><br><span class="line">do</span><br><span class="line">    cd $DOCUMENT_GIT_DIR</span><br><span class="line">    git_repo=`grep -w $dir $DOCUMENT_CONFIG_DIR/config | awk '&#123;print $1&#125;'`</span><br><span class="line">    branch=`grep -w $dir $DOCUMENT_CONFIG_DIR/config | awk '&#123;print $2&#125;'`</span><br><span class="line">    title=`grep -w $dir $DOCUMENT_CONFIG_DIR/config | awk '&#123;print $3&#125;'`</span><br><span class="line">    location=`grep -w $dir $DOCUMENT_CONFIG_DIR/config | awk '&#123;print $4&#125;'`</span><br><span class="line">    domain=`grep -w $dir $DOCUMENT_CONFIG_DIR/config |awk -F [@:] '&#123;print $2&#125;'`</span><br><span class="line">    project=`grep -w $dir $DOCUMENT_CONFIG_DIR/config |awk -F [:/] '&#123;print $2"/"$3&#125;'|awk -F. '&#123;print $1&#125;'`</span><br><span class="line"></span><br><span class="line">    if [ ! -d "$dir" ];then</span><br><span class="line">        git clone -b $branch $git_repo</span><br><span class="line">    else</span><br><span class="line">        cd $dir &amp;&amp; git pull origin</span><br><span class="line">    fi</span><br><span class="line">    ###sh book_gen.sh</span><br><span class="line">cat &gt; $DOCUMENT_GIT_DIR/$dir/book.json &lt;&lt;EOF</span><br><span class="line">&#123;</span><br><span class="line">    "title": "$dir",</span><br><span class="line">    "description": "$dir",</span><br><span class="line">    "author": "vnimos",</span><br><span class="line">    "output.name": "site",</span><br><span class="line">    "language": "zh-hans",</span><br><span class="line">    "gitbook": "3.2.3",</span><br><span class="line">    "root": ".",</span><br><span class="line">    "links": &#123;</span><br><span class="line">        "sidebar": &#123;</span><br><span class="line">            "Home": "http://docs.xxx.com"</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    "plugins": [</span><br><span class="line">        "-lunr",</span><br><span class="line">        "-highlight",</span><br><span class="line">        "-livereload",</span><br><span class="line">        "-search",</span><br><span class="line">        "search-plus",</span><br><span class="line">        "highlight-code",</span><br><span class="line">        "alerts",</span><br><span class="line">        "terminal",</span><br><span class="line">        "code",</span><br><span class="line">        "expandable-chapters",</span><br><span class="line">        "anchor-navigation-ex",</span><br><span class="line">        "edit-link",</span><br><span class="line">        "splitter"</span><br><span class="line">    ],</span><br><span class="line">    "pluginsConfig": &#123;</span><br><span class="line">        "terminal": &#123;</span><br><span class="line">            "copyButtons": false,</span><br><span class="line">            "fade": true,</span><br><span class="line">            "style": "flat"</span><br><span class="line">        &#125;,</span><br><span class="line">        "code": &#123;</span><br><span class="line">            "copyButtons": true</span><br><span class="line">        &#125;,</span><br><span class="line">        "edit-link": &#123;</span><br><span class="line">            "base": "http://$domain/$project/edit/$branch",</span><br><span class="line">            "label": "编辑此页"</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">    export BOOK$&#123;NUM&#125;_GIT_DIR="$DOCUMENT_GIT_DIR/$dir"</span><br><span class="line">    export BOOK$&#123;NUM&#125;_BUILD_DIR="$DOCUMENT_BUILD_DIR/$location/$dir"</span><br><span class="line">    export BOOK$&#123;NUM&#125;_DIR="$DOCUMENT_DIR/$location/$dir"</span><br><span class="line"></span><br><span class="line">    if eval [ ! -d '$'"BOOK$&#123;NUM&#125;_BUILD_DIR" ];then</span><br><span class="line">        eval mkdir -p '$'"BOOK$&#123;NUM&#125;_BUILD_DIR"</span><br><span class="line">    fi</span><br><span class="line">    if eval [ ! -d '$'"BOOK$&#123;NUM&#125;_DIR" ];then</span><br><span class="line">        eval mkdir -p '$'"BOOK$&#123;NUM&#125;_DIR"</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    # build book if found new files appear in 6 seconds</span><br><span class="line">    export change$&#123;NUM&#125;=`eval find '$'"BOOK$&#123;NUM&#125;_GIT_DIR" -type f -mmin -0.1 ! -name "SUMMARY.md" ! -name "FETCH_HEAD" ! -name book.json |wc -l`</span><br><span class="line">    if eval [ '$'"change$&#123;NUM&#125;" -ne 0 ];then</span><br><span class="line">        echo -e "\033[33m==== Begin to build $dir ====\033[0m"</span><br><span class="line">        eval cd '$'"BOOK$&#123;NUM&#125;_GIT_DIR"</span><br><span class="line">        mv SUMMARY.md SUMMARY.md_bak &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">        /usr/bin/book sm</span><br><span class="line"></span><br><span class="line">        # delete catalog of node_module for SUMMARY.md</span><br><span class="line">        line1=`grep -n "\- Node Modules" SUMMARY.md |head -1 |awk -F: '&#123;print $1&#125;'`</span><br><span class="line">        line2=`grep -n node_modules SUMMARY.md |tail -1|awk -F: '&#123;print $1&#125;'`</span><br><span class="line">        if [ -n "$line1" -a -n "$line2" ];then</span><br><span class="line">            /usr/bin/sed -i "$&#123;line1&#125;,$&#123;line2&#125;d" SUMMARY.md</span><br><span class="line">        fi</span><br><span class="line"></span><br><span class="line">        # add CHANGELOG </span><br><span class="line">        /bin/git log --graph -n 50 --pretty="[%cd] - &lt;%an&gt; %s" &gt; CHANGELOG.md</span><br><span class="line">        sed -i "2a * [CHANGELOG](CHANGELOG.md)" SUMMARY.md</span><br><span class="line"></span><br><span class="line">        # copy node_modules if it is not exist</span><br><span class="line">        if eval [ ! -d "node_modules" ];then</span><br><span class="line">            /bin/cp -rp ~/node_modules/ .</span><br><span class="line">        fi</span><br><span class="line"></span><br><span class="line">        # build book and sync to web for nginx</span><br><span class="line">        eval rm -rf '$'"BOOK$&#123;NUM&#125;_BUILD_DIR"</span><br><span class="line">        eval /usr/bin/gitbook build '$'"BOOK$&#123;NUM&#125;_GIT_DIR" '$'"BOOK$&#123;NUM&#125;_BUILD_DIR"</span><br><span class="line">        echo -e "\033[33m==== Begin to sync $dir ====\033[0m"</span><br><span class="line">        eval /usr/bin/rsync -avz '$'"BOOK$&#123;NUM&#125;_BUILD_DIR/" '$'"BOOK$&#123;NUM&#125;_DIR" &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">    else</span><br><span class="line">        echo -e "\033[32m==== Skip to build $dir ====\033[0m"</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    # add catalog to index according to class for book</span><br><span class="line">    line_title=`grep -n "# $location" $DOCUMENT_GIT_DIR/summary/README.md |awk -F: '&#123;print $1&#125;'`</span><br><span class="line">    sed -i "$&#123;line_title&#125;a - [$title]($location/$dir/index.html)" $DOCUMENT_GIT_DIR/summary/README.md</span><br><span class="line"></span><br><span class="line">    NUM=`expr $NUM + 1`</span><br><span class="line">done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">summary_build()&#123;</span><br><span class="line">echo -e "\033[33m==== Begin to build summary ====\033[0m"</span><br><span class="line">cd $DOCUMENT_GIT_DIR</span><br><span class="line">/usr/bin/sed -i 's/.md/.html/' ./summary/README.md</span><br><span class="line"></span><br><span class="line">/usr/bin/gitbook build ./summary $DOCUMENT_DIR/summary/</span><br><span class="line">ln -sf $DOCUMENT_DIR/summary/* $DOCUMENT_DIR/</span><br><span class="line">&#125;</span><br><span class="line">index_init</span><br><span class="line">books_build_sync</span><br><span class="line">summary_build</span><br></pre></td></tr></table></figure>
+<h2 id="实现效果"><a href="#实现效果" class="headerlink" title="实现效果"></a>实现效果</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#  git项目路径                                    项目分支        文档名称            文档分类路径</span><br><span class="line">git@gitlab.xxx.com:server/smServer-API.git         master       smServer-API         接口文档</span><br><span class="line">git@gitlab.xxx.com:server/openapi.git              master       YMS-OpenAPI          接口文档</span><br><span class="line">git@gitlab.xxx.com:server/Apollo-SS-API.git        master       会议管理              接口文档</span><br><span class="line">git@gitlab.xxx.com:server/conference-apidoc.git    master       Web后端接口文档       接口文档</span><br><span class="line">git@gitlab.xxx.com:server-ss/common.git            master       SIP文档               模块文档</span><br><span class="line">git@gitlab.xxx.com:server/document_example.git     master       文档项目说明          其它文档</span><br></pre></td></tr></table></figure>
+<p><img src="/images/devops/gitbook-document.png" alt=""></p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/10/19/k8s-ha-kubeadm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/19/k8s-ha-kubeadm/" itemprop="url">使用kubeadm部署Kubernetes1.11.3 HA</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-19T11:35:01+08:00">
+                2018-10-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/10/19/k8s-ha-kubeadm/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/10/19/k8s-ha-kubeadm/" class="cy_cmt_count" data-xid="2018/10/19/k8s-ha-kubeadm/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/10/19/k8s-ha-kubeadm/" class="leancloud_visitors" data-flag-title="使用kubeadm部署Kubernetes1.11.3 HA">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>在完成<a href="https://vnimos.cn/2017/12/14/docker-http-proxy/" title="科学上网" target="_blank" rel="noopener">科学上网</a>的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。</p>
+</blockquote>
+<h1 id="部署方案"><a href="#部署方案" class="headerlink" title="部署方案"></a>部署方案</h1><table>
+<thead>
+<tr>
+<th>hostname</th>
+<th>IP</th>
+<th>角色</th>
+<th>组件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k8s-master01</td>
+<td>10.200.112.111</td>
+<td>master</td>
+<td>keepalived、nginx、etcd、kubelet、kube-apiserver</td>
+</tr>
+<tr>
+<td>k8s-master02</td>
+<td>10.200.112.112</td>
+<td>master</td>
+<td>keepalived、nginx、etcd、kubelet、kube-apiserver</td>
+</tr>
+<tr>
+<td>k8s-master03</td>
+<td>10.200.112.113</td>
+<td>master</td>
+<td>keepalived、nginx、etcd、kubelet、kube-apiserver</td>
+</tr>
+<tr>
+<td>k8s-node01</td>
+<td>10.200.112.114</td>
+<td>node</td>
+<td>kubelet、kube-proxy</td>
+</tr>
+<tr>
+<td></td>
+<td>10.200.112.100</td>
+<td>master-vip</td>
+<td>无</td>
+</tr>
+</tbody>
+</table>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/10/19/k8s-ha-kubeadm/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/10/16/openstack-nova-nested/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/16/openstack-nova-nested/" itemprop="url">openstack中启用虚拟机嵌套</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-16T18:20:24+08:00">
+                2018-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/10/16/openstack-nova-nested/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/10/16/openstack-nova-nested/" class="cy_cmt_count" data-xid="2018/10/16/openstack-nova-nested/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/10/16/openstack-nova-nested/" class="leancloud_visitors" data-flag-title="openstack中启用虚拟机嵌套">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="检查系统是否支持nested"><a href="#检查系统是否支持nested" class="headerlink" title="检查系统是否支持nested"></a>检查系统是否支持nested</h1><blockquote>
+<p><code>nested</code>参数值为N，表示内核支持虚拟机嵌套，但未启用。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> lsmod|grep kvm</span><br><span class="line">kvm_intel             204800  0 </span><br><span class="line">kvm                   626688  1 kvm_intel</span><br><span class="line">irqbypass              16384  1 kvm</span><br><span class="line"><span class="meta">#</span> systool -m kvm_intel -A nested</span><br><span class="line">Module = "kvm_intel"</span><br><span class="line"></span><br><span class="line">    nested              = "N"</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/10/16/openstack-nova-nested/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/29/openstack-cinder-lvm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/29/openstack-cinder-lvm/" itemprop="url">Openstack使用LVM作为后端存储</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-29T15:31:12+08:00">
+                2018-09-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/09/29/openstack-cinder-lvm/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/09/29/openstack-cinder-lvm/" class="cy_cmt_count" data-xid="2018/09/29/openstack-cinder-lvm/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/09/29/openstack-cinder-lvm/" class="leancloud_visitors" data-flag-title="Openstack使用LVM作为后端存储">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="LVM作为libvirt存储池"><a href="#LVM作为libvirt存储池" class="headerlink" title="LVM作为libvirt存储池"></a>LVM作为libvirt存储池</h1><h2 id="创建VG"><a href="#创建VG" class="headerlink" title="创建VG"></a>创建VG</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> pvcreate /dev/sdc1</span><br><span class="line"><span class="meta">#</span> vgcreate libvirt /dev/sdc1</span><br></pre></td></tr></table></figure>
+<h2 id="libvirt中添加VG作为storage-pool"><a href="#libvirt中添加VG作为storage-pool" class="headerlink" title="libvirt中添加VG作为storage pool"></a>libvirt中添加VG作为storage pool</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># vi /etc/libvirt/storage/LVM.xml</span><br><span class="line"><span class="tag">&lt;<span class="name">pool</span> <span class="attr">type</span>=<span class="string">'logical'</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">name</span>&gt;</span>LVM<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">source</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>libvirt<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">format</span> <span class="attr">type</span>=<span class="string">'lvm2'</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">source</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">target</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">path</span>&gt;</span>/dev/libvirt<span class="tag">&lt;/<span class="name">path</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">target</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">pool</span>&gt;</span></span><br><span class="line"># virsh pool-define /etc/libvirt/storage/LVM.xml</span><br><span class="line"># virsh pool-start LVM</span><br><span class="line"># virsh pool-list</span><br><span class="line"> Name                 State      Autostart</span><br><span class="line">-------------------------------------------</span><br><span class="line"> default              active     yes</span><br><span class="line"> LVM                  active     no</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/29/openstack-cinder-lvm/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/28/vmware-mirgate-to-openstack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/28/vmware-mirgate-to-openstack/" itemprop="url">迁移exsi下的虚拟机到openstack</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-28T16:33:10+08:00">
+                2018-09-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/09/28/vmware-mirgate-to-openstack/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/09/28/vmware-mirgate-to-openstack/" class="cy_cmt_count" data-xid="2018/09/28/vmware-mirgate-to-openstack/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/09/28/vmware-mirgate-to-openstack/" class="leancloud_visitors" data-flag-title="迁移exsi下的虚拟机到openstack">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="检查virtio驱动"><a href="#检查virtio驱动" class="headerlink" title="检查virtio驱动"></a>检查virtio驱动</h1><ul>
+<li>检查虚拟机内核是否支持virtio驱动</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> grep -E -i "VIRTIO_BLK|VIRTIO_NET" /boot/config-$(uname -r)</span><br><span class="line">CONFIG_VIRTIO_BLK=m</span><br><span class="line">CONFIG_VIRTIO_NET=m</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>如果在输出信息中没有找到VIRTIO_BLK及VIRTIO_NET的信息，表示该操作系统没有安装virtio相关驱动，需要编译安装virtio驱动</li>
+<li>如果参数<strong><code>CONFIG_VIRTIO_BLK</code></strong>及<strong><code>CONFIG_VIRTIO_NET</code></strong>取值为y，表示包含了virtio驱动，可直接迁移到kvm环境</li>
+<li>如果参数<strong>CONFIG_VIRTIO_BLK</strong>及<strong>CONFIG_VIRTIO_NET</strong>取值为m，需要检查virtio驱动是否加入initramfs，否则需要修复initramfs</li>
+</ul>
+</blockquote>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/28/vmware-mirgate-to-openstack/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/27/openstack-nova-metadata-userdata/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/27/openstack-nova-metadata-userdata/" itemprop="url">Openstack metadata和userdata</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-27T18:49:10+08:00">
+                2018-09-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/09/27/openstack-nova-metadata-userdata/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/09/27/openstack-nova-metadata-userdata/" class="cy_cmt_count" data-xid="2018/09/27/openstack-nova-metadata-userdata/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/09/27/openstack-nova-metadata-userdata/" class="leancloud_visitors" data-flag-title="Openstack metadata和userdata">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="Metadata"><a href="#Metadata" class="headerlink" title="Metadata"></a>Metadata</h1><blockquote>
+<p><code>metadate service</code>最早概念是AWS提出的，通过该服务可以为虚拟机提供元数据，包含虚拟机id、主机名、密钥、IP地址、用户自定义脚本等。</p>
+</blockquote>
+<p>在OpenStack中，虚拟机获取 Metadata 信息的方式有两种：<code>Config drive</code>和<code>metadata RESTful</code>服务。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/27/openstack-nova-metadata-userdata/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/27/openstack-nova-action/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/27/openstack-nova-action/" itemprop="url">Openstack实例操作</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-27T15:43:10+08:00">
+                2018-09-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/09/27/openstack-nova-action/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/09/27/openstack-nova-action/" class="cy_cmt_count" data-xid="2018/09/27/openstack-nova-action/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/09/27/openstack-nova-action/" class="leancloud_visitors" data-flag-title="Openstack实例操作">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="snapshot（快照）"><a href="#snapshot（快照）" class="headerlink" title="snapshot（快照）"></a>snapshot（快照）</h1><blockquote>
+<p><strong><code>Snapshot</code></strong> 的工作原理是对实例的镜像文件（backing_file + instance_disk）进行全量备份，生成一个类型为 snapshot的image，然后将其保存到Glance上。</p>
+</blockquote>
+<p>目前OpenStack支持cold snapshot和live snapshot。创建cold snapshot之前会关闭实例，创建完成后开启实例。</p>
+<ul>
+<li><p>创建snapshot</p>
+<blockquote>
+<p>创建snapshot是通过<code>qemu-img convert -f qcow2 -O qcow2</code>命令完成</p>
+</blockquote>
+</li>
+<li><p>上传image到glance</p>
+</li>
+</ul>
+<p>若创建的实例是<code>boot from volume</code>，则可以利用块设备提供的基于指针的 volume snapshot 功能，不会真正拷贝数据（快照大小为0），通常一瞬间就完成，对业务几乎没有影响。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/27/openstack-nova-action/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/26/openstack-nova-migrate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/26/openstack-nova-migrate/" itemprop="url">Openstack实例迁移</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-26T17:04:12+08:00">
+                2018-09-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/09/26/openstack-nova-migrate/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/09/26/openstack-nova-migrate/" class="cy_cmt_count" data-xid="2018/09/26/openstack-nova-migrate/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/09/26/openstack-nova-migrate/" class="leancloud_visitors" data-flag-title="Openstack实例迁移">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="Migrate"><a href="#Migrate" class="headerlink" title="Migrate"></a>Migrate</h1><blockquote>
+<p>OpenStack实例迁移操作不要求源和目标节点必须使用共享存储，但<code>需要所有运行nova-compute的节点对应的用户做ssh信任</code>。</p>
+</blockquote>
+<p>migrate过程，nova-compute主要完成以下步骤：</p>
+<ul>
+<li>源计算节点上关闭实例</li>
+<li>以<code>&lt;instance_id&gt;_resize</code>重命名源计算节点的实例目录</li>
+<li>将实例的镜像文件通过scp拷贝目标计算节点上</li>
+<li>在目标计算节点上启动实例</li>
+<li>连接实例相关的网络接口</li>
+<li>等待用户confirm或revert</li>
+<li>若confirm则删除源计算节点的实例目录</li>
+<li>若revert则关闭且删除目标计算节点上的instance，然后在源计算节点上重命名实例目录并启动实例</li>
+</ul>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/26/openstack-nova-migrate/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/25/openstack-glance-image-format/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/25/openstack-glance-image-format/" itemprop="url">Openstack glance镜像格式</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-25T17:14:12+08:00">
+                2018-09-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/09/25/openstack-glance-image-format/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/09/25/openstack-glance-image-format/" class="cy_cmt_count" data-xid="2018/09/25/openstack-glance-image-format/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/09/25/openstack-glance-image-format/" class="leancloud_visitors" data-flag-title="Openstack glance镜像格式">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="稀疏文件"><a href="#稀疏文件" class="headerlink" title="稀疏文件"></a>稀疏文件</h1><blockquote>
+<p>稀疏文件特性就是文件系统会把分配的空字节文件记录在元数据中，而不会实际占用磁盘空间。因此如果你创建了一个100G的稀疏文件，ls看到的是分配的大小，可见是100G，但是用du看到的是实际使用的大小，可见文件会很小。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> dd if=/dev/zero of=100G.img bs=1G seek=100 count=0</span><br><span class="line">0+0 records in</span><br><span class="line">0+0 records out</span><br><span class="line">0 bytes (0 B) copied, 0.000193969 s, 0.0 kB/s</span><br><span class="line"><span class="meta">#</span> ls -lh 100G.img</span><br><span class="line">-rw-r--r-- 1 root root 100G Sep 29 10:57 100G.img</span><br><span class="line"><span class="meta">#</span> du -sh 100G.img</span><br><span class="line">0       100G.img</span><br></pre></td></tr></table></figure>
+<p>通过<code>truncate</code>命令可随意调整稀疏文件大小<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> truncate -s 1T 100G.img</span><br><span class="line"><span class="meta">#</span> ls -lh 100G.img</span><br><span class="line">-rw-r--r-- 1 root root 1.0T Sep 29 11:00 100G.img</span><br><span class="line"><span class="meta">#</span> du -sh 100G.img</span><br><span class="line">0       100G.img</span><br></pre></td></tr></table></figure></p>
+<h1 id="Qcow2"><a href="#Qcow2" class="headerlink" title="Qcow2"></a>Qcow2</h1><blockquote>
+<p>Qcow2 是 QEMU 目前推荐的镜像格式，它支持<code>稀疏文件</code>特性以节省存储空间，支持加密以提高镜像文件的安全性，支持基于zlib的压缩。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># qemu-img create -f qcow2 100G.qcow2 100G</span><br><span class="line">Formatting &apos;100G.qcow2&apos;, fmt=qcow2 size=107374182400 encryption=off cluster_size=65536 lazy_refcounts=off </span><br><span class="line"># qemu-img info 100G.qcow2</span><br><span class="line">image: 100G.qcow2</span><br><span class="line">file format: qcow2</span><br><span class="line">virtual size: 100G (107374182400 bytes)</span><br><span class="line">disk size: 196K</span><br><span class="line">cluster_size: 65536</span><br><span class="line">Format specific information:</span><br><span class="line">    compat: 1.1</span><br><span class="line">    lazy refcounts: false</span><br><span class="line"># ls -lh 100G.qcow2</span><br><span class="line">-rw-r--r--. 1 root root 194K Sep 29 11:17 100G.qcow2</span><br><span class="line"># du -sh 100G.qcow2</span><br><span class="line">196K    100G.qcow2</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Qcow2 镜像可以用来保存另一个镜像文件的变化，它并不去修改原始镜像文件，原始镜像文件也叫后端镜像(backing_file)。只记录与原始镜像文件的不同部分的镜像文件，这种镜像文件就叫做copy-on-write镜像，它虽然是一个单独的镜像文件，但它的大部分数据都来自原始镜像，只有基于原始镜像文件的增量部分才会被记录下来。</p>
+</blockquote>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/25/openstack-glance-image-format/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/21/openstack-nova-reset-password/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/21/openstack-nova-reset-password/" itemprop="url">Openstack重置实例密码</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-21T16:23:12+08:00">
+                2018-09-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/09/21/openstack-nova-reset-password/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/09/21/openstack-nova-reset-password/" class="cy_cmt_count" data-xid="2018/09/21/openstack-nova-reset-password/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/09/21/openstack-nova-reset-password/" class="leancloud_visitors" data-flag-title="Openstack重置实例密码">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>Qemu Guest Agent是一个运行在虚拟机内部的服务，是实现宿主机和虚拟机进行交互的方式，且不依赖于网络，而是依赖于virtio-serial（默认首选方式）或者isa-serial，而QEMU则提供了串口设备的模拟及数据交换的通道，最终呈现出来的是一个串口设备（虚拟机内部）和一个unix socket文件（宿主机上）。<br><code>通过qemu-ga可实现修改KVM虚拟机中的管理员密码</code></p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/09/21/openstack-nova-reset-password/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+  </section>
+
+  
+  <nav class="pagination">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script id="cy_cmt_num" src="https://changyan.sohu.com/upload/plugins/plugins.list.count.js?clientId=cyt9Ylqyn"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

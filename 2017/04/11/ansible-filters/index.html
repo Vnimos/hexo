@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ansible,playbook," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Ansible默认支持Jinja2语言的内置filter，用于转换模板表达式中的数据。  定义变量默认值 如果未定义变量值，则使用default()指定的默认值  12- name: Defaulting Undefined Variables  debug: msg=&amp;quot;&amp;#123;&amp;#123; ansible | default(&amp;apos;xxx&amp;apos;) &amp;#125;&amp;#12">
+<meta name="keywords" content="ansible,playbook">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible Filters">
+<meta property="og:url" content="http://www.vnimos.cn/2017/04/11/ansible-filters/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="Ansible默认支持Jinja2语言的内置filter，用于转换模板表达式中的数据。  定义变量默认值 如果未定义变量值，则使用default()指定的默认值  12- name: Defaulting Undefined Variables  debug: msg=&amp;quot;&amp;#123;&amp;#123; ansible | default(&amp;apos;xxx&amp;apos;) &amp;#125;&amp;#12">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-26T08:00:27.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible Filters">
+<meta name="twitter:description" content="Ansible默认支持Jinja2语言的内置filter，用于转换模板表达式中的数据。  定义变量默认值 如果未定义变量值，则使用default()指定的默认值  12- name: Defaulting Undefined Variables  debug: msg=&amp;quot;&amp;#123;&amp;#123; ansible | default(&amp;apos;xxx&amp;apos;) &amp;#125;&amp;#12">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2017/04/11/ansible-filters/"/>
+
+
+
+
+
+	  <title>Ansible Filters | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/04/11/ansible-filters/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ansible Filters</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-11T13:43:59+08:00">
+                2017-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/04/11/ansible-filters/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/04/11/ansible-filters/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/04/11/ansible-filters/" class="leancloud_visitors" data-flag-title="Ansible Filters">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>Ansible默认支持Jinja2语言的内置filter，用于转换模板表达式中的数据。</p>
+</blockquote>
+<h1 id="定义变量默认值"><a href="#定义变量默认值" class="headerlink" title="定义变量默认值"></a><a href="http://docs.ansible.com/ansible/latest/playbooks_filters.html#id11" target="_blank" rel="noopener">定义变量默认值</a></h1><blockquote>
+<p>如果未定义变量值，则使用<code>default()</code>指定的默认值</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">- name: Defaulting Undefined Variables</span><br><span class="line">  debug: msg=&quot;&#123;&#123; ansible | default(&apos;xxx&apos;) &#125;&#125;&quot;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="省略参数值"><a href="#省略参数值" class="headerlink" title="省略参数值"></a><a href="http://docs.ansible.com/ansible/latest/playbooks_filters.html#id12" target="_blank" rel="noopener">省略参数值</a></h1><blockquote>
+<p><code>omit</code>参数可用于省略模块中未指定的参数值</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">  - name: touch files with an optional mode</span><br><span class="line">    file: dest=&#123;&#123; item.path &#125;&#125; state=touch mode=&#123;&#123; item.mode|default(omit) &#125;&#125;</span><br><span class="line">    with_items:</span><br><span class="line">    - path: /root/abc</span><br><span class="line">    - path: /root/def</span><br><span class="line">    - path: /root/ghi</span><br><span class="line">      mode: &quot;0777&quot;</span><br><span class="line"></span><br><span class="line">TASK [touch files with an optional mode] *******************************************************</span><br><span class="line">changed: [localhost] =&gt; (item=&#123;u&apos;path&apos;: u&apos;/root/abc&apos;&#125;)</span><br><span class="line">changed: [localhost] =&gt; (item=&#123;u&apos;path&apos;: u&apos;/root/def&apos;&#125;)</span><br><span class="line">changed: [localhost] =&gt; (item=&#123;u&apos;path&apos;: u&apos;/root/ghi&apos;, u&apos;mode&apos;: u&apos;0777&apos;&#125;)</span><br></pre></td></tr></table></figure>
+<h1 id="List"><a href="#List" class="headerlink" title="List"></a><a href="http://docs.ansible.com/ansible/latest/playbooks_filters.html#id13" target="_blank" rel="noopener">List</a></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  gather_facts: false</span><br><span class="line">  vars:</span><br><span class="line">    list1: [1,3,5,7,9]</span><br><span class="line">    list2: [0,2,4,6,8]</span><br><span class="line">    list3: [0,1,0,3,1,2,3]</span><br><span class="line">  - name: List Filter</span><br><span class="line">    debug: msg=&quot;Min:&#123;&#123; list1 | min &#125;&#125; Max:&#123;&#123; list2 | max &#125;&#125; Random:&#123;&#123; list2 | random &#125;&#125; Join:&#123;&#123; list1 | join &#125;&#125; Join(-):&#123;&#123; list2 | join(&apos;-&apos;) &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [List Filter] ****************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;Min:1 Max:8 Random:8 Join:13579 Join(-):0-2-4-6-8&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="集合"><a href="#集合" class="headerlink" title="集合"></a><a href="http://docs.ansible.com/ansible/latest/playbooks_filters.html#id14" target="_blank" rel="noopener">集合</a></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  - name: Set Filter</span><br><span class="line">    debug: msg=&quot;去重:&#123;&#123; list3 | unique &#125;&#125; 并集:&#123;&#123; list1 | union(list2) &#125;&#125; 交集:&#123;&#123; list1 | intersect(list3) &#125;&#125; 差集:&#123;&#123; list1 | difference(list3) &#125;&#125; 对称差集:&#123;&#123; list1 | symmetric_difference(list3) &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [Set Filter] ********************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;去重:[0, 1, 3, 2] 并集:[1, 3, 5, 7, 9, 0, 2, 4, 6, 8] 交集:[1, 3] 差集:[5, 7, 9] 对称差集:[5, 7, 9, 0, 2]&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="IP地址"><a href="#IP地址" class="headerlink" title="IP地址"></a><a href="http://docs.ansible.com/ansible/latest/playbooks_filters.html#id19" target="_blank" rel="noopener">IP地址</a></h1><blockquote>
+<p><code>ipaddr/ipv4/ipv6</code>可用于判断变量值是否为有效的IP地址（需要安装python-netaddr）</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  gather_facts: false</span><br><span class="line">  vars:</span><br><span class="line">    IP1: 192.168.1.1</span><br><span class="line">    IP2: 172.16.1.1/24</span><br><span class="line">  tasks:</span><br><span class="line">  - name: IP address Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; IP1 | ipaddr &#125;&#125; &#123;&#123; IP2 | ipv4 &#125;&#125; &#123;&#123; IP2 | ipaddr(&apos;address&apos;) &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [IP address Filter] ****************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;192.168.1.1 172.16.1.1/24 172.16.1.1&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="URL-Split"><a href="#URL-Split" class="headerlink" title="URL Split"></a><a href="http://docs.ansible.com/ansible/latest/playbooks_filters.html#id25" target="_blank" rel="noopener">URL Split</a></h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  gather_facts: false</span><br><span class="line">  vars:</span><br><span class="line">    URL: http://user:password@www.example.com:8080/dir/index.html?query=term#frament</span><br><span class="line">  tasks:</span><br><span class="line">  - name: URL Split Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; URL | urlsplit(&apos;scheme&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;username&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;password&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;hostname&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;port&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;netloc&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;path&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;query&apos;) &#125;&#125; &#123;&#123; URL | urlsplit(&apos;fragment&apos;) &#125;&#125;&quot;</span><br><span class="line">  - name: URL Split Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; URL | urlsplit &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK [URL Split Filter] *********************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;http user password www.example.com 8080 user:password@www.example.com:8080 /dir/index.html query=term frament&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TASK [URL Split Filter] *********************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &#123;</span><br><span class="line">        &quot;fragment&quot;: &quot;frament&quot;,</span><br><span class="line">        &quot;hostname&quot;: &quot;www.example.com&quot;,</span><br><span class="line">        &quot;netloc&quot;: &quot;user:password@www.example.com:8080&quot;,</span><br><span class="line">        &quot;password&quot;: &quot;password&quot;,</span><br><span class="line">        &quot;path&quot;: &quot;/dir/index.html&quot;,</span><br><span class="line">        &quot;port&quot;: 8080,</span><br><span class="line">        &quot;query&quot;: &quot;query=term&quot;,</span><br><span class="line">        &quot;scheme&quot;: &quot;http&quot;,</span><br><span class="line">        &quot;username&quot;: &quot;user&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="其他常用的Filter"><a href="#其他常用的Filter" class="headerlink" title="其他常用的Filter"></a>其他常用的Filter</h1><h2 id="regex-search"><a href="#regex-search" class="headerlink" title="regex_search"></a>regex_search</h2><blockquote>
+<p><code>regex_search</code>可通过正则表达式搜索指定的字符串</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  - name: regex_search Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; &quot;Hello Ansible&quot; | regex_search(&apos;sible&apos;) &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [regex_search Filter] *****************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;sible&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="strftime"><a href="#strftime" class="headerlink" title="strftime"></a>strftime</h2><blockquote>
+<p><code>strftime</code>显示当前系统时间</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  - name: strftime Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; &apos;%Y-%m-%d %H:%M:%S&apos; | strftime &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [strftime Filter] *****************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;2017-03-21 12:06:27&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="realpath"><a href="#realpath" class="headerlink" title="realpath"></a>realpath</h2><blockquote>
+<p><code>realpath</code>显示链接文件的真实路径</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  - name: realpath Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; &apos;/etc/grub.conf&apos; | realpath &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [realpath Filter] *****************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;/boot/grub/grub.conf&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="dirname"><a href="#dirname" class="headerlink" title="dirname"></a>dirname</h2><blockquote>
+<p><code>dirname</code>通过path显示文件所在的目录</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  - name: rirname Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; &apos;/etc/grub.conf&apos; | dirname &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [rirname Filter] *****************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;/etc&quot;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="basename"><a href="#basename" class="headerlink" title="basename"></a>basename</h2><blockquote>
+<p><code>basename</code>通过path显示文件名</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  - name: basename Filter</span><br><span class="line">    debug: msg=&quot;&#123;&#123; &apos;/etc/grub.conf&apos; | basename &#125;&#125;&quot;</span><br><span class="line"></span><br><span class="line">TASK [basename Filter] *****************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;grub.conf&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ansible/" rel="tag"># ansible</a>
+          
+            <a href="/tags/playbook/" rel="tag"># playbook</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/06/url-check/" rel="next" title="通过shell监控URL">
+                <i class="fa fa-chevron-left"></i> 通过shell监控URL
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/28/ansible-playbook-ext/" rel="prev" title="Ansible Playbook扩展">
+                Ansible Playbook扩展 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#定义变量默认值"><span class="nav-number">1.</span> <span class="nav-text">定义变量默认值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#省略参数值"><span class="nav-number">2.</span> <span class="nav-text">省略参数值</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#List"><span class="nav-number">3.</span> <span class="nav-text">List</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#集合"><span class="nav-number">4.</span> <span class="nav-text">集合</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IP地址"><span class="nav-number">5.</span> <span class="nav-text">IP地址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#URL-Split"><span class="nav-number">6.</span> <span class="nav-text">URL Split</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他常用的Filter"><span class="nav-number">7.</span> <span class="nav-text">其他常用的Filter</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#regex-search"><span class="nav-number">7.1.</span> <span class="nav-text">regex_search</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#strftime"><span class="nav-number">7.2.</span> <span class="nav-text">strftime</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#realpath"><span class="nav-number">7.3.</span> <span class="nav-text">realpath</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dirname"><span class="nav-number">7.4.</span> <span class="nav-text">dirname</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#basename"><span class="nav-number">7.5.</span> <span class="nav-text">basename</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

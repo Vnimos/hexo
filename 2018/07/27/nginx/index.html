@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ansible," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="ansible目录结构123456789101112131415161718# tree AnsibleAnsible├── inventories│   └── Project│      ├── hosts│      └── group_vars│           ├── all.yaml│           └── nginx.yaml├── roles│   └── nginx│">
+<meta name="keywords" content="ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible编排Nginx配置">
+<meta property="og:url" content="http://www.vnimos.cn/2018/07/27/nginx/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="ansible目录结构123456789101112131415161718# tree AnsibleAnsible├── inventories│   └── Project│      ├── hosts│      └── group_vars│           ├── all.yaml│           └── nginx.yaml├── roles│   └── nginx│">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-07-27T07:16:32.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible编排Nginx配置">
+<meta name="twitter:description" content="ansible目录结构123456789101112131415161718# tree AnsibleAnsible├── inventories│   └── Project│      ├── hosts│      └── group_vars│           ├── all.yaml│           └── nginx.yaml├── roles│   └── nginx│">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2018/07/27/nginx/"/>
+
+
+
+
+
+	  <title>Ansible编排Nginx配置 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/07/27/nginx/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ansible编排Nginx配置</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-27T14:21:29+08:00">
+                2018-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/07/27/nginx/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/07/27/nginx/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/07/27/nginx/" class="leancloud_visitors" data-flag-title="Ansible编排Nginx配置">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ansible目录结构"><a href="#ansible目录结构" class="headerlink" title="ansible目录结构"></a>ansible目录结构</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> tree Ansible</span><br><span class="line">Ansible</span><br><span class="line">├── inventories</span><br><span class="line">│   └── Project</span><br><span class="line">│      ├── hosts</span><br><span class="line">│      └── group_vars</span><br><span class="line">│           ├── all.yaml</span><br><span class="line">│           └── nginx.yaml</span><br><span class="line">├── roles</span><br><span class="line">│   └── nginx</span><br><span class="line">│       ├── defaults</span><br><span class="line">│       │   └── main.yaml</span><br><span class="line">│       ├── tasks</span><br><span class="line">│       │   └── main.yaml</span><br><span class="line">│       └── templates</span><br><span class="line">│           ├── nginx.conf</span><br><span class="line">│           └── service.conf.j2</span><br><span class="line">└── Project.yaml</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="playbook"><a href="#playbook" class="headerlink" title="playbook"></a>playbook</h1><blockquote>
+<p><code>Ansible/Project.yaml</code></p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">all</span></span><br><span class="line"><span class="attr">  roles:</span></span><br><span class="line"><span class="attr">    - role:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">      tags:</span></span><br><span class="line"><span class="bullet">        -</span> <span class="string">nginx</span></span><br></pre></td></tr></table></figure>
+<h1 id="inventories"><a href="#inventories" class="headerlink" title="inventories"></a>inventories</h1><blockquote>
+<p><code>Ansible/inventories/Project/hosts</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[all]          # Project.yaml中指定的hosts</span><br><span class="line">Project-manager-1           ansible_ssh_host=10.200.110.185</span><br><span class="line">Project-manager-2           ansible_ssh_host=10.200.110.186</span><br><span class="line">Project-manager-3           ansible_ssh_host=10.200.110.187</span><br><span class="line"></span><br><span class="line">[nginx]        # 该组host将自动加载group_vars目录中的nginx.yaml文件定义的变量</span><br><span class="line">Project-manager-1</span><br><span class="line">Project-manager-2</span><br><span class="line">Project-manager-3</span><br></pre></td></tr></table></figure>
+<h1 id="group-vars"><a href="#group-vars" class="headerlink" title="group_vars"></a>group_vars</h1><blockquote>
+<p><code>Ansible/inventories/group_vars/nginx.yaml</code></p>
+</blockquote>
+<h2 id="nginx-server-参数说明"><a href="#nginx-server-参数说明" class="headerlink" title="nginx_server 参数说明"></a>nginx_server 参数说明</h2><table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name(必须)</td>
+<td>str</td>
+<td>server对应的server_name</td>
+</tr>
+<tr>
+<td>port(必须)</td>
+<td>str</td>
+<td>端口号</td>
+</tr>
+<tr>
+<td>https(必须)</td>
+<td>bool</td>
+<td>是否跳转https</td>
+</tr>
+<tr>
+<td>ssl_certificate(若https为true则必须)</td>
+<td>str</td>
+<td>ssl_certificate文件名</td>
+</tr>
+<tr>
+<td>ssl_certificate_key(若https为true则必须)</td>
+<td>str</td>
+<td>ssl_certificate_key文件名</td>
+</tr>
+<tr>
+<td>location(必须)</td>
+<td>str</td>
+<td>location</td>
+</tr>
+<tr>
+<td>location.name(必须)</td>
+<td>str</td>
+<td>location表达式</td>
+</tr>
+<tr>
+<td>location.upstream(可选)</td>
+<td>str</td>
+<td>proxy_pass中对应的upstream</td>
+</tr>
+<tr>
+<td>location.protocol(若指定location.upstream则必须)</td>
+<td>str</td>
+<td>proxy_pass中对应的upstream对应的scheme(http或https)</td>
+</tr>
+<tr>
+<td>location.rewrite(可选)</td>
+<td>str</td>
+<td>rewrite规则</td>
+</tr>
+<tr>
+<td>location.extend(可选)</td>
+<td>dit</td>
+<td>用于扩展其他参数</td>
+</tr>
+<tr>
+<td>location.extend.name(若指定location.extend则必须)</td>
+<td>str</td>
+<td>扩展参数对应的参数名</td>
+</tr>
+<tr>
+<td>location.extend.value(若指定location.extend则必须)</td>
+<td>str</td>
+<td>扩展参数对应的参数值</td>
+</tr>
+</tbody>
+</table>
+<h2 id="nginx-upstream-参数说明"><a href="#nginx-upstream-参数说明" class="headerlink" title="nginx_upstream 参数说明"></a>nginx_upstream 参数说明</h2><table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name(必须)</td>
+<td>str</td>
+<td>upstream名称</td>
+</tr>
+<tr>
+<td>backend(必须)</td>
+<td>list</td>
+<td>upstream对应的后端server</td>
+</tr>
+<tr>
+<td>backend.name(必须)</td>
+<td>str</td>
+<td>backend名称</td>
+</tr>
+<tr>
+<td>backend.weigth(必须)</td>
+<td>str</td>
+<td>后端服务器权重</td>
+</tr>
+<tr>
+<td>backend.max_fails(必须)</td>
+<td>str</td>
+<td>后端服务器最大请求失败次数(超过则置为不可用)</td>
+</tr>
+<tr>
+<td>backend.fail_timeout(必须)</td>
+<td>str</td>
+<td>后端服务器故障后置为不可用时间</td>
+</tr>
+<tr>
+<td>balance(可选)</td>
+<td>str</td>
+<td>负载均衡策略( hash/ip_hash默认为roundrobin)</td>
+</tr>
+<tr>
+<td>connections(可选)</td>
+<td>str</td>
+<td>keepalive数量(指定最大空闲连接数量,用于长链接)</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">nginx_server:</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">project-nginx.vnimos.cn</span></span><br><span class="line"><span class="attr">  port:</span> <span class="number">80</span></span><br><span class="line"><span class="attr">  https:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  ssl_certificate:</span> <span class="string">wildcard-client.vnimos.cn.crt</span></span><br><span class="line"><span class="attr">  ssl_certificate_key:</span> <span class="string">wildcard-client.vnimos.cn.key</span></span><br><span class="line"><span class="attr">  location:</span></span><br><span class="line">  <span class="comment"># Web前端</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">/</span></span><br><span class="line"><span class="attr">    upstream:</span> <span class="string">server_frontend</span></span><br><span class="line"><span class="attr">    protocol:</span> <span class="string">https</span></span><br><span class="line">  <span class="comment"># Web后端</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">~</span> <span class="string">(/datacenter|/pin|/phonebook|/freeswitch|/user-account|/api/v1/external/phonebook|/negotiate|/autop)</span></span><br><span class="line"><span class="attr">    upstream:</span> <span class="string">server_backend</span></span><br><span class="line"><span class="attr">    protocol:</span> <span class="string">http</span></span><br><span class="line"></span><br><span class="line"><span class="attr">nginx_upstream:</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">server_frontend</span></span><br><span class="line"><span class="attr">  backend:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">'<span class="template-variable">&#123;&#123; hostvars["Project-manager-1"]["ansible_ssh_host"] &#125;&#125;</span>:<span class="template-variable">&#123;&#123; web_project_port &#125;&#125;</span>'</span></span><br><span class="line"><span class="attr">    weight:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">    max_fails:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">    fail_timeout:</span> <span class="number">10</span><span class="string">s</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">'<span class="template-variable">&#123;&#123; hostvars["Project-manager-2"]["ansible_ssh_host"] &#125;&#125;</span>:<span class="template-variable">&#123;&#123; web_project_port &#125;&#125;</span>'</span></span><br><span class="line"><span class="attr">    weight:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">    max_fails:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">    fail_timeout:</span> <span class="number">10</span><span class="string">s</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">'<span class="template-variable">&#123;&#123; hostvars["Project-manager-3"]["ansible_ssh_host"] &#125;&#125;</span>:<span class="template-variable">&#123;&#123; web_project_port &#125;&#125;</span>'</span></span><br><span class="line"><span class="attr">    weight:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">    max_fails:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">    fail_timeout:</span> <span class="number">10</span><span class="string">s</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">server_backend</span></span><br><span class="line"><span class="attr">  backend:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">'<span class="template-variable">&#123;&#123; hostvars["Project-manager-1"]["ansible_ssh_host"] &#125;&#125;</span>:<span class="template-variable">&#123;&#123; microconference_service_server_port &#125;&#125;</span>'</span></span><br><span class="line"><span class="attr">    weight:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">    max_fails:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">    fail_timeout:</span> <span class="number">10</span><span class="string">s</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">'<span class="template-variable">&#123;&#123; hostvars["Project-manager-2"]["ansible_ssh_host"] &#125;&#125;</span>:<span class="template-variable">&#123;&#123; microconference_service_server_port &#125;&#125;</span>'</span></span><br><span class="line"><span class="attr">    weight:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">    max_fails:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">    fail_timeout:</span> <span class="number">10</span><span class="string">s</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">'<span class="template-variable">&#123;&#123; hostvars["Project-manager-3"]["ansible_ssh_host"] &#125;&#125;</span>:<span class="template-variable">&#123;&#123; microconference_service_server_port &#125;&#125;</span>'</span></span><br><span class="line"><span class="attr">    weight:</span> <span class="number">1</span></span><br><span class="line"><span class="attr">    max_fails:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">    fail_timeout:</span> <span class="number">10</span><span class="string">s</span></span><br></pre></td></tr></table></figure>
+<h1 id="template模版"><a href="#template模版" class="headerlink" title="template模版"></a>template模版</h1><blockquote>
+<p><code>Ansible/roles/nginx/templates/service.conf.j2</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">map $http_upgrade $connection_upgrade &#123;</span><br><span class="line">    default upgrade;</span><br><span class="line">    &apos;&apos;      close;</span><br><span class="line">&#125;</span><br><span class="line">#server</span><br><span class="line">&#123;% for server in nginx_server %&#125;</span><br><span class="line">server &#123;</span><br><span class="line">    listen &#123;&#123; server.port &#125;&#125;;</span><br><span class="line">    server_name &#123;&#123; server.name &#125;&#125;;</span><br><span class="line">&#123;% if server.https %&#125;</span><br><span class="line">    listen         443 ssl;</span><br><span class="line">    if ($scheme = http ) &#123; </span><br><span class="line">        return 301 https://$host$request_uri; </span><br><span class="line">    &#125;</span><br><span class="line">    ssl_certificate      ssl/&#123;&#123; server.ssl_certificate &#125;&#125;;</span><br><span class="line">    ssl_certificate_key  ssl/&#123;&#123; server.ssl_certificate_key &#125;&#125;;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line"></span><br><span class="line">    proxy_http_version 1.1; </span><br><span class="line">    proxy_set_header   Upgrade $http_upgrade;</span><br><span class="line">    proxy_set_header   Connection $connection_upgrade; </span><br><span class="line"></span><br><span class="line">    proxy_set_header Host $host;</span><br><span class="line">    proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    proxy_set_header X-Real-Port $remote_port;</span><br><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">    proxy_set_header X-Forwarded-Protocol &quot;$scheme&quot;;</span><br><span class="line">    add_header Strict-Transport-Security &quot;max-age=16000000;includeSubDomains;preload;&quot; always;</span><br><span class="line">    add_header X-Frame-Options &quot;DENY&quot; always;</span><br><span class="line">    add_header Referrer-Policy &quot;no-referrer-when-downgrade&quot; always;</span><br><span class="line">    add_header X-Content-Type-Options &quot;nosniff&quot; always;</span><br><span class="line">    add_header X-XSS-Protection &quot;1;mode=block&quot; always;</span><br><span class="line"></span><br><span class="line">&#123;% for location in server.location %&#125;</span><br><span class="line">    location &#123;&#123; location.name &#125;&#125; &#123;</span><br><span class="line">&#123;% if location.rewrite is defined %&#125;</span><br><span class="line">        rewrite &#123;&#123; location.rewrite &#125;&#125;;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&#123;% if location.upstream is defined %&#125;</span><br><span class="line">        proxy_pass &#123;&#123; location.protocol &#125;&#125;://&#123;&#123; location.upstream &#125;&#125;;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&#123;% if location.extend is defined %&#125;</span><br><span class="line">&#123;% for extend in location.extend %&#125;</span><br><span class="line">    &#123;&#123; extend.name &#125;&#125; &#123;&#123; extend.value &#125;&#125;;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line">&#123;% endif %&#125; </span><br><span class="line">    &#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line"></span><br><span class="line">#upstream</span><br><span class="line">&#123;% for upstream in nginx_upstream %&#125;</span><br><span class="line">upstream &#123;&#123; upstream.name &#125;&#125; &#123;</span><br><span class="line">&#123;% for backend in upstream.backend %&#125;</span><br><span class="line">    server   &#123;&#123; backend.name &#125;&#125;  weight=&#123;&#123; backend.weight &#125;&#125; max_fails=&#123;&#123; backend.max_fails &#125;&#125; fail_timeout=&#123;&#123; backend.fail_timeout &#125;&#125;;</span><br><span class="line">&#123;% endfor %&#125;</span><br><span class="line">&#123;% if upstream.balance is defined %&#125;</span><br><span class="line">    &#123;&#123; upstream.balance &#125;&#125;;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&#123;% if upstream.connections is defined %&#125;</span><br><span class="line">    keepalive &#123;&#123; upstream.connections &#125;&#125;;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="执行playbook"><a href="#执行playbook" class="headerlink" title="执行playbook"></a>执行playbook</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> ansible-playbook -i inventories/Project/hosts Project.yaml  --tag nginx</span><br></pre></td></tr></table></figure>
+<h1 id="生成后的配置（service-conf）"><a href="#生成后的配置（service-conf）" class="headerlink" title="生成后的配置（service.conf）"></a>生成后的配置（service.conf）</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">map $http_upgrade $connection_upgrade &#123;</span><br><span class="line">    default upgrade;</span><br><span class="line">    &apos;&apos;      close;</span><br><span class="line">&#125;</span><br><span class="line">#server</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name project-nginx.vnimos.cn;</span><br><span class="line">    listen         443 ssl;</span><br><span class="line">    if ($scheme = http ) &#123; </span><br><span class="line">        return 301 https://$host$request_uri; </span><br><span class="line">    &#125;</span><br><span class="line">    ssl_certificate      ssl/wildcard.vnimos.cn.crt;</span><br><span class="line">    ssl_certificate_key  ssl/wildcard.vnimos.cn.key;</span><br><span class="line">    proxy_http_version 1.1; </span><br><span class="line">    proxy_set_header   Upgrade $http_upgrade;</span><br><span class="line">    proxy_set_header   Connection $connection_upgrade; </span><br><span class="line">    proxy_set_header Host $host;</span><br><span class="line">    proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">    proxy_set_header X-Real-Port $remote_port;</span><br><span class="line">    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">    proxy_set_header X-Forwarded-Protocol &quot;$scheme&quot;;</span><br><span class="line">    add_header Strict-Transport-Security &quot;max-age=16000000;includeSubDomains;preload;&quot; always;</span><br><span class="line">    add_header X-Frame-Options &quot;DENY&quot; always;</span><br><span class="line">    add_header Referrer-Policy &quot;no-referrer-when-downgrade&quot; always;</span><br><span class="line">    add_header X-Content-Type-Options &quot;nosniff&quot; always;</span><br><span class="line">    add_header X-XSS-Protection &quot;1;mode=block&quot; always;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass https://server_frontend;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">    location ~ (/datacenter|/pin|/phonebook|/freeswitch|/user-account|/api/v1/external/phonebook|/negotiate|/autop) &#123;</span><br><span class="line">        proxy_pass http://server_backend;</span><br><span class="line"> </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#upstream</span><br><span class="line">upstream server_frontend &#123;</span><br><span class="line">    server   127.0.0.1:9880  weight=1 max_fails=5 fail_timeout=10s;</span><br><span class="line">&#125;</span><br><span class="line">upstream server_meeting_join &#123;</span><br><span class="line">    server   127.0.0.1:9884  weight=1 max_fails=5 fail_timeout=10s;</span><br><span class="line">&#125;</span><br><span class="line">upstream server_meeting_control &#123;</span><br><span class="line">    server   127.0.0.1:9884  weight=1 max_fails=5 fail_timeout=10s;</span><br><span class="line">    ip_hash;</span><br><span class="line">    keepalive 64;</span><br><span class="line">&#125;</span><br><span class="line">upstream server_backend &#123;</span><br><span class="line">    server   127.0.0.1:9999  weight=1 max_fails=5 fail_timeout=10s;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ansible/" rel="tag"># ansible</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/06/vpc-aliyun-aws/" rel="next" title="阿里云和AWS间的VPC互连">
+                <i class="fa fa-chevron-left"></i> 阿里云和AWS间的VPC互连
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/11/openstack-keystone-auth/" rel="prev" title="Openstack Keystone身份管理">
+                Openstack Keystone身份管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ansible目录结构"><span class="nav-number">1.</span> <span class="nav-text">ansible目录结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#playbook"><span class="nav-number">2.</span> <span class="nav-text">playbook</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#inventories"><span class="nav-number">3.</span> <span class="nav-text">inventories</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#group-vars"><span class="nav-number">4.</span> <span class="nav-text">group_vars</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx-server-参数说明"><span class="nav-number">4.1.</span> <span class="nav-text">nginx_server 参数说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx-upstream-参数说明"><span class="nav-number">4.2.</span> <span class="nav-text">nginx_upstream 参数说明</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#template模版"><span class="nav-number">5.</span> <span class="nav-text">template模版</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#执行playbook"><span class="nav-number">6.</span> <span class="nav-text">执行playbook</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#生成后的配置（service-conf）"><span class="nav-number">7.</span> <span class="nav-text">生成后的配置（service.conf）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

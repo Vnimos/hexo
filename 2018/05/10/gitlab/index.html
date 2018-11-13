@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="持续集成,gitlab," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="安装1234567891011121314151617181920212223242526# vim /etc/yum.repos.d/gitlab-ce.repo[gitlab-ce] name=Gitlab CE Repositorybaseurl=https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el$releasever/gpgcheck">
+<meta name="keywords" content="持续集成,gitlab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gitlab安装配置管理">
+<meta property="og:url" content="http://www.vnimos.cn/2018/05/10/gitlab/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="安装1234567891011121314151617181920212223242526# vim /etc/yum.repos.d/gitlab-ce.repo[gitlab-ce] name=Gitlab CE Repositorybaseurl=https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el$releasever/gpgcheck">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.vnimos.cn/images/gitlab/gitlab-update.png">
+<meta property="og:updated_time" content="2018-07-13T00:53:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Gitlab安装配置管理">
+<meta name="twitter:description" content="安装1234567891011121314151617181920212223242526# vim /etc/yum.repos.d/gitlab-ce.repo[gitlab-ce] name=Gitlab CE Repositorybaseurl=https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el$releasever/gpgcheck">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/gitlab/gitlab-update.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2018/05/10/gitlab/"/>
+
+
+
+
+
+	  <title>Gitlab安装配置管理 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/05/10/gitlab/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gitlab安装配置管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T14:21:29+08:00">
+                2018-05-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cicd/" itemprop="url" rel="index">
+                    <span itemprop="name">cicd</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/05/10/gitlab/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/05/10/gitlab/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/05/10/gitlab/" class="leancloud_visitors" data-flag-title="Gitlab安装配置管理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> vim /etc/yum.repos.d/gitlab-ce.repo</span><br><span class="line">[gitlab-ce] </span><br><span class="line">name=Gitlab CE Repository</span><br><span class="line">baseurl=https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el$releasever/</span><br><span class="line">gpgcheck=0</span><br><span class="line">enabled=1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> yum makecache</span><br><span class="line"><span class="meta">#</span> EXTERNAL_URL="http://172.16.100.99"</span><br><span class="line"><span class="meta">#</span> yum install -y gitlab-ce</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> gitlab-ctl reconfigure</span><br><span class="line"><span class="meta">#</span> gitlab-ctl status</span><br><span class="line">run: gitaly: (pid 3627) 9s; run: log: (pid 3287) 40s</span><br><span class="line">run: gitlab-monitor: (pid 3667) 8s; run: log: (pid 3493) 28s</span><br><span class="line">run: gitlab-workhorse: (pid 3653) 9s; run: log: (pid 3315) 39s</span><br><span class="line">run: logrotate: (pid 3387) 36s; run: log: (pid 3386) 36s</span><br><span class="line">run: nginx: (pid 3361) 38s; run: log: (pid 3360) 38s</span><br><span class="line">run: node-exporter: (pid 3475) 30s; run: log: (pid 3474) 30s</span><br><span class="line">run: postgres-exporter: (pid 3726) 7s; run: log: (pid 3565) 19s</span><br><span class="line">run: postgresql: (pid 3111) 90s; run: log: (pid 3110) 90s</span><br><span class="line">run: prometheus: (pid 3710) 8s; run: log: (pid 3537) 21s</span><br><span class="line">run: redis: (pid 3051) 96s; run: log: (pid 3050) 96s</span><br><span class="line">run: redis-exporter: (pid 3521) 22s; run: log: (pid 3520) 22s</span><br><span class="line">run: sidekiq: (pid 3268) 46s; run: log: (pid 3267) 46s</span><br><span class="line">run: unicorn: (pid 3230) 48s; run: log: (pid 3229) 48s</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="集成LDAP"><a href="#集成LDAP" class="headerlink" title="集成LDAP"></a>集成LDAP</h1><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">gitlab_rails[<span class="string">'ldap_enabled'</span>] = <span class="literal">true</span></span><br><span class="line">gitlab_rails[<span class="string">'ldap_servers'</span>] = YAML.load &lt;&lt;-<span class="string">'EOS'</span></span><br><span class="line">   <span class="symbol">main:</span> </span><br><span class="line">     <span class="symbol">label:</span> <span class="string">'LDAP'</span></span><br><span class="line">     <span class="symbol">host:</span> <span class="string">'192.168.1.20'</span></span><br><span class="line">     <span class="symbol">port:</span> <span class="number">389</span></span><br><span class="line">     <span class="symbol">uid:</span> <span class="string">'sAMAccountName'</span></span><br><span class="line">     <span class="symbol">bind_dn:</span> <span class="string">'CN=***,OU=服务器软件部五组,OU=服务器软件部,OU=研发中心,OU=亿联-用户,DC=yealink,DC=com'</span></span><br><span class="line">     <span class="symbol">password:</span> <span class="string">'******'</span></span><br><span class="line">     <span class="symbol">encryption:</span> <span class="string">'plain'</span></span><br><span class="line">     <span class="symbol">verify_certificates:</span> <span class="literal">false</span></span><br><span class="line">     <span class="symbol">active_directory:</span> <span class="literal">true</span></span><br><span class="line">     <span class="symbol">allow_username_or_email_login:</span> <span class="literal">false</span></span><br><span class="line">     <span class="symbol">block_auto_created_users:</span> <span class="literal">false</span></span><br><span class="line">     <span class="symbol">base:</span> <span class="string">'DC=yealink,DC=com'</span></span><br><span class="line">     <span class="symbol">user_filter:</span> <span class="string">''</span></span><br><span class="line">EOS</span><br></pre></td></tr></table></figure>
+<p>通过<code>gitlab-rake gitlab:ldap:check</code>命令可检查LDAP配置<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> gitlab-ctl reconfigure</span><br><span class="line"><span class="meta">#</span> gitlab-rake gitlab:ldap:check</span><br><span class="line">Checking LDAP ...</span><br><span class="line"></span><br><span class="line">Server: ldapmain</span><br><span class="line">LDAP authentication... Success</span><br><span class="line">LDAP users with access to your GitLab server (only showing the first 100 results)</span><br><span class="line">&lt;...以下省略100行，若无输出一般是user_filter配置错了...&gt;</span><br><span class="line">Checking LDAP ... Finished</span><br></pre></td></tr></table></figure></p>
+<h1 id="配置邮件通知"><a href="#配置邮件通知" class="headerlink" title="配置邮件通知"></a>配置邮件通知</h1><h2 id="postfix"><a href="#postfix" class="headerlink" title="postfix"></a>postfix</h2><blockquote>
+<p>前提需要配置postfix能够发送邮件，先用以下命令测试，具体配置可参考<a href="http://blog.51cto.com/vnimos/1203162#T1" target="_blank" rel="noopener">http://blog.51cto.com/vnimos/1203162#T1</a></p>
+</blockquote>
+<p><code>echo &quot;postfix test again&quot; | mail -s &#39;postfix_test2&#39; zyp19891128@163.com</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gitlab_rails[&apos;gitlab_email_enabled&apos;] = true</span><br><span class="line">gitlab_rails[&apos;gitlab_email_from&apos;] = &apos;gitlab@vnimos.com&apos;</span><br><span class="line">gitlab_rails[&apos;gitlab_email_display_name&apos;] = &apos;Gitlab&apos;</span><br></pre></td></tr></table></figure></p>
+<h2 id="smtp"><a href="#smtp" class="headerlink" title="smtp"></a>smtp</h2><blockquote>
+<p>通过stmp，不需要配置sendmail或postfix。</p>
+</blockquote>
+<ul>
+<li><p>163邮箱</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gitlab_rails[&apos;gitlab_email_from&apos;] = &apos;zyp19891128@163.com&apos;</span><br><span class="line">gitlab_rails[&apos;gitlab_email_display_name&apos;] = &apos;Gitlab&apos;</span><br><span class="line">gitlab_rails[&apos;smtp_enable&apos;] = true</span><br><span class="line">gitlab_rails[&apos;smtp_address&apos;] = &quot;smtp.163.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_port&apos;] = 25</span><br><span class="line">gitlab_rails[&apos;smtp_user_name&apos;] = &quot;zyp19891128@163.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_password&apos;] = &quot;&lt;授权密码,非邮箱密码&gt;&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_domain&apos;] = &quot;163.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_authentication&apos;] = &quot;login&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_enable_starttls_auto&apos;] = true</span><br><span class="line">gitlab_rails[&apos;smtp_tls&apos;] = false</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>公司邮箱</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">gitlab_rails[&apos;gitlab_email_from&apos;] = &apos;***@yealink.com&apos;</span><br><span class="line">gitlab_rails[&apos;gitlab_email_display_name&apos;] = &apos;Gitlab&apos;</span><br><span class="line">gitlab_rails[&apos;smtp_enable&apos;] = true</span><br><span class="line">gitlab_rails[&apos;smtp_address&apos;] = &quot;mail.yealink.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_port&apos;] = 587</span><br><span class="line">gitlab_rails[&apos;smtp_user_name&apos;] = &quot;yl1844&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_password&apos;] = &quot;****&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_domain&apos;] = &quot;yealink.com&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_authentication&apos;] = &quot;login&quot;</span><br><span class="line">gitlab_rails[&apos;smtp_enable_starttls_auto&apos;] = true</span><br><span class="line">gitlab_rails[&apos;smtp_tls&apos;] = false</span><br><span class="line">gitlab_rails[&apos;smtp_openssl_verify_mode&apos;] = &apos;none&apos;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="smtp邮箱问题排查"><a href="#smtp邮箱问题排查" class="headerlink" title="smtp邮箱问题排查"></a>smtp邮箱问题排查</h3><p><code>OpenSSL::SSL::SSLError: SSL_connect returned=1 errno=0 state=SSLv2/v3 read server hello A: unknown protocol</code></p>
+<blockquote>
+<p>该报错提示SSL认证错误，需要禁用SSL认证，或启用SSL认证时填写正确的SSL对应的端口。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">gitlab_rails[&apos;smtp_tls&apos;] = false</span><br><span class="line">---------------------------------</span><br><span class="line">gitlab_rails[&apos;smtp_port&apos;] = 465</span><br><span class="line">gitlab_rails[&apos;smtp_tls&apos;] = true</span><br></pre></td></tr></table></figure>
+<p>另外SMTP授权认证问题可参考：# <a href="https://vnimos.cn/2018/05/08/smtp_verify/" target="_blank" rel="noopener">SMTP邮箱登录验证</a></p>
+<hr>
+<h1 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> gitlab-rake gitlab:backup:create</span><br><span class="line"><span class="meta">#</span> ll /var/opt/gitlab/backups/</span><br><span class="line">total 252</span><br><span class="line">-rw------- 1 git git 256000 Jul 12 16:51 1531385481_2018_07_12_10.1.3_gitlab_backup.tar</span><br></pre></td></tr></table></figure>
+<h1 id="恢复"><a href="#恢复" class="headerlink" title="恢复"></a>恢复</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> gitlab-ctl stop unicorn</span><br><span class="line"><span class="meta">#</span> gitlab-ctl stop sidekiq</span><br><span class="line"><span class="meta">#</span> gitlab-ctl status</span><br><span class="line">run: gitaly: (pid 3627) 2782s; run: log: (pid 3287) 2813s</span><br><span class="line">run: gitlab-monitor: (pid 3667) 2781s; run: log: (pid 3493) 2801s</span><br><span class="line">run: gitlab-workhorse: (pid 3653) 2782s; run: log: (pid 3315) 2812s</span><br><span class="line">run: logrotate: (pid 3387) 2809s; run: log: (pid 3386) 2809s</span><br><span class="line">run: nginx: (pid 7235) 1637s; run: log: (pid 3360) 2811s</span><br><span class="line">run: node-exporter: (pid 3475) 2803s; run: log: (pid 3474) 2803s</span><br><span class="line">run: postgres-exporter: (pid 3726) 2780s; run: log: (pid 3565) 2792s</span><br><span class="line">run: postgresql: (pid 3111) 2863s; run: log: (pid 3110) 2863s</span><br><span class="line">run: prometheus: (pid 3710) 2781s; run: log: (pid 3537) 2794s</span><br><span class="line">run: redis: (pid 3051) 2869s; run: log: (pid 3050) 2869s</span><br><span class="line">run: redis-exporter: (pid 3521) 2795s; run: log: (pid 3520) 2795s</span><br><span class="line">down: sidekiq: 103s, normally up; run: log: (pid 3267) 2819s</span><br><span class="line">down: unicorn: 114s, normally up; run: log: (pid 3229) 2821s</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> gitlab-rake gitlab:backup:restore BACKUP=1531385481_2018_07_12_10.1.3</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> gitlab-ctl restart</span><br><span class="line">ok: run: gitaly: (pid 10554) 0s</span><br><span class="line">ok: run: gitlab-monitor: (pid 10566) 1s</span><br><span class="line">ok: run: gitlab-workhorse: (pid 10574) 0s</span><br><span class="line">ok: run: logrotate: (pid 10619) 0s</span><br><span class="line">ok: run: nginx: (pid 10630) 1s</span><br><span class="line">ok: run: node-exporter: (pid 10638) 0s</span><br><span class="line">ok: run: postgres-exporter: (pid 10644) 1s</span><br><span class="line">ok: run: postgresql: (pid 10653) 0s</span><br><span class="line">ok: run: prometheus: (pid 10661) 0s</span><br><span class="line">ok: run: redis: (pid 10671) 0s</span><br><span class="line">ok: run: redis-exporter: (pid 10675) 0s</span><br><span class="line">ok: run: sidekiq: (pid 10681) 1s</span><br><span class="line">ok: run: unicorn: (pid 10688) 0s</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> gitlab-rake gitlab:check SANITIZE=true</span><br></pre></td></tr></table></figure>
+<h1 id="升级"><a href="#升级" class="headerlink" title="升级"></a>升级</h1><blockquote>
+<p>当前版本为10.1.3，升级到最新版本（11.0.3），需要先升级到10.x的最新版本（当前为10.8.5），才能进行跨版本升级。<br><img src="/images/gitlab/gitlab-update.png" alt=""><br>升级过程中gitlab将自动进行备份，安装新版本并卸载、清除旧版本的gitlab，然后reconfigure</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> rpm -Uvh gitlab-ce-10.8.5-ce.0.el7.x86_64.rpm</span><br><span class="line"><span class="meta">#</span> rpm -Uvh gitlab-ce-11.0.3-ce.0.el7.x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/持续集成/" rel="tag"># 持续集成</a>
+          
+            <a href="/tags/gitlab/" rel="tag"># gitlab</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/08/smtp_verify/" rel="next" title="SMTP邮箱登录验证">
+                <i class="fa fa-chevron-left"></i> SMTP邮箱登录验证
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/15/gitlab-ci.yml/" rel="prev" title="Gitlab持续集成-(.gitlab-ci.yml)">
+                Gitlab持续集成-(.gitlab-ci.yml) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#集成LDAP"><span class="nav-number">2.</span> <span class="nav-text">集成LDAP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置邮件通知"><span class="nav-number">3.</span> <span class="nav-text">配置邮件通知</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#postfix"><span class="nav-number">3.1.</span> <span class="nav-text">postfix</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#smtp"><span class="nav-number">3.2.</span> <span class="nav-text">smtp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#smtp邮箱问题排查"><span class="nav-number">3.2.1.</span> <span class="nav-text">smtp邮箱问题排查</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#备份"><span class="nav-number">4.</span> <span class="nav-text">备份</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#恢复"><span class="nav-number">5.</span> <span class="nav-text">恢复</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#升级"><span class="nav-number">6.</span> <span class="nav-text">升级</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

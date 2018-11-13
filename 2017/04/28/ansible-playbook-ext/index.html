@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ansible,playbook," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="handlers Handlers是一组task（与普通的task没有任何区别），用于被notify调用。Handlers只会在Play的末尾执行一次，即使被多个不同的task notify，且只有指定notify的task执行结果为changed才会触发。  123456789tasks:- name: Disable DNS resolv for ssh  lineinfile: path=/">
+<meta name="keywords" content="ansible,playbook">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible Playbook扩展">
+<meta property="og:url" content="http://www.vnimos.cn/2017/04/28/ansible-playbook-ext/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="handlers Handlers是一组task（与普通的task没有任何区别），用于被notify调用。Handlers只会在Play的末尾执行一次，即使被多个不同的task notify，且只有指定notify的task执行结果为changed才会触发。  123456789tasks:- name: Disable DNS resolv for ssh  lineinfile: path=/">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-30T00:35:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible Playbook扩展">
+<meta name="twitter:description" content="handlers Handlers是一组task（与普通的task没有任何区别），用于被notify调用。Handlers只会在Play的末尾执行一次，即使被多个不同的task notify，且只有指定notify的task执行结果为changed才会触发。  123456789tasks:- name: Disable DNS resolv for ssh  lineinfile: path=/">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2017/04/28/ansible-playbook-ext/"/>
+
+
+
+
+
+	  <title>Ansible Playbook扩展 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/04/28/ansible-playbook-ext/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ansible Playbook扩展</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T19:56:10+08:00">
+                2017-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/04/28/ansible-playbook-ext/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/04/28/ansible-playbook-ext/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/04/28/ansible-playbook-ext/" class="leancloud_visitors" data-flag-title="Ansible Playbook扩展">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="handlers"><a href="#handlers" class="headerlink" title="handlers"></a>handlers</h1><blockquote>
+<p><code>Handlers</code>是一组task（与普通的task没有任何区别），用于被<code>notify</code>调用。Handlers只会在Play的末尾执行一次，即使被多个不同的task notify，且只有指定notify的task执行结果为<code>changed</code>才会触发。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">Disable</span> <span class="string">DNS</span> <span class="string">resolv</span> <span class="string">for</span> <span class="string">ssh</span></span><br><span class="line"><span class="attr">  lineinfile:</span> <span class="string">path=/etc/ssh/sshd_config</span> <span class="string">regexp=".*UseDNS"</span> <span class="string">line="UseDNS</span> <span class="literal">no</span><span class="string">"</span></span><br><span class="line"><span class="string">  notify: </span></span><br><span class="line"><span class="string">  - restart ssh server</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">handlers:</span></span><br><span class="line"><span class="string">- name: restart ssh server</span></span><br><span class="line"><span class="string">  service: name=sshd state=restarted</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="changed-when、failed-when"><a href="#changed-when、failed-when" class="headerlink" title="changed_when、failed_when"></a>changed_when、failed_when</h1><blockquote>
+<p>使用shell和command模块时，如果不使用changed_when，Ansible将永远返回changed。通过<code>changed_when</code>语句可对返回的信息进行重写，根据任务返回结果判断运行结果是否真正符合预期。同理<code>failed_when</code>也可达到相同的效果。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">Nothing</span> <span class="string">to</span> <span class="string">do</span> <span class="string">for</span> <span class="string">shell</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">echo</span> <span class="string">"Nothing to do"</span></span><br><span class="line"><span class="attr">    register:</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    changed_when:</span> <span class="string">"'Something to do' in result.stdout"</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">Something</span> <span class="string">to</span> <span class="string">do</span> <span class="string">for</span> <span class="string">shell</span></span><br><span class="line"><span class="attr">    shell:</span> <span class="string">echo</span> <span class="string">"Something to do"</span></span><br><span class="line"><span class="attr">    register:</span> <span class="string">result</span></span><br><span class="line"><span class="attr">    changed_when:</span> <span class="string">"'Something to do' in result.stdout"</span></span><br><span class="line"></span><br><span class="line"><span class="string">TASK</span> <span class="string">[Nothing</span> <span class="string">to</span> <span class="string">do</span> <span class="string">for</span> <span class="string">shell]</span> <span class="string">***********************************************</span></span><br><span class="line"><span class="attr">ok:</span> <span class="string">[localhost]</span></span><br><span class="line"></span><br><span class="line"><span class="string">TASK</span> <span class="string">[Something</span> <span class="string">to</span> <span class="string">do</span> <span class="string">for</span> <span class="string">shell]</span> <span class="string">*********************************************</span></span><br><span class="line"><span class="attr">changed:</span> <span class="string">[localhost]</span></span><br></pre></td></tr></table></figure>
+<h1 id="ignore-errors"><a href="#ignore-errors" class="headerlink" title="ignore_errors"></a>ignore_errors</h1><blockquote>
+<p>默认情况下，Ansible执行task时遇到任务执行失败则会中断后续的playbook运行，通过<code>ignore_errors</code>可忽略该task中的报错。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">determine</span> <span class="string">the</span> <span class="string">device</span> <span class="string">was</span> <span class="string">formated</span> <span class="string">filesystem</span> <span class="string">if</span> <span class="string">is</span> <span class="string">exist</span></span><br><span class="line"><span class="attr">  shell:</span> <span class="string">blkid</span> <span class="bullet">-s</span> <span class="string">TYPE</span> <span class="string">/dev/sdb1</span></span><br><span class="line"><span class="attr">  register:</span> <span class="string">filesystem</span></span><br><span class="line"><span class="attr">  when:</span> <span class="string">ansible_devices.sdb</span> <span class="string">is</span> <span class="string">defined</span></span><br><span class="line"><span class="attr">  ignore_errors:</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h1 id="delegate-to、local-action"><a href="#delegate-to、local-action" class="headerlink" title="delegate_to、local_action"></a>delegate_to、local_action</h1><blockquote>
+<p><code>delegate_to</code>用于在特定的task中指定需要运行该task的主机，<code>local_action</code>用于指定task在localhost上执行。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tasks:</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">Get</span> <span class="string">hostname</span></span><br><span class="line"><span class="attr">  shell:</span> <span class="string">hostname</span></span><br><span class="line"><span class="attr">  register:</span> <span class="string">hostname</span></span><br><span class="line"><span class="attr">  delegate_to:</span> <span class="number">10.1</span><span class="number">.10</span><span class="number">.71</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">Display</span> <span class="string">IP</span></span><br><span class="line"><span class="attr">  debug:</span> <span class="string">msg="&#123;&#123;</span> <span class="string">hostname.stdout</span> <span class="string">&#125;&#125;"</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">Get</span> <span class="string">hostname</span></span><br><span class="line"><span class="attr">  local_action:</span> <span class="string">command</span> <span class="string">hostname</span></span><br><span class="line"><span class="attr">  register:</span> <span class="string">hostname</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">Display</span> <span class="string">IP</span></span><br><span class="line"><span class="attr">  debug:</span> <span class="string">msg="&#123;&#123;</span> <span class="string">hostname.stdout</span> <span class="string">&#125;&#125;"</span></span><br></pre></td></tr></table></figure>
+<h1 id="vars-prompt"><a href="#vars-prompt" class="headerlink" title="vars_prompt"></a>vars_prompt</h1><blockquote>
+<p><code>vars_prompt</code>主要用于通过交互式对变量进行赋值。</p>
+</blockquote>
+<ul>
+<li>private：隐藏输入值（默认为yes）</li>
+<li>default：默认值</li>
+<li>confirm：要求对变量输入2次，增加输入的正确性</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">localhost</span></span><br><span class="line"><span class="attr">  vars_prompt:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">key</span></span><br><span class="line"><span class="attr">    prompt:</span> <span class="string">"value of key"</span></span><br><span class="line"><span class="attr">    private:</span> <span class="literal">yes</span></span><br><span class="line"><span class="attr">    default:</span> <span class="string">test</span></span><br><span class="line"><span class="attr">    confirm:</span> <span class="literal">yes</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">test</span></span><br><span class="line"><span class="attr">    debug:</span> <span class="string">msg="&#123;&#123;</span> <span class="string">key</span> <span class="string">&#125;&#125;"</span></span><br></pre></td></tr></table></figure>
+<h1 id="tags标签"><a href="#tags标签" class="headerlink" title="tags标签"></a>tags标签</h1><blockquote>
+<p>默认情况下，Ansible会执行playbook中定义的所有任务。<code>tags</code>可为roles、单个task、或整个playbook打上标签，然后通过<code>--tags=TAGS</code>指定要运行其中的个别任务或<code>--skip-tags=SKIP_TAGS</code>跳过指定的任务。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">localhost</span></span><br><span class="line"><span class="attr">  tags:</span> <span class="string">deploy</span></span><br><span class="line"><span class="attr">  roles:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">&#123;</span> <span class="attr">role:</span> <span class="string">tomcat,</span> <span class="attr">tags:</span> <span class="string">['tomcat','app']</span> <span class="string">&#125;</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">"Tags Test"</span></span><br><span class="line"><span class="attr">    debug:</span> <span class="string">msg="Tags</span> <span class="string">Test!"</span></span><br><span class="line"><span class="attr">    tags:</span> <span class="string">test</span></span><br></pre></td></tr></table></figure>
+<h1 id="Block块"><a href="#Block块" class="headerlink" title="Block块"></a>Block块</h1><blockquote>
+<p><code>Block</code>可对任务进行分组，且可在块级别上应用任务变量。<br>Block块中可插入<code>rescue</code>和<code>always</code>，当block中定义的task执行失败将会触发rescue部分中的task，可用于回滚操作。always部分则无论block中的task是否执行成功都会触发。</p>
+</blockquote>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- hosts:</span> <span class="string">localhost</span></span><br><span class="line"><span class="attr">  tasks:</span></span><br><span class="line"><span class="attr">  - name:</span> <span class="string">Attempt</span> <span class="string">and</span> <span class="string">gracefull</span> <span class="string">roll</span> <span class="string">back</span> <span class="string">demo</span></span><br><span class="line"><span class="attr">    block:</span></span><br><span class="line"><span class="attr">    - debug:</span> <span class="string">msg='[Block]:正常执行'</span></span><br><span class="line"><span class="attr">    - debug:</span> <span class="string">msg='[Block]:执行失败，中断Block中后续的task执行'</span></span><br><span class="line"><span class="attr">      failed_when:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    - debug:</span> <span class="string">msg='[Block]:由于上一个task失败，中断执行'</span></span><br><span class="line"><span class="attr">    rescue:</span></span><br><span class="line"><span class="attr">    - debug:</span> <span class="string">msg='[Rescue]:block中的task失败将触发rescue中的task'</span></span><br><span class="line"><span class="attr">    - debug:</span> <span class="string">msg='[Rescue]:执行失败，中断Rescue中后续的task执行'</span></span><br><span class="line"><span class="attr">      failed_when:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">    - debug:</span> <span class="string">msg='[Rescue]:由于上一个task失败，中断执行'</span></span><br><span class="line"><span class="attr">    always:</span></span><br><span class="line"><span class="attr">    - debug:</span> <span class="string">msg="[Always]:无论block中的task是否失败都会执行"</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">TASK [debug] ************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;[Block]:正常执行&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TASK [debug] ************************************************************</span><br><span class="line">fatal: [localhost]: FAILED! =&gt; &#123;</span><br><span class="line">    &quot;changed&quot;: false, </span><br><span class="line">    &quot;failed_when_result&quot;: true, </span><br><span class="line">    &quot;msg&quot;: &quot;[Block]:执行失败，中断Block中后续的task执行&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TASK [debug] ************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;[Rescue]:block中的task失败将触发rescue中的task&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TASK [debug] ************************************************************</span><br><span class="line">fatal: [localhost]: FAILED! =&gt; &#123;</span><br><span class="line">    &quot;changed&quot;: false, </span><br><span class="line">    &quot;failed_when_result&quot;: true, </span><br><span class="line">    &quot;msg&quot;: &quot;[Rescue]:执行失败，中断Rescue中后续的task执行&quot;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TASK [debug] ************************************************************</span><br><span class="line">ok: [localhost] =&gt; &#123;</span><br><span class="line">    &quot;msg&quot;: &quot;[Always]:无论block中的task是否失败都会执行&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ansible/" rel="tag"># ansible</a>
+          
+            <a href="/tags/playbook/" rel="tag"># playbook</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/11/ansible-filters/" rel="next" title="Ansible Filters">
+                <i class="fa fa-chevron-left"></i> Ansible Filters
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/14/ansible-sysinit/" rel="prev" title="通过Ansible的playbook初始化系统">
+                通过Ansible的playbook初始化系统 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#handlers"><span class="nav-number">1.</span> <span class="nav-text">handlers</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#changed-when、failed-when"><span class="nav-number">2.</span> <span class="nav-text">changed_when、failed_when</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ignore-errors"><span class="nav-number">3.</span> <span class="nav-text">ignore_errors</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#delegate-to、local-action"><span class="nav-number">4.</span> <span class="nav-text">delegate_to、local_action</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vars-prompt"><span class="nav-number">5.</span> <span class="nav-text">vars_prompt</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#tags标签"><span class="nav-number">6.</span> <span class="nav-text">tags标签</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Block块"><span class="nav-number">7.</span> <span class="nav-text">Block块</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

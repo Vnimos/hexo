@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="AWS,阿里云,VPC," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="阿里云 阿里云上VPC间VPC互连都可以通过高速通道或VPN网关实现，各自优缺点如下。     方案 描述 优点 限制     高速通道 通过高速通道路由器接口连接两个VPC 同地域VPC互连免费、大带宽、即开即用，配置立即生效 跨地域VPC互连费用相比VPN网关高一些   VPN网关 通过基于Internet加密的IPsec-VPN隧道实现VPC互连 低成本、安全、即开即用，配置立即生效 网络延">
+<meta name="keywords" content="AWS,阿里云,VPC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="阿里云和AWS间的VPC互连">
+<meta property="og:url" content="http://www.vnimos.cn/2018/06/06/vpc-aliyun-aws/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="阿里云 阿里云上VPC间VPC互连都可以通过高速通道或VPN网关实现，各自优缺点如下。     方案 描述 优点 限制     高速通道 通过高速通道路由器接口连接两个VPC 同地域VPC互连免费、大带宽、即开即用，配置立即生效 跨地域VPC互连费用相比VPN网关高一些   VPN网关 通过基于Internet加密的IPsec-VPN隧道实现VPC互连 低成本、安全、即开即用，配置立即生效 网络延">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/expressConnect.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/router-interface.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/router-interface2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/ec-add-router1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/ec-add-router2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-gw1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-gw2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-user1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-user2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-ipsec1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-ipsec2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-add-router1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-add-router2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-peering.jpg">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/aws-vpc.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/aws-vpcpeering.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpc-peering-router.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpc-peering-add-router1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpc-peering-add-router2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpc-peering-region.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/aws-vpn-user.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/aws-vpn.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/aws-vpn-vpc.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/aws-vpn-connect.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/aws-vpn-add-router.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-user-aws.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-ipsec-aws1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-ipsec-aws2.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/VPC/vpn-add-router-aws.png">
+<meta property="og:updated_time" content="2018-06-07T09:01:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="阿里云和AWS间的VPC互连">
+<meta name="twitter:description" content="阿里云 阿里云上VPC间VPC互连都可以通过高速通道或VPN网关实现，各自优缺点如下。     方案 描述 优点 限制     高速通道 通过高速通道路由器接口连接两个VPC 同地域VPC互连免费、大带宽、即开即用，配置立即生效 跨地域VPC互连费用相比VPN网关高一些   VPN网关 通过基于Internet加密的IPsec-VPN隧道实现VPC互连 低成本、安全、即开即用，配置立即生效 网络延">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/VPC/expressConnect.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2018/06/06/vpc-aliyun-aws/"/>
+
+
+
+
+
+	  <title>阿里云和AWS间的VPC互连 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/06/06/vpc-aliyun-aws/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">阿里云和AWS间的VPC互连</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-06T14:19:33+08:00">
+                2018-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/06/06/vpc-aliyun-aws/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/06/06/vpc-aliyun-aws/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/06/06/vpc-aliyun-aws/" class="leancloud_visitors" data-flag-title="阿里云和AWS间的VPC互连">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="阿里云"><a href="#阿里云" class="headerlink" title="阿里云"></a>阿里云</h1><blockquote>
+<p>阿里云上<a href="https://help.aliyun.com/document_detail/61133.html?spm=a2c4g.11186623.6.565.tRq8cW#same" target="_blank" rel="noopener"><strong>VPC间VPC互连</strong></a>都可以通过高速通道或VPN网关实现，各自优缺点如下。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th><strong>方案</strong></th>
+<th><strong>描述</strong></th>
+<th><strong>优点</strong></th>
+<th><strong>限制</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>高速通道</code></strong></td>
+<td>通过高速通道路由器接口连接两个VPC</td>
+<td>同地域VPC互连免费、大带宽、即开即用，配置立即生效</td>
+<td>跨地域VPC互连费用相比VPN网关高一些</td>
+</tr>
+<tr>
+<td><strong><code>VPN网关</code></strong></td>
+<td>通过基于Internet加密的IPsec-VPN隧道实现VPC互连</td>
+<td>低成本、安全、即开即用，配置立即生效</td>
+<td>网络延迟和可用性取决于 Internet</td>
+</tr>
+</tbody>
+</table>
+<a id="more"></a>
+<h2 id="高速通道"><a href="#高速通道" class="headerlink" title="高速通道"></a>高速通道</h2><blockquote>
+<p>高速通道（Express Connect）是一款基于 IPVPN 的便捷高效的网络服务，用于在云上的不同网络环境间实现高速、稳定、安全的私网通信，包括跨地域/跨用户的 VPC 内网互通、专线接入等场景。</p>
+</blockquote>
+<h3 id="相同region下的VPC互连"><a href="#相同region下的VPC互连" class="headerlink" title="相同region下的VPC互连"></a>相同region下的VPC互连</h3><blockquote>
+<p>由于相同region下的VPC互连免费，因此选择使用高速通道。</p>
+</blockquote>
+<p><img src="/images/VPC/expressConnect.png" alt="高速通道"></p>
+<ul>
+<li>创建路由器接口<blockquote>
+<p>选择同时创建两端，则自动创建2个路由器接口（发起端和接收端）</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/images/VPC/router-interface.png" alt=""><br><img src="/images/VPC/router-interface2.png" alt=""></p>
+<ul>
+<li>配置路由<blockquote>
+<p>分别在发起端和接收端的VPC路由表上添加路由条目，下一条类型选择<code>路由器接口（专有网络方向）</code>并选择对端的VPC</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/images/VPC/ec-add-router1.png" alt=""><br><img src="/images/VPC/ec-add-router2.png" alt=""></p>
+<h2 id="VPN网关"><a href="#VPN网关" class="headerlink" title="VPN网关"></a>VPN网关</h2><h3 id="跨region的VPC互连"><a href="#跨region的VPC互连" class="headerlink" title="跨region的VPC互连"></a>跨region的VPC互连</h3><blockquote>
+<p>跨region的VPC间互连仍然可通过高速通道，但由于需要另外收费，且费用相比VPN网关高，因此选择使用VPN网关。</p>
+</blockquote>
+<p><img src="/images/VPC/vpn.png" alt="VPN网关"></p>
+<ul>
+<li><span id="vpn-gw"> 创建VPN网关 </span><blockquote>
+<p>分别在两个VPC上创建VPN网关</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/images/VPC/vpn-gw1.png" alt="VPN网关"><br><img src="/images/VPC/vpn-gw2.png" alt="VPN网关"></p>
+<ul>
+<li>创建VPN用户网关<blockquote>
+<p>分别在两个VPC上创建VPN用户网关，其中IP地址指向对端VPN网关的IP</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/images/VPC/vpn-user1.png" alt="VPN网关"><br><img src="/images/VPC/vpn-user2.png" alt="VPN网关"></p>
+<ul>
+<li>创建IPSec连接<blockquote>
+<p>分别在两个VPC上创建IPSec连接，并指定本端网段和对端网段</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/images/VPC/vpn-ipsec1.png" alt="VPN网关"><br><img src="/images/VPC/vpn-ipsec2.png" alt="VPN网关"></p>
+<ul>
+<li>配置路由<blockquote>
+<p>分别在两个VPC上的路由表中添加路由条目</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/images/VPC/vpn-add-router1.png" alt=""><br><img src="/images/VPC/vpn-add-router2.png" alt=""></p>
+<hr>
+<h1 id="AWS"><a href="#AWS" class="headerlink" title="AWS"></a>AWS</h1><h2 id="VPC-Peering"><a href="#VPC-Peering" class="headerlink" title="VPC Peering"></a>VPC Peering</h2><blockquote>
+<p>VPC对等连接是两个VPC之间的网络连接，通过此连接，可以使用私有IPv4或IPv6地址在两个 VPC之间路由流量。这两个VPC中的实例可以彼此通信，就像它们在同一网络中一样。您可以在自己的VPC之间创建VPC对等连接，或者在自己的VPC与其他AWS账户中的VPC之间创建连接。VPC可位于不同区域内。</p>
+</blockquote>
+<p><img src="/images/VPC/vpn-peering.jpg" alt="VPC 对等连接"><br>AWS 使用 VPC 的现有基础设施来创建 VPC 对等连接；该连接既不是网关也不是 VPN 连接，并且不依赖某一单独的物理硬件。没有单点通信故障也没有带宽瓶颈。</p>
+<h3 id="相同region下的VPC间互连"><a href="#相同region下的VPC间互连" class="headerlink" title="相同region下的VPC间互连"></a>相同region下的VPC间互连</h3><ul>
+<li>创建2个VPC<br><img src="/images/VPC/aws-vpc.png" alt=""></li>
+<li>创建VPC对等连接<br><img src="/images/VPC/aws-vpcpeering.png" alt=""><blockquote>
+<p>刚创建完成的对等连接正常状态为<code>Pending-acceptance</code>，需要在接受方接受请求后才会变成<code>active</code>状态。</p>
+</blockquote>
+</li>
+<li>更新路由表<br>要将流量发送到对等VPC中的实例，必须向路由表中添加与该实例所在子网相关联的路由。<br>此路由指向VPC对等连接中另一个VPC的CIDR块(或CIDR块的子网)。<br><img src="/images/VPC/vpc-peering-router.png" alt=""><br><img src="/images/VPC/vpc-peering-add-router1.png" alt=""><br><img src="/images/VPC/vpc-peering-add-router2.png" alt=""></li>
+</ul>
+<h3 id="跨region-AWS账户下的VPC间互连"><a href="#跨region-AWS账户下的VPC间互连" class="headerlink" title="跨region/AWS账户下的VPC间互连"></a>跨region/AWS账户下的VPC间互连</h3><blockquote>
+<p>跨region或不同AWS下的VPC间互连只需在创建对等连接时选择指定区域或选择另一个账户，并填写接受方的VPC_ID，创建完成后将会自动在接受方创建相同的对等连接，只需在接受方接受请求即可。其他配置方法与同一region下的相同。</p>
+</blockquote>
+<p><img src="/images/VPC/vpc-peering-region.png" alt=""></p>
+<hr>
+<h1 id="阿里云与AWS之间的VPC互联"><a href="#阿里云与AWS之间的VPC互联" class="headerlink" title="阿里云与AWS之间的VPC互联"></a>阿里云与AWS之间的VPC互联</h1><blockquote>
+<p>阿里云与AWS之间的VPC互连可通过阿里云的”VPN网关”与AWS的”VPN连接”走VPN进行对接，也可以通过阿里云的”高速通道专线接入”与AWS的”Direct Connect”通过物理专线进行对接。</p>
+</blockquote>
+<h2 id="VPN"><a href="#VPN" class="headerlink" title="VPN"></a>VPN</h2><h3 id="AWS上配置VPN连接"><a href="#AWS上配置VPN连接" class="headerlink" title="AWS上配置VPN连接"></a>AWS上配置VPN连接</h3><ul>
+<li>创建客户网关<br><img src="/images/VPC/aws-vpn-user.png" alt=""></li>
+<li>创建虚拟专用网关<br><img src="/images/VPC/aws-vpn.png" alt=""></li>
+<li>将虚拟专用网关与VPC关联<br><img src="/images/VPC/aws-vpn-vpc.png" alt=""></li>
+<li>创建VPN连接<br><img src="/images/VPC/aws-vpn-connect.png" alt=""></li>
+<li>下载VPN连接配置，并根据配置在阿里云上创建VPN网关<blockquote>
+<p>下载下来的是VPN设备上相关的VPN配置，主要从中获取AWS上分配的VPN连接的<code>IP地址</code>、<code>预共享密钥</code>和<code>SA生存周期</code>，其他配置默认与阿里云一致。</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">crypto isakmp policy 201</span><br><span class="line">  encryption aes</span><br><span class="line">  authentication pre-share</span><br><span class="line">  group 2</span><br><span class="line">  lifetime 28800</span><br><span class="line">  hash sha</span><br><span class="line">tunnel-group 13.250.249.194 type ipsec-l2l</span><br><span class="line">tunnel-group 13.250.249.194 ipsec-attributes</span><br><span class="line">   pre-shared-key GH_Jr4dIkuwAcD3GULOPlimkqBeZwOvN</span><br><span class="line">tunnel-group 52.220.23.174 type ipsec-l2l</span><br><span class="line">tunnel-group 52.220.23.174 ipsec-attributes</span><br><span class="line">   pre-shared-key 1Hm255efOyYBij9NPz5hCPfe56AFmF.j</span><br><span class="line">crypto map &lt;amzn_vpn_map&gt; 1 set peer  13.250.249.194 52.220.23.174</span><br><span class="line">crypto map &lt;amzn_vpn_map&gt; 1 set security-association lifetime seconds 3600</span><br></pre></td></tr></table></figure>
+<p><code>这边有个坑就是AWS上的VPN连接提供了2个IP，但是在阿里云上不能创建2个IPSec连接到这2个IP，否则无法互通，但只连接其中1个IP就没问题</code></p>
+<ul>
+<li>配置路由</li>
+</ul>
+<p><img src="/images/VPC/aws-vpn-add-router.png" alt=""></p>
+<h3 id="阿里云上配置VPN网关"><a href="#阿里云上配置VPN网关" class="headerlink" title="阿里云上配置VPN网关"></a>阿里云上配置VPN网关</h3><ul>
+<li><p>创建VPN网关</p>
+<blockquote>
+<p>可参考以上<a href="#vpn-gw">创建VPN网关</a>的步骤，这里可直接用之前创建的VPN网关，不需再新建</p>
+</blockquote>
+</li>
+<li><p>创建用户网关</p>
+<blockquote>
+<p>这里需要将对端IP指向AWS上的VPN IP</p>
+</blockquote>
+</li>
+</ul>
+<p><img src="/images/VPC/vpn-user-aws.png" alt=""></p>
+<ul>
+<li>创建IPsec连接</li>
+</ul>
+<p><img src="/images/VPC/vpn-ipsec-aws1.png" alt=""><br><img src="/images/VPC/vpn-ipsec-aws2.png" alt=""></p>
+<ul>
+<li>配置路由</li>
+</ul>
+<p><img src="/images/VPC/vpn-add-router-aws.png" alt=""></p>
+<h2 id="专线"><a href="#专线" class="headerlink" title="专线"></a>专线</h2>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/AWS/" rel="tag"># AWS</a>
+          
+            <a href="/tags/阿里云/" rel="tag"># 阿里云</a>
+          
+            <a href="/tags/VPC/" rel="tag"># VPC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/15/gitlab-ci.yml/" rel="next" title="Gitlab持续集成-(.gitlab-ci.yml)">
+                <i class="fa fa-chevron-left"></i> Gitlab持续集成-(.gitlab-ci.yml)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/27/nginx/" rel="prev" title="Ansible编排Nginx配置">
+                Ansible编排Nginx配置 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#阿里云"><span class="nav-number">1.</span> <span class="nav-text">阿里云</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#高速通道"><span class="nav-number">1.1.</span> <span class="nav-text">高速通道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相同region下的VPC互连"><span class="nav-number">1.1.1.</span> <span class="nav-text">相同region下的VPC互连</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VPN网关"><span class="nav-number">1.2.</span> <span class="nav-text">VPN网关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#跨region的VPC互连"><span class="nav-number">1.2.1.</span> <span class="nav-text">跨region的VPC互连</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AWS"><span class="nav-number">2.</span> <span class="nav-text">AWS</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VPC-Peering"><span class="nav-number">2.1.</span> <span class="nav-text">VPC Peering</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相同region下的VPC间互连"><span class="nav-number">2.1.1.</span> <span class="nav-text">相同region下的VPC间互连</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#跨region-AWS账户下的VPC间互连"><span class="nav-number">2.1.2.</span> <span class="nav-text">跨region/AWS账户下的VPC间互连</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#阿里云与AWS之间的VPC互联"><span class="nav-number">3.</span> <span class="nav-text">阿里云与AWS之间的VPC互联</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VPN"><span class="nav-number">3.1.</span> <span class="nav-text">VPN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AWS上配置VPN连接"><span class="nav-number">3.1.1.</span> <span class="nav-text">AWS上配置VPN连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阿里云上配置VPN网关"><span class="nav-number">3.1.2.</span> <span class="nav-text">阿里云上配置VPN网关</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#专线"><span class="nav-number">3.2.</span> <span class="nav-text">专线</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

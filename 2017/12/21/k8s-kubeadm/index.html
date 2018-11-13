@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker,http_proxy,kubernetes," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="在完成科学上网的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。  环境准备（在所有节点上执行）   hostname IP 作用     k8s-master 172.16.100.50 master/etcd   k8s-node1 172.16.100.51 node   k8s-node2 172.16.100.52 node">
+<meta name="keywords" content="docker,http_proxy,kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用kubeadm部署Kubernetes1.8.5">
+<meta property="og:url" content="http://www.vnimos.cn/2017/12/21/k8s-kubeadm/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="在完成科学上网的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。  环境准备（在所有节点上执行）   hostname IP 作用     k8s-master 172.16.100.50 master/etcd   k8s-node1 172.16.100.51 node   k8s-node2 172.16.100.52 node">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2017-12-21T09:10:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用kubeadm部署Kubernetes1.8.5">
+<meta name="twitter:description" content="在完成科学上网的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。  环境准备（在所有节点上执行）   hostname IP 作用     k8s-master 172.16.100.50 master/etcd   k8s-node1 172.16.100.51 node   k8s-node2 172.16.100.52 node">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2017/12/21/k8s-kubeadm/"/>
+
+
+
+
+
+	  <title>使用kubeadm部署Kubernetes1.8.5 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/12/21/k8s-kubeadm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用kubeadm部署Kubernetes1.8.5</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-21T16:35:01+08:00">
+                2017-12-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/12/21/k8s-kubeadm/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/12/21/k8s-kubeadm/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/12/21/k8s-kubeadm/" class="leancloud_visitors" data-flag-title="使用kubeadm部署Kubernetes1.8.5">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>在完成<a href="https://vnimos.cn/2017/12/14/docker-http-proxy/" title="科学上网" target="_blank" rel="noopener">科学上网</a>的前提下，我们准备使用kubeadm通过http代理部署Kubernetes。</p>
+</blockquote>
+<h1 id="环境准备（在所有节点上执行）"><a href="#环境准备（在所有节点上执行）" class="headerlink" title="环境准备（在所有节点上执行）"></a>环境准备（在所有节点上执行）</h1><table>
+<thead>
+<tr>
+<th>hostname</th>
+<th>IP</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>k8s-master</td>
+<td>172.16.100.50</td>
+<td>master/etcd</td>
+</tr>
+<tr>
+<td>k8s-node1</td>
+<td>172.16.100.51</td>
+<td>node</td>
+</tr>
+<tr>
+<td>k8s-node2</td>
+<td>172.16.100.52</td>
+<td>node</td>
+</tr>
+</tbody>
+</table>
+<a id="more"></a>
+<h2 id="关闭swap"><a href="#关闭swap" class="headerlink" title="关闭swap"></a>关闭swap</h2><blockquote>
+<p>由于Kubernetes1.8之后需要关闭swap，否则将会出现如下报错：<br><code>running with swap on is not supported. Please disable swap</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># swapoff -a</span><br><span class="line"># sed -i &apos;/swap/d&apos; /etc/fstab</span><br></pre></td></tr></table></figure>
+<h2 id="配置http代理"><a href="#配置http代理" class="headerlink" title="配置http代理"></a>配置http代理</h2><blockquote>
+<p>由于kubeadm init时需要访问google的网站，如果不科学上网将会出现如下报错：<br><code>unable to get URL &quot;https://dl.k8s.io/release/stable-1.8.txt&quot;: Get https://storage.googleapis.com/kubernetes-release/release/stable-1.8.txt: dial tcp 172.217.160.112:443: i/o timeout</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># vi ~/.profile</span><br><span class="line">export http_proxy=&quot;http://k8s-master:8118&quot;</span><br><span class="line">export https_proxy=$http_proxy</span><br><span class="line">export no_proxy=&quot;localhost,127.0.0.1,localaddress,.localdomain.com,172.16.100.50&quot;</span><br></pre></td></tr></table></figure>
+<p>注：如果no_proxy中不添加<strong>172.16.100.50</strong>，则会出现<code>[preflight] WARNING: Connection to &quot;https://172.16.100.50:6443&quot; uses proxy &quot;http://172.16.100.50:8118&quot;. If that is not intended, adjust your proxy settings</code>的告警</p>
+<h2 id="Docker配置http代理"><a href="#Docker配置http代理" class="headerlink" title="Docker配置http代理"></a>Docker配置http代理</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># mkdir /etc/systemd/system/docker.service.d/</span><br><span class="line"># cd /etc/systemd/system/docker.service.d/</span><br><span class="line"># vi http-proxy.conf</span><br><span class="line">[Service]</span><br><span class="line">Environment=&quot;HTTP_PROXY=http://k8s-master:8118/&quot;</span><br><span class="line">Environment=&quot;HTTPS_PROXY=https://k8s-master:8118/&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="添加Kubernetes的apt源"><a href="#添加Kubernetes的apt源" class="headerlink" title="添加Kubernetes的apt源"></a>添加Kubernetes的apt源</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -</span><br><span class="line"># cat &gt; /etc/apt/sources.list.d/kubernetes.list &lt;&lt;EOF</span><br><span class="line">deb http://apt.kubernetes.io/ kubernetes-xenial main</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<h2 id="安装所需软件"><a href="#安装所需软件" class="headerlink" title="安装所需软件"></a>安装所需软件</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># apt-get update</span><br><span class="line"># apt-get install -y docker.io kubelet=1.8.5-00 kubeadm=1.8.5-00 kubectl=1.8.5-00</span><br></pre></td></tr></table></figure>
+<h1 id="部署Master节点"><a href="#部署Master节点" class="headerlink" title="部署Master节点"></a>部署Master节点</h1><h2 id="通过kubeadm初始化"><a href="#通过kubeadm初始化" class="headerlink" title="通过kubeadm初始化"></a>通过kubeadm初始化</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">root@k8s-master:~# kubeadm init --apiserver-advertise-address 172.16.100.50 --pod-network-cidr=10.244.0.0/16</span><br><span class="line">[kubeadm] WARNING: kubeadm is in beta, please do not use it for production clusters.</span><br><span class="line">[init] Using Kubernetes version: v1.8.5</span><br><span class="line">[init] Using Authorization modes: [Node RBAC]</span><br><span class="line">[preflight] Running pre-flight checks</span><br><span class="line">[kubeadm] WARNING: starting in 1.8, tokens expire after 24 hours by default (if you require a non-expiring token use --token-ttl 0)</span><br><span class="line">[certificates] Generated ca certificate and key.</span><br><span class="line">[certificates] Generated apiserver certificate and key.</span><br><span class="line">[certificates] apiserver serving cert is signed for DNS names [k8s-master kubernetes kubernetes.default kubernetes.default.svc kubernetes.default.svc.cluster.local] and IPs [10.96.0.1 172.16.100.50]</span><br><span class="line">[certificates] Generated apiserver-kubelet-client certificate and key.</span><br><span class="line">[certificates] Generated sa key and public key.</span><br><span class="line">[certificates] Generated front-proxy-ca certificate and key.</span><br><span class="line">[certificates] Generated front-proxy-client certificate and key.</span><br><span class="line">[certificates] Valid certificates and keys now exist in &quot;/etc/kubernetes/pki&quot;</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: &quot;admin.conf&quot;</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: &quot;kubelet.conf&quot;</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: &quot;controller-manager.conf&quot;</span><br><span class="line">[kubeconfig] Wrote KubeConfig file to disk: &quot;scheduler.conf&quot;</span><br><span class="line">[controlplane] Wrote Static Pod manifest for component kube-apiserver to &quot;/etc/kubernetes/manifests/kube-apiserver.yaml&quot;</span><br><span class="line">[controlplane] Wrote Static Pod manifest for component kube-controller-manager to &quot;/etc/kubernetes/manifests/kube-controller-manager.yaml&quot;</span><br><span class="line">[controlplane] Wrote Static Pod manifest for component kube-scheduler to &quot;/etc/kubernetes/manifests/kube-scheduler.yaml&quot;</span><br><span class="line">[etcd] Wrote Static Pod manifest for a local etcd instance to &quot;/etc/kubernetes/manifests/etcd.yaml&quot;</span><br><span class="line">[init] Waiting for the kubelet to boot up the control plane as Static Pods from directory &quot;/etc/kubernetes/manifests&quot;</span><br><span class="line">[init] This often takes around a minute; or longer if the control plane images have to be pulled.</span><br><span class="line"></span><br><span class="line">[apiclient] All control plane components are healthy after 615.502170 seconds</span><br><span class="line">[uploadconfig] Storing the configuration used in ConfigMap &quot;kubeadm-config&quot; in the &quot;kube-system&quot; Namespace</span><br><span class="line">[markmaster] Will mark node k8s-master as master by adding a label and a taint</span><br><span class="line">[markmaster] Master k8s-master tainted and labelled with key/value: node-role.kubernetes.io/master=&quot;&quot;</span><br><span class="line">[bootstraptoken] Using token: 3d52f3.9899527f02a75122</span><br><span class="line">[bootstraptoken] Configured RBAC rules to allow Node Bootstrap tokens to post CSRs in order for nodes to get long term certificate credentials</span><br><span class="line">[bootstraptoken] Configured RBAC rules to allow the csrapprover controller automatically approve CSRs from a Node Bootstrap Token</span><br><span class="line">[bootstraptoken] Configured RBAC rules to allow certificate rotation for all node client certificates in the cluster</span><br><span class="line">[bootstraptoken] Creating the &quot;cluster-info&quot; ConfigMap in the &quot;kube-public&quot; namespace</span><br><span class="line">[addons] Applied essential addon: kube-dns</span><br><span class="line">[addons] Applied essential addon: kube-proxy</span><br><span class="line"></span><br><span class="line">Your Kubernetes master has initialized successfully!</span><br><span class="line"></span><br><span class="line">To start using your cluster, you need to run (as a regular user):</span><br><span class="line"></span><br><span class="line">  mkdir -p $HOME/.kube</span><br><span class="line">  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">  sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"></span><br><span class="line">You should now deploy a pod network to the cluster.</span><br><span class="line">Run &quot;kubectl apply -f [podnetwork].yaml&quot; with one of the options listed at:</span><br><span class="line">  http://kubernetes.io/docs/admin/addons/</span><br><span class="line"></span><br><span class="line">You can now join any number of machines by running the following on each node</span><br><span class="line">as root:</span><br><span class="line"></span><br><span class="line">  kubeadm join --token 3d52f3.9899527f02a75122 172.16.100.50:6443 --discovery-token-ca-cert-hash sha256:c04f230146d11fd87932bb589b0a6ccc897bd15f99bda74f009a69919de5a205</span><br></pre></td></tr></table></figure>
+<p><strong>初始化过程主要完成：</strong></p>
+<ol>
+<li>[preflight]：kubeadm执行初始化前的检查；</li>
+<li>[certificates]：生成token和证书。</li>
+<li>[kubeconfig]~[etcd]：生成相关的配置文件；</li>
+<li>[init]~[bootstraptoken]：安装Master组件，会从goolge的 Registry下载组件的Docker镜像，这一步可能会花一些时间，主要取决于网络质量。</li>
+<li>[addons]：安装附加组件kube-dns和kube-proxy；</li>
+<li>Kubernetes Master 初始化成功；</li>
+<li>提示如何配置kubectl（使用普通用户）；</li>
+<li>提示如何安装 Pod 网络（参考 <a href="http://kubernetes.io/docs/admin/addons/" target="_blank" rel="noopener">http://kubernetes.io/docs/admin/addons/</a> ）；</li>
+<li>提示如何注册其他节点到 Cluster（需要记录下提示命令）。</li>
+</ol>
+<ul>
+<li>使用普通用户管理Kubernetes：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vnimos@k8s-master:~$ mkdir -p $HOME/.kube</span><br><span class="line">vnimos@k8s-master:~$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">vnimos@k8s-master:~$ sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="检查Kubernetes状态"><a href="#检查Kubernetes状态" class="headerlink" title="检查Kubernetes状态"></a>检查Kubernetes状态</h2><blockquote>
+<p>由于还未部署pod网络，所以kube-dns还处于Pending状态</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">vnimos@k8s-master:~$ sudo systemctl status kubelet</span><br><span class="line">● kubelet.service - kubelet: The Kubernetes Node Agent</span><br><span class="line">   Loaded: loaded (/lib/systemd/system/kubelet.service; enabled; vendor preset: enabled)</span><br><span class="line">  Drop-In: /etc/systemd/system/kubelet.service.d</span><br><span class="line">           └─10-kubeadm.conf</span><br><span class="line">   Active: active (running) since Thu 2017-12-21 15:33:24 CST; 14min ago</span><br><span class="line">     Docs: http://kubernetes.io/docs/</span><br><span class="line"> Main PID: 7941 (kubelet)</span><br><span class="line">    Tasks: 16</span><br><span class="line">   Memory: 42.7M</span><br><span class="line">      CPU: 15.932s</span><br><span class="line">   CGroup: /system.slice/kubelet.service</span><br><span class="line">           └─7941 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --pod-manifest-path=/etc/kubernetes/manifests -</span><br><span class="line">vnimos@k8s-master:~$ sudo docker images</span><br><span class="line">REPOSITORY                                               TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">gcr.io/google_containers/kube-apiserver-amd64            v1.8.5              ff90510bd7a8        13 days ago         194 MB</span><br><span class="line">gcr.io/google_containers/kube-controller-manager-amd64   v1.8.5              b3710be972a6        13 days ago         129 MB</span><br><span class="line">gcr.io/google_containers/kube-scheduler-amd64            v1.8.5              b7977f445d3b        13 days ago         55 MB</span><br><span class="line">gcr.io/google_containers/etcd-amd64                      3.0.17              243830dae7dd        10 months ago       169 MB</span><br><span class="line">gcr.io/google_containers/pause-amd64                     3.0                 99e59f495ffa        19 months ago       747 kB</span><br><span class="line">vnimos@k8s-master:~$ kubectl get node</span><br><span class="line">NAME         STATUS     ROLES     AGE       VERSION</span><br><span class="line">k8s-master   NotReady   master    2m        v1.8.5</span><br><span class="line">vnimos@k8s-master:~$ kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                                 READY     STATUS    RESTARTS   AGE       IP              NODE</span><br><span class="line">etcd-k8s-master                      1/1       Running   0          3s        172.16.100.50   k8s-master</span><br><span class="line">kube-apiserver-k8s-master            1/1       Running   0          3s        172.16.100.50   k8s-master</span><br><span class="line">kube-controller-manager-k8s-master   1/1       Running   0          3s        172.16.100.50   k8s-master</span><br><span class="line">kube-dns-545bc4bfd4-d299p            0/3       Pending   0          19m       &lt;none&gt;          &lt;none&gt;</span><br><span class="line">kube-proxy-9bnnx                     1/1       Running   0          19m       172.16.100.50   k8s-master</span><br><span class="line">kube-scheduler-k8s-master            1/1       Running   0          3s        172.16.100.50   k8s-master</span><br></pre></td></tr></table></figure>
+<h1 id="部署Pod网络（Fannel）"><a href="#部署Pod网络（Fannel）" class="headerlink" title="部署Pod网络（Fannel）"></a>部署Pod网络（Fannel）</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">vnimos@k8s-master:~$ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml</span><br><span class="line">clusterrole &quot;flannel&quot; created</span><br><span class="line">clusterrolebinding &quot;flannel&quot; created</span><br><span class="line">serviceaccount &quot;flannel&quot; created</span><br><span class="line">configmap &quot;kube-flannel-cfg&quot; created</span><br><span class="line">daemonset &quot;kube-flannel-ds&quot; created</span><br><span class="line">vnimos@k8s-master:~$ kubectl get pod -n kube-system -o wide</span><br><span class="line">NAME                                 READY     STATUS    RESTARTS   AGE       IP              NODE</span><br><span class="line">etcd-k8s-master                      1/1       Running   0          1m        172.16.100.50   k8s-master</span><br><span class="line">kube-apiserver-k8s-master            1/1       Running   0          1m        172.16.100.50   k8s-master</span><br><span class="line">kube-controller-manager-k8s-master   1/1       Running   0          1m        172.16.100.50   k8s-master</span><br><span class="line">kube-dns-545bc4bfd4-d299p            3/3       Running   0          31m       10.244.0.2      k8s-master</span><br><span class="line">kube-flannel-ds-fw56r                1/1       Running   0          2m        172.16.100.50   k8s-master</span><br><span class="line">kube-proxy-9bnnx                     1/1       Running   0          31m       172.16.100.50   k8s-master</span><br><span class="line">kube-scheduler-k8s-master            1/1       Running   0          1m        172.16.100.50   k8s-master</span><br><span class="line">vnimos@k8s-master:~$ kubectl get node</span><br><span class="line">NAME         STATUS    ROLES     AGE       VERSION</span><br><span class="line">k8s-master   Ready     master    31m       v1.8.5</span><br></pre></td></tr></table></figure>
+<h1 id="部署node节点"><a href="#部署node节点" class="headerlink" title="部署node节点"></a>部署node节点</h1><h2 id="join-Kubernetes集群"><a href="#join-Kubernetes集群" class="headerlink" title="join Kubernetes集群"></a>join Kubernetes集群</h2><blockquote>
+<p>如果部署完Master节点忘了记录Token，可通过<code>kubeadm token list</code>查看</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">root@k8s-node1:~# kubeadm join --token 3d52f3.9899527f02a75122 172.16.100.50:6443 --discovery-token-ca-cert-hash sha256:c04f230146d11fd87932bb589b0a6ccc897bd15f99bda74f009a69919de5a205</span><br><span class="line">[kubeadm] WARNING: kubeadm is in beta, please do not use it for production clusters.</span><br><span class="line">[preflight] Running pre-flight checks</span><br><span class="line">[discovery] Trying to connect to API Server &quot;172.16.100.50:6443&quot;</span><br><span class="line">[discovery] Created cluster-info discovery client, requesting info from &quot;https://172.16.100.50:6443&quot;</span><br><span class="line">[discovery] Requesting info from &quot;https://172.16.100.50:6443&quot; again to validate TLS against the pinned public key</span><br><span class="line">[discovery] Cluster info signature and contents are valid and TLS certificate validates against pinned roots, will use API Server &quot;172.16.100.50:6443&quot;</span><br><span class="line">[discovery] Successfully established connection with API Server &quot;172.16.100.50:6443&quot;</span><br><span class="line">[bootstrap] Detected server version: v1.8.5</span><br><span class="line">[bootstrap] The server supports the Certificates API (certificates.k8s.io/v1beta1)</span><br><span class="line"></span><br><span class="line">Node join complete:</span><br><span class="line">* Certificate signing request sent to master and response</span><br><span class="line">  received.</span><br><span class="line">* Kubelet informed of new secure connection details.</span><br><span class="line"></span><br><span class="line">Run &apos;kubectl get nodes&apos; on the master to see this machine join.</span><br></pre></td></tr></table></figure>
+<h2 id="检查Kubernetes状态-1"><a href="#检查Kubernetes状态-1" class="headerlink" title="检查Kubernetes状态"></a>检查Kubernetes状态</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">vnimos@k8s-master:~$ kubectl get pod -o wide -n kube-system</span><br><span class="line">NAME                                 READY     STATUS    RESTARTS   AGE       IP              NODE</span><br><span class="line">etcd-k8s-master                      1/1       Running   0          18m       172.16.100.50   k8s-master</span><br><span class="line">kube-apiserver-k8s-master            1/1       Running   0          17m       172.16.100.50   k8s-master</span><br><span class="line">kube-controller-manager-k8s-master   1/1       Running   0          18m       172.16.100.50   k8s-master</span><br><span class="line">kube-dns-545bc4bfd4-frlb5            3/3       Running   0          17m       10.244.0.2      k8s-master</span><br><span class="line">kube-flannel-ds-68xvq                1/1       Running   0          16m       172.16.100.50   k8s-master</span><br><span class="line">kube-flannel-ds-hp5ck                1/1       Running   0          15m       172.16.100.51   k8s-node1</span><br><span class="line">kube-flannel-ds-j67hh                1/1       Running   3          4m        172.16.100.52   k8s-node2</span><br><span class="line">kube-proxy-lck5q                     1/1       Running   0          4m        172.16.100.52   k8s-node2</span><br><span class="line">kube-proxy-rtrxh                     1/1       Running   0          17m       172.16.100.50   k8s-master</span><br><span class="line">kube-proxy-trlt7                     1/1       Running   0          15m       172.16.100.51   k8s-node1</span><br><span class="line">kube-scheduler-k8s-master            1/1       Running   0          18m       172.16.100.50   k8s-master</span><br><span class="line">vnimos@k8s-master:~$ kubectl get node</span><br><span class="line">NAME         STATUS    ROLES     AGE       VERSION</span><br><span class="line">k8s-master   Ready     master    18m       v1.8.5</span><br><span class="line">k8s-node1    Ready     &lt;none&gt;    15m       v1.8.5</span><br><span class="line">k8s-node2    Ready     &lt;none&gt;    4m        v1.8.5</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+            <a href="/tags/http-proxy/" rel="tag"># http_proxy</a>
+          
+            <a href="/tags/kubernetes/" rel="tag"># kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/14/docker-http-proxy/" rel="next" title="配置Docker http代理">
+                <i class="fa fa-chevron-left"></i> 配置Docker http代理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/08/smtp_verify/" rel="prev" title="SMTP邮箱登录验证">
+                SMTP邮箱登录验证 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#环境准备（在所有节点上执行）"><span class="nav-number">1.</span> <span class="nav-text">环境准备（在所有节点上执行）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭swap"><span class="nav-number">1.1.</span> <span class="nav-text">关闭swap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置http代理"><span class="nav-number">1.2.</span> <span class="nav-text">配置http代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker配置http代理"><span class="nav-number">1.3.</span> <span class="nav-text">Docker配置http代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加Kubernetes的apt源"><span class="nav-number">1.4.</span> <span class="nav-text">添加Kubernetes的apt源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装所需软件"><span class="nav-number">1.5.</span> <span class="nav-text">安装所需软件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署Master节点"><span class="nav-number">2.</span> <span class="nav-text">部署Master节点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#通过kubeadm初始化"><span class="nav-number">2.1.</span> <span class="nav-text">通过kubeadm初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查Kubernetes状态"><span class="nav-number">2.2.</span> <span class="nav-text">检查Kubernetes状态</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署Pod网络（Fannel）"><span class="nav-number">3.</span> <span class="nav-text">部署Pod网络（Fannel）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署node节点"><span class="nav-number">4.</span> <span class="nav-text">部署node节点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#join-Kubernetes集群"><span class="nav-number">4.1.</span> <span class="nav-text">join Kubernetes集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查Kubernetes状态-1"><span class="nav-number">4.2.</span> <span class="nav-text">检查Kubernetes状态</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

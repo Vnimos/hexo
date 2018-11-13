@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ansible,playbook," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="main.yaml123456- import_playbook: hostname.yaml- import_playbook: packages.yaml- import_playbook: partion.yaml- import_playbook: user.yaml- import_playbook: download.yaml- import_playbook: optimize.ya">
+<meta name="keywords" content="ansible,playbook">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过Ansible的playbook初始化系统">
+<meta property="og:url" content="http://www.vnimos.cn/2017/05/14/ansible-sysinit/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="main.yaml123456- import_playbook: hostname.yaml- import_playbook: packages.yaml- import_playbook: partion.yaml- import_playbook: user.yaml- import_playbook: download.yaml- import_playbook: optimize.ya">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-28T02:45:59.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过Ansible的playbook初始化系统">
+<meta name="twitter:description" content="main.yaml123456- import_playbook: hostname.yaml- import_playbook: packages.yaml- import_playbook: partion.yaml- import_playbook: user.yaml- import_playbook: download.yaml- import_playbook: optimize.ya">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2017/05/14/ansible-sysinit/"/>
+
+
+
+
+
+	  <title>通过Ansible的playbook初始化系统 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/05/14/ansible-sysinit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通过Ansible的playbook初始化系统</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-14T15:35:28+08:00">
+                2017-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/05/14/ansible-sysinit/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/05/14/ansible-sysinit/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/05/14/ansible-sysinit/" class="leancloud_visitors" data-flag-title="通过Ansible的playbook初始化系统">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="main-yaml"><a href="#main-yaml" class="headerlink" title="main.yaml"></a>main.yaml</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- import_playbook: hostname.yaml</span><br><span class="line">- import_playbook: packages.yaml</span><br><span class="line">- import_playbook: partion.yaml</span><br><span class="line">- import_playbook: user.yaml</span><br><span class="line">- import_playbook: download.yaml</span><br><span class="line">- import_playbook: optimize.yaml</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="variables-yaml"><a href="#variables-yaml" class="headerlink" title="variables.yaml"></a>variables.yaml</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">---</span><br><span class="line">services: xxx</span><br><span class="line">packages:</span><br><span class="line">- dos2unix</span><br><span class="line">- tree</span><br><span class="line">- telnet</span><br><span class="line">- htop</span><br><span class="line">- iftop</span><br><span class="line">- lrzsz</span><br><span class="line">- zip</span><br><span class="line">- unzip</span><br><span class="line">- lsof</span><br><span class="line">- bind-utils</span><br><span class="line">- screen</span><br><span class="line">- mtr</span><br><span class="line">- net-tools</span><br><span class="line">- parted</span><br></pre></td></tr></table></figure>
+<h1 id="hostname-yaml"><a href="#hostname-yaml" class="headerlink" title="hostname.yaml"></a>hostname.yaml</h1><blockquote>
+<p>根据服务名称设置主机名（包含服务名称、公/私网IP后缀），并添加hosts解析</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  vars_files:</span><br><span class="line">  - variables.yaml</span><br><span class="line">  tasks:</span><br><span class="line">  - name: determine if variable is defined</span><br><span class="line">    fail: msg=&quot;The variable service is not defined&quot;</span><br><span class="line">    when: service == &quot;xxx&quot;</span><br><span class="line">  - name: get the variables of private_ip_tail</span><br><span class="line">    shell: echo &#123;&#123; ansible_eth0.ipv4.address &#125;&#125; | awk -F &quot;.&quot; &apos;&#123;print $NF&#125;&apos;</span><br><span class="line">    register: private</span><br><span class="line">  - name: define hostname if eth1 is not exist</span><br><span class="line">    shell: echo &#123;&#123; service &#125;&#125;_&#123;&#123; private.stdout &#125;&#125;</span><br><span class="line">    register: hostname</span><br><span class="line">    when: ansible_eth1.ipv4 is undefined</span><br><span class="line">  - name: get the variables of public_ip_tail</span><br><span class="line">    shell: echo &#123;&#123; ansible_eth1.ipv4.address &#125;&#125; | awk -F &quot;.&quot; &apos;&#123;print $NF&#125;&apos;</span><br><span class="line">    register: public</span><br><span class="line">    when: ansible_eth1.ipv4 is defined</span><br><span class="line">  - name: define hostname if eth1 is exist</span><br><span class="line">    shell: echo &#123;&#123; service &#125;&#125;_&#123;&#123; private.stdout &#125;&#125;_&#123;&#123; public.stdout &#125;&#125;</span><br><span class="line">    register: hostname</span><br><span class="line">    when: ansible_eth1.ipv4 is defined</span><br><span class="line">  - name: set hostname</span><br><span class="line">    hostname: name=&quot;&#123;&#123; hostname.stdout &#125;&#125;&quot;</span><br><span class="line">  - name: update mappings from /etc/hosts</span><br><span class="line">    lineinfile: path=&quot;/etc/hosts&quot; regexp=&quot;^&#123;&#123; ansible_eth0.ipv4.address &#125;&#125;&quot; line=&quot;&#123;&#123; ansible_eth0.ipv4.address &#125;&#125; &#123;&#123; hostname.stdout &#125;&#125;&quot;</span><br><span class="line">  - name: Add mappings to /etc/hosts</span><br><span class="line">    blockinfile:</span><br><span class="line">      path: /etc/hosts</span><br><span class="line">      block: |</span><br><span class="line">        10.30.206.112    jenkins.ztjystore.com</span><br><span class="line">      marker: &quot;# &#123;mark&#125; ANSIBLE MANAGED BLOCK for jenkins deploy webserver&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="packages-yaml"><a href="#packages-yaml" class="headerlink" title="packages.yaml"></a>packages.yaml</h1><blockquote>
+<p>安装相关的软件包</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  tasks:</span><br><span class="line">  - name: install the common packages</span><br><span class="line">    yum: name=&#123;&#123; item &#125;&#125; state=present</span><br><span class="line">    with_items: &quot;&#123;&#123; packages &#125;&#125;&quot;</span><br></pre></td></tr></table></figure>
+<h1 id="partion-yaml"><a href="#partion-yaml" class="headerlink" title="partion.yaml"></a>partion.yaml</h1><blockquote>
+<p>判断是否存在第2个磁盘，若存在且未分区则进行分区</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  tasks:</span><br><span class="line">  - name: determine if device is exist</span><br><span class="line">    shell: blkid -s TYPE /dev/sdb1 </span><br><span class="line">    register: filesystem</span><br><span class="line">    when: ansible_devices.sdb is defined</span><br><span class="line">    ignore_errors: True</span><br><span class="line">  - name: Create a new primary partition if the partion is not exist or is not filesystem</span><br><span class="line">    parted: device=/dev/sdb number=1 state=present</span><br><span class="line">    when: ansible_devices.sdb is defined and filesystem.stdout.find(&apos;TYPE&apos;) != 1</span><br><span class="line">  - name: make filesystem for /dev/sdb1</span><br><span class="line">    filesystem: dev=/dev/sdb1 fstype=ext4</span><br><span class="line">  - name: Add mount point to fstab</span><br><span class="line">    mount: src=/dev/sdb1 path=/data fstype=ext4 state=mounted</span><br></pre></td></tr></table></figure>
+<h1 id="user-yaml"><a href="#user-yaml" class="headerlink" title="user.yaml"></a>user.yaml</h1><blockquote>
+<p>创建普通用户，并对需要的用户赋予sudo权限</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  tasks:</span><br><span class="line">  - name: create user</span><br><span class="line">    user: name=&#123;&#123; item.user &#125;&#125; group=admin uid=&#123;&#123; item.uid &#125;&#125;</span><br><span class="line">    with_items:</span><br><span class="line">    - &#123; uid: 1001, user: log_user &#125;</span><br><span class="line">    - &#123; uid: 1002, user: yunwei &#125;</span><br><span class="line">    - &#123; uid: 1003, user: tomcat &#125;</span><br><span class="line">  - name: set password for user</span><br><span class="line">    shell: echo &quot;&#123;&#123; item.passwd &#125;&#125;&quot; | passwd --stdin &#123;&#123; item.user &#125;&#125;</span><br><span class="line">    with_items:</span><br><span class="line">    - &#123; passwd: &quot;xxxxxx&quot;, user: log_user &#125;</span><br><span class="line">    - &#123; passwd: &quot;xxxxxx&quot;, user: yunwei &#125;</span><br><span class="line">  - name: grant sudo to user(yunwei)</span><br><span class="line">    copy:</span><br><span class="line">      content: |</span><br><span class="line">        &#123;&#123; item.user &#125;&#125; ALL=(ALL) NOPASSWD:ALL</span><br><span class="line">      dest: /etc/sudoers.d/yunwei</span><br><span class="line">      validate: &apos;/usr/sbin/visudo -cf %s&apos;</span><br><span class="line">    with_items:</span><br><span class="line">    - &#123; user: yunwei &#125;</span><br></pre></td></tr></table></figure>
+<h1 id="download-yaml"><a href="#download-yaml" class="headerlink" title="download.yaml"></a>download.yaml</h1><blockquote>
+<p>下载相关的脚本或工具包到指定的目录，并设置权限</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  tasks:</span><br><span class="line">  - name: create directory</span><br><span class="line">    file: path=&quot;&#123;&#123; item &#125;&#125;&quot; state=directory mode=0750 group=admin</span><br><span class="line">    with_items:</span><br><span class="line">      - /server/tools</span><br><span class="line">      - /server/scripts</span><br><span class="line">      - /data/</span><br><span class="line">  - name: download the tomcat template</span><br><span class="line">    get_url: url=&#123;&#123; item &#125;&#125; dest=/server/tools/ validate_certs=false</span><br><span class="line">    with_items:</span><br><span class="line">    - http://ztjy-upgrade.oss-cn-hangzhou.aliyuncs.com/public/template.tar.gz</span><br><span class="line">  - name: download the tomcatctl.sh</span><br><span class="line">    get_url: url=&#123;&#123; item &#125;&#125; dest=/server/scripts/tomcatctl.sh validate_certs=false mode=700</span><br><span class="line">    with_items:</span><br><span class="line">    - http://ztjy-upgrade.oss-cn-hangzhou.aliyuncs.com/public/tomcatctl.sh</span><br><span class="line">  - name: set the mode of tomcatctl.sh to 755</span><br><span class="line">    file: src=&quot;/server/scripts/tomcatctl.sh&quot; dest=&quot;/bin/tomcatctl.sh&quot; mode=750 group=admin state=link</span><br><span class="line">  - name: unarchive the osscmd</span><br><span class="line">    unarchive: src=&quot;http://ztjy-upgrade.oss-cn-hangzhou.aliyuncs.com/public/osscmd.tar.gz&quot; dest=&quot;/server/scripts/&quot; validate_certs=false remote_src=yes</span><br><span class="line">  - name: unarchive the jdk1.7</span><br><span class="line">    unarchive: src=&quot;http://ztjyupdate.ztjystore.cn/jdk1.7.0_67.zip&quot; dest=&quot;/data/&quot; owner=tomcat group=admin validate_certs=false remote_src=yes</span><br><span class="line">  - name: unarchive the jdk1.8</span><br><span class="line">    unarchive: src=&quot;https://ztjyupdate.ztjystore.cn/jdk-8u11-linux-x64.tar.gz&quot; dest=&quot;/data/&quot; owner=tomcat group=admin validate_certs=false remote_src=yes</span><br><span class="line">  - name: unarchive the tomcat template</span><br><span class="line">    unarchive: src=&quot;/server/tools/template.tar.gz&quot; dest=&quot;/data/&quot; owner=tomcat group=admin remote_src=yes</span><br><span class="line">  - name: rename the template directory</span><br><span class="line">    shell: mv /data/template/ /data/&#123;&#123; service &#125;&#125;/</span><br><span class="line"></span><br><span class="line">  - name: deny other user to webapps</span><br><span class="line">    file: path=&quot;/data/&#123;&#123; service &#125;&#125;/tomcat/webapps/&quot; mode=750 state=directory</span><br></pre></td></tr></table></figure>
+<p>#optimize.yaml</p>
+<blockquote>
+<p>相关的优化项（ulimit、环境变量、SELINUX等）</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  tasks:</span><br><span class="line">  - name: Add PAM limits for admin group</span><br><span class="line">    pam_limits: domain=&quot;@admin&quot;  limit_type=&quot;-&quot; dest=&quot;/etc/security/limits.d/admin.conf&quot; limit_item=&#123;&#123; item.key &#125;&#125; value=&#123;&#123; item.value &#125;&#125;</span><br><span class="line">    with_items:</span><br><span class="line">    - &#123; key: nproc , value: 10240 &#125;</span><br><span class="line">    - &#123; key: nofile, value: 10240 &#125;</span><br><span class="line">  - name: Add environment variables</span><br><span class="line">    blockinfile:</span><br><span class="line">      path: /etc/profile</span><br><span class="line">      block: |</span><br><span class="line">        export &#123;&#123; item.key &#125;&#125;=&#123;&#123; item.value &#125;&#125;</span><br><span class="line">      marker: &quot;# &#123;mark&#125; ANSIBLE MANAGED BLOCK for environment variables&quot;</span><br><span class="line">    with_items:</span><br><span class="line">    - &#123; key: HISTTIMEFORMAT , value: &apos;&quot;%F %T &quot;&apos; &#125;</span><br><span class="line">  - name: Disable DNS resolv for ssh</span><br><span class="line">    lineinfile: path=/etc/ssh/sshd_config regexp=&quot;.*UseDNS&quot; line=&quot;UseDNS no&quot;</span><br><span class="line">    notify: </span><br><span class="line">    - restart ssh server</span><br><span class="line">  - name: Disable SELINUX</span><br><span class="line">    lineinfile: path=/etc/selinux/config regexp=&quot;^SELINUX=&quot; line=&quot;SELINUX=disabled&quot;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  handlers:</span><br><span class="line">  - name: restart ssh server</span><br><span class="line">    service: name=sshd state=restarted</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ansible/" rel="tag"># ansible</a>
+          
+            <a href="/tags/playbook/" rel="tag"># playbook</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/28/ansible-playbook-ext/" rel="next" title="Ansible Playbook扩展">
+                <i class="fa fa-chevron-left"></i> Ansible Playbook扩展
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/09/dockerfile/" rel="prev" title="Dockfile">
+                Dockfile <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#main-yaml"><span class="nav-number">1.</span> <span class="nav-text">main.yaml</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#variables-yaml"><span class="nav-number">2.</span> <span class="nav-text">variables.yaml</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#hostname-yaml"><span class="nav-number">3.</span> <span class="nav-text">hostname.yaml</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#packages-yaml"><span class="nav-number">4.</span> <span class="nav-text">packages.yaml</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#partion-yaml"><span class="nav-number">5.</span> <span class="nav-text">partion.yaml</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#user-yaml"><span class="nav-number">6.</span> <span class="nav-text">user.yaml</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#download-yaml"><span class="nav-number">7.</span> <span class="nav-text">download.yaml</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

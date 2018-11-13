@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker,swarm mode," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="Libnetwork Libnetwork最初是由libcontainer和Docker Engine中的网络相关的代码合并而成的，是Docker容器网络库，最核心的内容是其定义的Container Network Model（CNM）。  Libnetwork CNM 定义了Docker容器的网络模型，按照该模型开发出的driver就能与docker daemon协同工作，实现容器网络。dock">
+<meta name="keywords" content="docker,swarm mode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swarm Mode负载均衡">
+<meta property="og:url" content="http://www.vnimos.cn/2017/08/07/swarm-mode-loadbalance/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="Libnetwork Libnetwork最初是由libcontainer和Docker Engine中的网络相关的代码合并而成的，是Docker容器网络库，最核心的内容是其定义的Container Network Model（CNM）。  Libnetwork CNM 定义了Docker容器的网络模型，按照该模型开发出的driver就能与docker daemon协同工作，实现容器网络。dock">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.vnimos.cn/images/docker/Docker-Libnetwork.jpg">
+<meta property="og:image" content="http://www.vnimos.cn/images/docker/Docker-CNM.jpg">
+<meta property="og:image" content="http://www.vnimos.cn/images/docker/swarm-mode-lb.png">
+<meta property="og:updated_time" content="2018-03-21T07:33:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swarm Mode负载均衡">
+<meta name="twitter:description" content="Libnetwork Libnetwork最初是由libcontainer和Docker Engine中的网络相关的代码合并而成的，是Docker容器网络库，最核心的内容是其定义的Container Network Model（CNM）。  Libnetwork CNM 定义了Docker容器的网络模型，按照该模型开发出的driver就能与docker daemon协同工作，实现容器网络。dock">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/docker/Docker-Libnetwork.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2017/08/07/swarm-mode-loadbalance/"/>
+
+
+
+
+
+	  <title>Swarm Mode负载均衡 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/08/07/swarm-mode-loadbalance/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Swarm Mode负载均衡</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-07T15:11:29+08:00">
+                2017-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/08/07/swarm-mode-loadbalance/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2017/08/07/swarm-mode-loadbalance/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/08/07/swarm-mode-loadbalance/" class="leancloud_visitors" data-flag-title="Swarm Mode负载均衡">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Libnetwork"><a href="#Libnetwork" class="headerlink" title="Libnetwork"></a>Libnetwork</h1><blockquote>
+<p>Libnetwork最初是由libcontainer和Docker Engine中的网络相关的代码合并而成的，是Docker容器网络库，最核心的内容是其定义的Container Network Model（CNM）。</p>
+</blockquote>
+<p>Libnetwork CNM 定义了Docker容器的网络模型，按照该模型开发出的driver就能与docker daemon协同工作，实现容器网络。docker 原生的driver包括 none、bridge、overlay和macvlan，第三方driver包括flannel、weave、calico等。<br><a id="more"></a><br><img src="/images/docker/Docker-Libnetwork.jpg" alt=""></p>
+<h1 id="CNM"><a href="#CNM" class="headerlink" title="CNM"></a>CNM</h1><p>CNM定义了如下三个组件：<br><img src="/images/docker/Docker-CNM.jpg" alt=""></p>
+<ul>
+<li><p><strong>Sandbox</strong><br>Sandbox是Docker容器中一个网络配置的隔离环境，包含容器的interface、路由表和DNS设置。Linux Network Namespace是Sandbox的标准实现。Sandbox可以包含来自不同 Network的Endpoint。</p>
+</li>
+<li><p><strong>Endpoint</strong><br>Endpoint是一个在Network中进行网络通讯的接口（veth pair），用于将Sandbox接入Network。一个Endpoint只能属于一个Network，也只能属于一个Sandbox<br>Endpoint可以加入一个network，但多个Endpoint可以在一个Sandbox中共存。</p>
+</li>
+<li><p><strong>Network</strong><br>一个Network就是一个唯一的、可识别的endpoint组，组内endpoint可以相互通讯。Network的实现可以是linux Bridge、VLAN等。</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-manager ~]# ll /var/run/docker/netns/</span><br><span class="line">total 0</span><br><span class="line">-r--r--r-- 1 root root 0 Aug  5 10:45 1-i6xug49nwd</span><br><span class="line">-r--r--r-- 1 root root 0 Aug  5 10:45 ingress_sbox</span><br><span class="line">[root@swarm-manager ~]# nsenter --net=/var/run/docker/netns/ingress_sbox ifconfig</span><br><span class="line">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        inet 10.255.0.2  netmask 255.255.0.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:0a:ff:00:02  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">eth1: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 172.18.0.2  netmask 255.255.0.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:ac:12:00:02  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 90  bytes 75247 (73.4 KiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 123  bytes 10271 (10.0 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span><br><span class="line">        inet 127.0.0.1  netmask 255.0.0.0</span><br><span class="line">        loop  txqueuelen 0  (Local Loopback)</span><br><span class="line">        RX packets 6  bytes 504 (504.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 6  bytes 504 (504.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line">[root@swarm-manager ~]# iptables -t mangle -S</span><br><span class="line">-P PREROUTING ACCEPT</span><br><span class="line">-P INPUT ACCEPT</span><br><span class="line">-P FORWARD ACCEPT</span><br><span class="line">-P OUTPUT ACCEPT</span><br><span class="line">-P POSTROUTING ACCEPT</span><br><span class="line">[root@swarm-manager ~]# ipvsadm</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line"></span><br><span class="line">[root@swarm-manager ~]# nsenter --net=/var/run/docker/netns/1-i6xug49nwd ifconfig</span><br><span class="line">br0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        inet 10.255.0.1  netmask 255.255.0.0  broadcast 0.0.0.0</span><br><span class="line">        ether 3a:31:2c:7f:21:a8  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span><br><span class="line">        inet 127.0.0.1  netmask 255.0.0.0</span><br><span class="line">        loop  txqueuelen 0  (Local Loopback)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">veth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        ether 4e:75:b1:f9:5b:55  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">vxlan0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        ether 3a:31:2c:7f:21:a8  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+<p>通过<code>nsenter --net=&lt;SandboxKey&gt; ip add</code>可以直接进入容器的Sandbox，查询相关的网络信息</p>
+<hr>
+<h1 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h1><h2 id="internal-load-balancing"><a href="#internal-load-balancing" class="headerlink" title="internal load balancing"></a>internal load balancing</h2><h3 id="vip（基于ipvs）"><a href="#vip（基于ipvs）" class="headerlink" title="vip（基于ipvs）"></a>vip（基于ipvs）</h3><ul>
+<li><p>创建一个自定义的overlay网络：<br>只需在manager节点创建，当有Service连接该overlay网络时，将会自动在所分配的worker节点上自动创建该overlay网络。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-manager ~]# docker network create -d overlay --subnet 192.168.10.0/24 my-network</span><br><span class="line">[root@swarm-manager ~]# docker network ls -f name=my-network</span><br><span class="line">NETWORK ID          NAME                DRIVER              SCOPE</span><br><span class="line">nvpbs39b6ctz        my-network          overlay             swarm</span><br><span class="line">[root@swarm-manager ~]# docker network inspect -f &#123;&#123;.IPAM.Config&#125;&#125; my-network</span><br><span class="line">[&#123;192.168.10.0/24  192.168.10.1 map[]&#125;]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建一个连接到自定义的overlay网络的service（未指定”endpoint-mode”则默认为VIP模式）<br>Docker会为每个overlay网络创建一个独立的network namespace，其中会有一个linux bridge br0，endpoint还是由veth pair实现，一端连接到容器中的eth0，另一端连接到network namespace的br0上。<br><code>br0除了连接所有的endpoint，还会连接一个vxlan设备，用于与其他host建立vxlan tunnel。容器之间的数据就是通过这个tunnel通信的。</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-manager ~]# docker service create --replicas 2 --name nginx-vip --network my-network nginx</span><br><span class="line">[root@swarm-manager ~]# docker service inspect -f &#123;&#123;.Endpoint.VirtualIPs&#125;&#125; nginx-vip</span><br><span class="line">[&#123;nvpbs39b6ctzrfw6vj809kjbu 192.168.10.2/24&#125;]</span><br><span class="line"></span><br><span class="line">[root@swarm-node1 ~]# # ls -lrt /var/run/docker/netns/</span><br><span class="line">total 0</span><br><span class="line">-r--r--r--. 1 root root 0 Aug  6 11:24 ingress_sbox</span><br><span class="line">-r--r--r--. 1 root root 0 Aug  6 11:24 1-i6xug49nwd</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 10 16:30 1-vxe1cwk14a</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 10 16:30 18531514ffd0</span><br><span class="line">[root@swarm-node1 ~]# nsenter --net=/var/run/docker/netns/1-vxe1cwk14a ifconfig</span><br><span class="line">br0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        inet 192.168.10.1  netmask 255.255.255.0  broadcast 0.0.0.0</span><br><span class="line">        ether 5a:f5:4c:f3:98:d5  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span><br><span class="line">        inet 127.0.0.1  netmask 255.0.0.0</span><br><span class="line">        loop  txqueuelen 0  (Local Loopback)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">veth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        ether 96:57:63:17:80:83  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">vxlan0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        ether 5a:f5:4c:f3:98:d5  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line">[root@swarm-node1 ~]# nsenter --net=/var/run/docker/netns/18531514ffd0 ifconfig</span><br><span class="line">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        inet 192.168.10.4  netmask 255.255.255.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:c0:a8:0a:04  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">eth1: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 172.18.0.3  netmask 255.255.0.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:ac:12:00:03  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 7484  bytes 16821353 (16.0 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 4780  bytes 321518 (313.9 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span><br><span class="line">        inet 127.0.0.1  netmask 255.0.0.0</span><br><span class="line">        loop  txqueuelen 0  (Local Loopback)</span><br><span class="line">        RX packets 14  bytes 1717 (1.6 KiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 14  bytes 1717 (1.6 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>service-name将通过内置的DNS解析到VIP地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-node1 ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">d66e400533af        nginx:latest        &quot;nginx -g &apos;daemon ...&quot;   18 minutes ago      Up 18 minutes       80/tcp              nginx-vip.2.p52ud6cmmgonl236dtvhuzibk</span><br><span class="line"># docker exec -it d66e400533af sh</span><br><span class="line">root@d66e400533af:/# nslookup nginx-vip</span><br><span class="line">Server:         127.0.0.11</span><br><span class="line">Address:        127.0.0.11#53</span><br><span class="line"></span><br><span class="line">Non-authoritative answer:</span><br><span class="line">Name:   nginx-vip</span><br><span class="line">Address: 192.168.10.2</span><br><span class="line"></span><br><span class="line">root@d66e400533af:/# nslookup tasks.nginx-vip</span><br><span class="line">Server:         127.0.0.11</span><br><span class="line">Address:        127.0.0.11#53</span><br><span class="line"></span><br><span class="line">Non-authoritative answer:</span><br><span class="line">Name:   tasks.nginx-vip</span><br><span class="line">Address: 192.168.10.4</span><br><span class="line">Name:   tasks.nginx-vip</span><br><span class="line">Address: 192.168.10.3</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Service IP：<code>192.168.10.2</code>在iptables的mangle表的OUTPUT链中被标记为0x112（274），IPVS通过该标记将Service IP转发到192.168.10.3和192.168.10.4的容器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-node1 ~]# docker inspect -f &#123;&#123;.NetworkSettings.SandboxKey&#125;&#125; d66e400533af</span><br><span class="line">/var/run/docker/netns/18531514ffd0</span><br><span class="line">[root@swarm-node1 ~]# nsenter --net=/var/run/docker/netns/18531514ffd0 sh</span><br><span class="line">sh-4.2# ip add show eth0</span><br><span class="line">102: eth0@if103: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP </span><br><span class="line">    link/ether 02:42:c0:a8:0a:04 brd ff:ff:ff:ff:ff:ff link-netnsid 0</span><br><span class="line">    inet 192.168.10.4/24 scope global eth0</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet 192.168.10.2/32 scope global eth0</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">sh-4.2# ip route</span><br><span class="line">default via 172.18.0.1 dev eth1 </span><br><span class="line">172.18.0.0/16 dev eth1 proto kernel scope link src 172.18.0.3 </span><br><span class="line">192.168.10.0/24 dev eth0 proto kernel scope link src 192.168.10.4 </span><br><span class="line">sh-4.2# iptables -t mangle -S</span><br><span class="line">-P PREROUTING ACCEPT</span><br><span class="line">-P INPUT ACCEPT</span><br><span class="line">-P FORWARD ACCEPT</span><br><span class="line">-P OUTPUT ACCEPT</span><br><span class="line">-P POSTROUTING ACCEPT</span><br><span class="line">-A OUTPUT -d 192.168.10.2/32 -j MARK --set-xmark 0x112/0xffffffff</span><br><span class="line">sh-4.2# ipvsadm</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">FWM  274 rr</span><br><span class="line">  -&gt; 192.168.10.3:0                Masq    1      0          0</span><br><span class="line">  -&gt; 192.168.10.4:0                Masq    1      0          0</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>VIP模式中，swarm mode为容器分配了一个连接到overlay网络（my-network）的网卡<code>&quot;eth0@if103&quot;</code>且生成了VIP，同时也分配了一个连接到docker_gwbridge网络的网卡<code>&quot;eth1@if105&quot;</code>用于连接外部网络。<br>所有连接到my-network网络中的容器可以通过service-name或者VIP来访问service，通过service-name访问时，将先通过内置的DNS服务解析获取到VIP。</p>
+<h3 id="dnsrr（DNS-round-robin）"><a href="#dnsrr（DNS-round-robin）" class="headerlink" title="dnsrr（DNS round-robin）"></a>dnsrr（DNS round-robin）</h3><ul>
+<li><p>创建一个连接到自定义的overlay网络的service，并指定endpoint-mode为dnsrr</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-manager ~]# docker service create --endpoint-mode dnsrr --replicas 2 --name nginx-dnsrr --network my-network nginx</span><br><span class="line">[root@swarm-manager ~]# docker service inspect -f &#123;&#123;.Spec.EndpointSpec.Mode&#125;&#125; nginx-dnsrr</span><br><span class="line">dnsrr</span><br><span class="line">[root@swarm-node1 ~]# docker inspect -f &#123;&#123;.NetworkSettings.SandboxKey&#125;&#125; b68f0b4465b4</span><br><span class="line">/var/run/docker/netns/b4efcf686a74</span><br><span class="line">[root@swarm-node1 ~]# ls -lrt /var/run/docker/netns/</span><br><span class="line">total 0</span><br><span class="line">-r--r--r--. 1 root root 0 Aug  6 11:24 ingress_sbox</span><br><span class="line">-r--r--r--. 1 root root 0 Aug  6 11:24 1-i6xug49nwd</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 10 16:30 1-vxe1cwk14a</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 10 16:30 18531514ffd0</span><br><span class="line">-r--r--r--. 1 root root 0 Aug 10 18:08 b4efcf686a74</span><br><span class="line">[root@swarm-node1 ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS               NAMES</span><br><span class="line">b68f0b4465b4        nginx:latest        &quot;nginx -g &apos;daemon ...&quot;   About a minute ago   Up About a minute   80/tcp              nginx-dnsrr.2.kpx2tqqmdugdpwpdwynbyzf9j</span><br><span class="line">d66e400533af        nginx:latest        &quot;nginx -g &apos;daemon ...&quot;   2 hours ago          Up 2 hours          80/tcp              nginx-vip.2.p52ud6cmmgonl236dtvhuzibk</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>service-name将通过内置的DNS解析到每个容器的overlay网络地址</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-node1 ~]# docker exec -it b68f0b4465b4 bash</span><br><span class="line">root@b68f0b4465b4:/# nslookup nginx-dnsrr</span><br><span class="line">Server:         127.0.0.11</span><br><span class="line">Address:        127.0.0.11#53</span><br><span class="line"></span><br><span class="line">Non-authoritative answer:</span><br><span class="line">Name:   my-nginx-dnsrr</span><br><span class="line">Address: 192.168.10.5</span><br><span class="line">Name:   my-nginx-dnsrr</span><br><span class="line">Address: 192.168.10.6</span><br><span class="line">root@b68f0b4465b4:/# ifconfig</span><br><span class="line">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        inet 192.168.10.6  netmask 255.255.255.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:c0:a8:0a:06  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">eth1: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 172.18.0.4  netmask 255.255.0.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:ac:12:00:04  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 7656  bytes 16832156 (16.0 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 5053  bytes 343122 (335.0 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span><br><span class="line">        inet 127.0.0.1  netmask 255.0.0.0</span><br><span class="line">        loop  txqueuelen 0  (Local Loopback)</span><br><span class="line">        RX packets 6  bytes 788 (788.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 6  bytes 788 (788.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="ingress-load-balancing"><a href="#ingress-load-balancing" class="headerlink" title="ingress load balancing"></a>ingress load balancing</h2><ul>
+<li>创建一个连接到自定义的overlay网络的service，并将容器的80端口映射host的80端口<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-manager ~]# docker service create --replicas 2 --name nginx-ingress --network my-network --publish 80:80 nginx</span><br><span class="line">[root@swarm-manager ~]# docker service ls</span><br><span class="line">ID                  NAME                MODE                REPLICAS            IMAGE               PORTS</span><br><span class="line">7yzee08a9ryq        nginx-dnsrr         replicated          2/2                 nginx:latest</span><br><span class="line">qx5epc99yu8q        nginx-vip           replicated          2/2                 nginx:latest</span><br><span class="line">udiaexlplqq2        nginx-ingress       replicated          2/2                 nginx:latest        *:80-&gt;80/tcp</span><br><span class="line">[root@swarm-manager ~]# docker service inspect -f &#123;&#123;.Endpoint.VirtualIPs&#125;&#125; nginx-ingress </span><br><span class="line">[&#123;i6xug49nwdsxauqqpli3apvym 10.255.0.5/16&#125; &#123;vxe1cwk14avlfp2xjgymhkhdl 192.168.10.7/24&#125;]</span><br><span class="line">[root@swarm-node1 ~]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">42aed469b4cc        nginx:latest        &quot;nginx -g &apos;daemon ...&quot;   About an hour ago   Up About an hour    80/tcp              nginx-ingress.2.u00j8ich8cv4bo0grx1hbsr7q</span><br><span class="line">b68f0b4465b4        nginx:latest        &quot;nginx -g &apos;daemon ...&quot;   About an hour ago   Up About an hour    80/tcp              nginx-dnsrr.2.kpx2tqqmdugdpwpdwynbyzf9j</span><br><span class="line">d66e400533af        nginx:latest        &quot;nginx -g &apos;daemon ...&quot;   3 hours ago         Up 3 hours          80/tcp              nginx-vip.2.p52ud6cmmgonl236dtvhuzibk</span><br><span class="line">[root@swarm-node1 ~]# docker exec -it 42aed469b4cc bash</span><br><span class="line">root@42aed469b4cc:/# ifconfig</span><br><span class="line">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        inet 10.255.0.7  netmask 255.255.0.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:0a:ff:00:07  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">eth1: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">        inet 172.18.0.5  netmask 255.255.0.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:ac:12:00:05  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 4049  bytes 10745529 (10.2 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 3164  bytes 211730 (206.7 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">eth2: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1450</span><br><span class="line">        inet 192.168.10.9  netmask 255.255.255.0  broadcast 0.0.0.0</span><br><span class="line">        ether 02:42:c0:a8:0a:09  txqueuelen 0  (Ethernet)</span><br><span class="line">        RX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 0  bytes 0 (0.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span><br><span class="line">        inet 127.0.0.1  netmask 255.0.0.0</span><br><span class="line">        loop  txqueuelen 0  (Local Loopback)</span><br><span class="line">        RX packets 4  bytes 620 (620.0 B)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 4  bytes 620 (620.0 B)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line">root@42aed469b4cc:/# ip add show eth0</span><br><span class="line">110: eth0@if111: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP group default </span><br><span class="line">    link/ether 02:42:0a:ff:00:07 brd ff:ff:ff:ff:ff:ff link-netnsid 0</span><br><span class="line">    inet 10.255.0.7/16 scope global eth0</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet 10.255.0.5/32 scope global eth0</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">	   root@42aed469b4cc:/# ip add show eth2</span><br><span class="line">root@42aed469b4cc:/# ip add show eth2</span><br><span class="line">114: eth2@if115: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP group default </span><br><span class="line">    link/ether 02:42:c0:a8:0a:09 brd ff:ff:ff:ff:ff:ff link-netnsid 2</span><br><span class="line">    inet 192.168.10.9/24 scope global eth2</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet 192.168.10.7/32 scope global eth2</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>容器中除了lo，还创建了3个网卡：</p>
+<ul>
+<li><strong>eth0</strong>：连接到<code>ingress</code>的网络，通过routing mesh提供外部服务访问。</li>
+<li><strong>eth1</strong>：当service设置了端口映射时，swarm会为Service中的每个容器另外分配一块网卡，连接到<code>docker_gwbridge</code>网络。当容器内部主动往外发送数据时，由docker_gwbridge SNAT转发至外部网络。</li>
+<li><strong>eth2</strong>：连接到<code>my-network</code>的overlay网络。</li>
+</ul>
+<h3 id="routing-mesh"><a href="#routing-mesh" class="headerlink" title="routing mesh"></a>routing mesh</h3><blockquote>
+<p>如果在创建Service时映射了端口，swarm mode将会<code>通过routing mesh在所有节点上监听80端口，即使节点上未创建相应的容器</code>，并通过iptables做反向NAT，当客户端访问集群中的任意节点的80端口，swarm负载均衡会将请求路由到一个活动的容器。若不想在未创建容器的节点上监听published端口，则可在映射端口时通过<code>--publish mode=host,target=80,published=8080</code>进行指定。</p>
+</blockquote>
+<p>创建完Service之后会发现Virtual IPs有两个入口，其中<code>10.255.0.5</code>连接到ingress网络，<code>192.168.10.7</code>是连接自定义的my-network网络。当外部客户端访问服务时，swarm负载均衡的流程如下:<br><img src="/images/docker/swarm-mode-lb.png" alt=""></p>
+<p>1、用户访问swarm-node1上的Nginx服务（172.16.100.21:80）<br>2、iptables将根据<code>-A DOCKER-INGRESS -p tcp -m tcp --dport 80 -j DNAT --to-destination 172.18.0.2:80</code>的规则将请求转发至<code>ingress sanbox</code>中的172.18.0.2:80。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-node1 ~]# iptables -t nat -S</span><br><span class="line">-P PREROUTING ACCEPT</span><br><span class="line">-P INPUT ACCEPT</span><br><span class="line">-P OUTPUT ACCEPT</span><br><span class="line">-P POSTROUTING ACCEPT</span><br><span class="line">-N DOCKER</span><br><span class="line">-N DOCKER-INGRESS</span><br><span class="line">-A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER-INGRESS</span><br><span class="line">-A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER</span><br><span class="line">-A OUTPUT -m addrtype --dst-type LOCAL -j DOCKER-INGRESS</span><br><span class="line">-A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER</span><br><span class="line">-A POSTROUTING -o docker_gwbridge -m addrtype --src-type LOCAL -j MASQUERADE</span><br><span class="line">-A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE</span><br><span class="line">-A POSTROUTING -s 172.18.0.0/16 ! -o docker_gwbridge -j MASQUERADE</span><br><span class="line">-A DOCKER -i docker0 -j RETURN</span><br><span class="line">-A DOCKER -i docker_gwbridge -j RETURN</span><br><span class="line">-A DOCKER-INGRESS -p tcp -m tcp --dport 80 -j DNAT --to-destination 172.18.0.2:80</span><br><span class="line">-A DOCKER-INGRESS -j RETURN</span><br></pre></td></tr></table></figure></p>
+<p>3、ingress sanbox中的iptable根据不同的端口设置不同的mark（0x114/276）。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-node1 ~]# nsenter --net=/var/run/docker/netns/ingress_sbox iptables -t mangle -S</span><br><span class="line">-P PREROUTING ACCEPT</span><br><span class="line">-P INPUT ACCEPT</span><br><span class="line">-P FORWARD ACCEPT</span><br><span class="line">-P OUTPUT ACCEPT</span><br><span class="line">-P POSTROUTING ACCEPT</span><br><span class="line">-A PREROUTING -p tcp -m tcp --dport 80 -j MARK --set-xmark 0x114/0xffffffff</span><br><span class="line">-A OUTPUT -d 10.255.0.5/32 -j MARK --set-xmark 0x114/0xffffffff</span><br></pre></td></tr></table></figure></p>
+<p>4、ipvs将根据不同的mark转发到对应的real server（容器namespace）；<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-node1 ~]# nsenter --net=/var/run/docker/netns/ingress_sbox ipvsadm</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">FWM  276 rr</span><br><span class="line">  -&gt; 10.255.0.6:0                 Masq    1      0          0</span><br><span class="line">  -&gt; 10.255.0.7:0                 Masq    1      0          0</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+            <a href="/tags/swarm-mode/" rel="tag"># swarm mode</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/06/swarm-mode-overview/" rel="next" title="Swarm Mode简介">
+                <i class="fa fa-chevron-left"></i> Swarm Mode简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/15/swarm-mode-service/" rel="prev" title="Swarm Mode服务管理">
+                Swarm Mode服务管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Libnetwork"><span class="nav-number">1.</span> <span class="nav-text">Libnetwork</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CNM"><span class="nav-number">2.</span> <span class="nav-text">CNM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#负载均衡"><span class="nav-number">3.</span> <span class="nav-text">负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#internal-load-balancing"><span class="nav-number">3.1.</span> <span class="nav-text">internal load balancing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#vip（基于ipvs）"><span class="nav-number">3.1.1.</span> <span class="nav-text">vip（基于ipvs）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dnsrr（DNS-round-robin）"><span class="nav-number">3.1.2.</span> <span class="nav-text">dnsrr（DNS round-robin）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ingress-load-balancing"><span class="nav-number">3.2.</span> <span class="nav-text">ingress load balancing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#routing-mesh"><span class="nav-number">3.2.1.</span> <span class="nav-text">routing mesh</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
