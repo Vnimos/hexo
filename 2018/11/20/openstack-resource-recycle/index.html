@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="openstack," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="实现原理 更新实例元数据后OpenStack会往nova数据库的instance_metadata表的key、value列中插入相关的信息。这样我们可以自定义一个expired_time的元数据参数，用于表示该实例的过期时间。然后通过定期从数据库获取每个实例的该参数值，并与当前时间进行比较，若到期则通过调用openstack client的命令关闭实例，若到期未修改该参数值且超过7天则自动删除实例">
+<meta name="keywords" content="openstack">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenStack资源回收">
+<meta property="og:url" content="http://www.vnimos.cn/2018/11/20/openstack-resource-recycle/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="实现原理 更新实例元数据后OpenStack会往nova数据库的instance_metadata表的key、value列中插入相关的信息。这样我们可以自定义一个expired_time的元数据参数，用于表示该实例的过期时间。然后通过定期从数据库获取每个实例的该参数值，并与当前时间进行比较，若到期则通过调用openstack client的命令关闭实例，若到期未修改该参数值且超过7天则自动删除实例">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.vnimos.cn/images/openstack/userdata-update.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/openstack/resource-recycle-mail.png">
+<meta property="og:updated_time" content="2018-11-20T01:50:36.029Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenStack资源回收">
+<meta name="twitter:description" content="实现原理 更新实例元数据后OpenStack会往nova数据库的instance_metadata表的key、value列中插入相关的信息。这样我们可以自定义一个expired_time的元数据参数，用于表示该实例的过期时间。然后通过定期从数据库获取每个实例的该参数值，并与当前时间进行比较，若到期则通过调用openstack client的命令关闭实例，若到期未修改该参数值且超过7天则自动删除实例">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/openstack/userdata-update.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2018/11/20/openstack-resource-recycle/"/>
+
+
+
+
+
+	  <title>OpenStack资源回收 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/11/20/openstack-resource-recycle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OpenStack资源回收</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-20T09:34:31+08:00">
+                2018-11-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/11/20/openstack-resource-recycle/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/11/20/openstack-resource-recycle/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/11/20/openstack-resource-recycle/" class="leancloud_visitors" data-flag-title="OpenStack资源回收">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h1><blockquote>
+<p>更新实例元数据后OpenStack会往nova数据库的instance_metadata表的key、value列中插入相关的信息。这样我们可以自定义一个<code>expired_time</code>的元数据参数，用于表示该实例的过期时间。然后通过定期从数据库获取每个实例的该参数值，并与当前时间进行比较，若到期则通过调用openstack client的命令关闭实例，若到期未修改该参数值且超过7天则自动删除实例。同时在实例即将到期前2天到删除实例这段时间向用户发送邮件提醒。</p>
+</blockquote>
+<p><img src="/images/openstack/userdata-update.png" alt=""><br><a id="more"></a><br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">MariaDB [nova]&gt; select instance_uuid,`key`,value from instance_metadata where `key`="expired_time";</span><br><span class="line">+<span class="comment">--------------------------------------+--------------+----------+</span></span><br><span class="line">| instance_uuid                        | key          | value    |</span><br><span class="line">+<span class="comment">--------------------------------------+--------------+----------+</span></span><br><span class="line">| 00a52695-c3df-4633-9797-db268e37187d | expired_time | 20181231 |</span><br><span class="line">+<span class="comment">--------------------------------------+--------------+----------+</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>若实例需要永久使用，则需要向运维发起申请，并由运维人员添加白名单<code>whitelist</code>（由于实例名非唯一标识可重复，故需要指定实例ID）</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">c639961f-e8b2-4655-8be0-f7e2b808f06b    opsbase-test-zhouyp</span><br><span class="line">07527701-4a45-4349-93cb-ba1924af7c81    ydbc-test-pgxa-1</span><br><span class="line">d4b21c62-2baf-4963-bb42-74cda3f67295    ydbc-test-pgxa-2</span><br><span class="line">7e5dc6e1-54bf-4147-9c98-d6c64a8aa02b    ydbc-test-pgxa-3</span><br><span class="line">76874a2b-0f1d-464a-88e6-8e56bde9724d    ydbc-test-pgxa-4</span><br></pre></td></tr></table></figure>
+<h1 id="实现脚本"><a href="#实现脚本" class="headerlink" title="实现脚本"></a>实现脚本</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span>!/bin/bash</span><br><span class="line">whitelist=$(grep -v ^"#" whitelist |awk '&#123;print $1&#125;')</span><br><span class="line">expired_time_default=`date -d "+ 1 month" +%Y%m%d`</span><br><span class="line">select_instance_all="select created_at,uuid,user_id,display_name,vm_state from instances where vm_state !='deleted' order by created_at DESC"</span><br><span class="line">select_instance_with_expired="select a.uuid,a.user_id,a.display_name,b.value,a.vm_state from instances a,instance_metadata b where a.vm_state !='deleted' and a.uuid=b.instance_uuid and b.key='expired_time' order by b.value,a.user_id"</span><br><span class="line">reference_url=http://docs.xxx.com/其它文档/Apollo_OpenStack/虚拟机续期.html</span><br><span class="line">. /root/admin-openrc.sh</span><br><span class="line"></span><br><span class="line">function fetch_instance_all()&#123;</span><br><span class="line">    mysql -h10.200.111.250 -uroot -ppassword nova -e "$select_instance_all" &gt; list_all</span><br><span class="line">    sed -i '1d' list_all</span><br><span class="line">&#125;</span><br><span class="line">function fetch_instance_with_expired()&#123;</span><br><span class="line">    mysql -h10.200.111.250 -uroot -ppassword nova -e "$select_instance_with_expired" &gt; list</span><br><span class="line">    sed -i '1d' list</span><br><span class="line">&#125;</span><br><span class="line">function add_expired_time()&#123;</span><br><span class="line">    for id in $(awk '&#123;print $3&#125;' list_all)</span><br><span class="line">    do</span><br><span class="line">        create_time=`grep $id list_all | awk '&#123;print $1,$2&#125;'`</span><br><span class="line">        create_interval=`echo "$(date +%s -d "-8 hour") $(date -d "$create_time" +%s) 3600" | awk '&#123;printf("%0.1f\n",($1-$2)/3600)&#125;'`</span><br><span class="line"></span><br><span class="line">        if [ `echo "$create_interval &lt; 24" | bc` -eq 1 ];then</span><br><span class="line">            echo "openstack server set --property expired_time=$expired_time_default $id" &gt;&gt; resource_recycle.log</span><br><span class="line">            openstack server set --property expired_time=$expired_time_default $id</span><br><span class="line">        fi</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function resource_recycle()&#123;</span><br><span class="line">    for id in $(awk '&#123;print $1&#125;' list)</span><br><span class="line">    do</span><br><span class="line">        echo $whitelist | grep $id  &gt; /dev/null</span><br><span class="line">        if [ "$?" -eq 0 ];then</span><br><span class="line">            continue</span><br><span class="line">        fi</span><br><span class="line"></span><br><span class="line">        vm_state=`grep $id list |awk '&#123;print $5&#125;'`</span><br><span class="line">        expired_time=`grep $id list |awk '&#123;print $4&#125;'`</span><br><span class="line">        instance_name=`grep $id list |awk '&#123;print $3&#125;'`</span><br><span class="line">        mail=`grep $id list |awk '&#123;print $2&#125;'`</span><br><span class="line"></span><br><span class="line">        expired_time_19700101=$(date -d "$expired_time" +%s)</span><br><span class="line">        # check expired_time is valid</span><br><span class="line">        if [ -z "$expired_time_19700101" ];then</span><br><span class="line">            echo "instance:$instance_name expired_time is invalid,set to $expired_time_default force" &gt;&gt; resource_recycle.log</span><br><span class="line">            echo "openstack server set --property expired_time=$expired_time_default $id" &gt;&gt; resource_recycle.log</span><br><span class="line">            openstack server set --property expired_time=$expired_time_default $id</span><br><span class="line">            expired_time_19700101=$(date -d "$expired_time_default" +%s)</span><br><span class="line">            echo -n "您好：</span><br><span class="line">            您的OpenStack实例[ $instance_name ]设置的expired_time:$expired_time 为无效日期，强制设为$expired_time_default" | mailx -s "虚拟机到期时间格式无效提醒" $mail</span><br><span class="line">        fi</span><br><span class="line"></span><br><span class="line">        current_19700101=$(date +%s)</span><br><span class="line">        remain_day=`echo "$expired_time_19700101 $current_19700101 86400" | awk '&#123;printf("%0.1f\n",($1-$2)/$3)&#125;'`</span><br><span class="line"></span><br><span class="line">        # remain_day &gt; 31</span><br><span class="line">        if [ `echo "$remain_day &gt; 31" | bc` -eq 1 ];then</span><br><span class="line">            remain_day=`echo "$(date +%s -d '+1 month') $(date +%s) 86400" | awk '&#123;printf("%0.1f\n",($1-$2)/$3)&#125;'`</span><br><span class="line">            echo "instance:$instance_name remain_day exceed 1 month,set to $expired_time_default force" &gt;&gt; resource_recycle.log</span><br><span class="line">            echo "openstack server set --property expired_time=$expired_time_default $id" &gt;&gt; resource_recycle.log</span><br><span class="line">            openstack server set --property expired_time=$expired_time_default $id</span><br><span class="line">            echo -n "您好：</span><br><span class="line">            您的OpenStack实例[ $instance_name ]设置的expired_time:$expired_time 超过31天，且未申请加入白名单，强制设为$expired_time_default" | mailx -s "虚拟机到期时间设置无效提醒" $mail</span><br><span class="line"></span><br><span class="line">        # 0 &lt; remain_day &lt; 7,send mail</span><br><span class="line">        elif [ `echo "$remain_day &gt; 0" | bc` -eq 1 -a `echo "$remain_day &lt; 7" | bc` -eq 1 ];then</span><br><span class="line">            echo "instance:$instance_name have "$remain_day" day remain,and will shutdown after $remain_day day" &gt;&gt; resource_recycle.log</span><br><span class="line">            echo -n "您好：</span><br><span class="line">            您的OpenStack实例[ $instance_name ]剩余 $remain_day 天到期，到期后机器将停止服务，并在2周后自动删除，如需继续使用请及时续期。</span><br><span class="line">            具体操作请参考：$reference_url"| mailx -s "虚拟机即将到期提醒" $mail</span><br><span class="line"></span><br><span class="line">        # -14 &lt; remain_day ≤ 0,shutdown if instance is active and send mail</span><br><span class="line">        elif [ `echo "$remain_day &lt; 0" | bc` -eq 1 -a `echo "$remain_day &gt; -14" | bc` -eq 1 ];then</span><br><span class="line">            delete_time=`echo "$remain_day 14" | awk '&#123;printf("%0.1f\n",$1+$2)&#125;'`</span><br><span class="line">            remain_day_abs=`echo "$remain_day" | awk '&#123;printf("%0.1f\n",0-$1)&#125;'`</span><br><span class="line">            if [ "$vm_state" = active ];then</span><br><span class="line">                echo "instance:$instance_name have $remain_day day remain,begin to shutdown" &gt;&gt; resource_recycle.log</span><br><span class="line">                echo "openstack server stop $id" &gt;&gt; resource_recycle.log</span><br><span class="line">                openstack server stop $id</span><br><span class="line">                sleep 30</span><br><span class="line">                #vm_state=\`stopped\`</span><br><span class="line">                vm_state=`openstack server show $id|grep vm_state|awk '&#123;print $4&#125;'`</span><br><span class="line">            fi</span><br><span class="line"></span><br><span class="line">            if [ "$vm_state" = stopped ];then</span><br><span class="line">                echo "instance:$instance_name is already been shutdown,and will delete after $delete_time day" &gt;&gt; resource_recycle.log</span><br><span class="line">                echo -n "您好：</span><br><span class="line">                您的OpenStack实例[ $instance_name ]已过期 $remain_day_abs 天并停止服务，将在$delete_time天后自动删除，如需继续使用请及时续期。</span><br><span class="line">                具体操作请参考：$reference_url"| mailx -s "虚拟机到期关闭提醒" $mail</span><br><span class="line">            else</span><br><span class="line">                echo "openstack stop instance:$instance_name failed" &gt;&gt; resource_recycle.log</span><br><span class="line">                echo "OpenStack实例[ $instance_name ]到期自动关闭失败"| mailx -s "虚拟机到期停机失败" zhouyp@xxx.com</span><br><span class="line">            fi </span><br><span class="line"></span><br><span class="line">        # remain_day ≤ -14,delete if instance is stopped and send mail</span><br><span class="line">        elif [ `echo "$remain_day &lt; -14" | bc` -eq 1 ];then</span><br><span class="line">            if [ "$vm_state" = active ];then</span><br><span class="line">                echo instance:$instance_name expired more than 2 weeks but is active &gt;&gt; resource_recycle.log</span><br><span class="line">                echo "openstack server stop $id" &gt;&gt; resource_recycle.log</span><br><span class="line">                openstack server stop $id</span><br><span class="line">                sleep 30</span><br><span class="line">                vm_state=`openstack server show $id|grep vm_state|awk '&#123;print $4&#125;'`</span><br><span class="line">            fi</span><br><span class="line">            if [ "$vm_state" = stopped ];then</span><br><span class="line">                echo "openstack server delete $id" &gt;&gt; resource_recycle.log</span><br><span class="line">                openstack server delete $id</span><br><span class="line">                sleep 30</span><br><span class="line">                echo "instance:$instance_name is already been delete" &gt;&gt; resource_recycle.log</span><br><span class="line">                echo -n "您好：</span><br><span class="line">                您的OpenStack实例[ $instance_name ]已过期超过2周并自动删除"| mailx -s "虚拟机删除提醒" $mail</span><br><span class="line">                #vm_state=\`deleted\`</span><br><span class="line">                vm_state=`openstack server show $id|grep vm_state|awk '&#123;print $4&#125;'`</span><br><span class="line">            fi</span><br><span class="line">        fi</span><br><span class="line">        echo "| $mail | \`$instance_name\` | $vm_state | $remain_day | "&gt;&gt; report.md</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function whitelist()&#123;</span><br><span class="line">    for id in $(grep -v ^"#" whitelist|awk '&#123;print $1&#125;')</span><br><span class="line">    do</span><br><span class="line">        vm_state=`grep $id list |awk '&#123;print $5&#125;'`</span><br><span class="line">        remain_day=forever</span><br><span class="line">        instance_name=`grep $id list|awk '&#123;print $3&#125;'`</span><br><span class="line">        mail=`grep $id list|awk '&#123;print $2&#125;'`</span><br><span class="line"></span><br><span class="line">        echo "| $mail | \`$instance_name\` | $vm_state | **\`"$remain_day"\`** |" &gt;&gt; report.md</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">function main () &#123;</span><br><span class="line">    fetch_instance_all</span><br><span class="line">    add_expired_time</span><br><span class="line">    fetch_instance_with_expired</span><br><span class="line">    resource_recycle</span><br><span class="line">    whitelist</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">cat &gt; report.md &lt;&lt;EOF</span><br><span class="line">| 负责人 | 实例 |状态|剩余天数 |</span><br><span class="line">| --- | --- | ---| -- |</span><br><span class="line">EOF</span><br><span class="line">echo "============================ Begin: `date +%Y.%m.%d-%H:%M:%S` ============================" &gt;&gt; resource_recycle.log</span><br><span class="line">main $@</span><br><span class="line">echo "============================ End:   `date +%Y.%m.%d-%H:%M:%S` ============================" &gt;&gt; resource_recycle.log</span><br></pre></td></tr></table></figure>
+<h1 id="实现效果"><a href="#实现效果" class="headerlink" title="实现效果"></a>实现效果</h1><h2 id="邮件提醒"><a href="#邮件提醒" class="headerlink" title="邮件提醒"></a>邮件提醒</h2><p><img src="/images/openstack/resource-recycle-mail.png" alt=""></p>
+<h2 id="生成报表"><a href="#生成报表" class="headerlink" title="生成报表"></a>生成报表</h2><blockquote>
+<p>脚本执行后将生产一份repo.md的文件，可查看所有实例的到期时间，若实例到期需要续期，则可更新指定实例的元数据<code>expired_time</code>参数</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>负责人</th>
+<th>实例</th>
+<th>状态</th>
+<th>剩余天数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="mailto:cxh@xxx.com" target="_blank" rel="noopener">cxh@xxx.com</a></td>
+<td>uc-protobuf-gw-cxh</td>
+<td>active</td>
+<td>29.0</td>
+</tr>
+<tr>
+<td><a href="mailto:laiyl@xxx.com" target="_blank" rel="noopener">laiyl@xxx.com</a></td>
+<td>laiyl_wangb_test</td>
+<td>active</td>
+<td>29.0</td>
+</tr>
+<tr>
+<td><a href="mailto:laiyl@xxx.com" target="_blank" rel="noopener">laiyl@xxx.com</a></td>
+<td>laiyl_linzw_联盟2</td>
+<td>active</td>
+<td>29.0</td>
+</tr>
+<tr>
+<td><a href="mailto:laiyl@xxx.com" target="_blank" rel="noopener">laiyl@xxx.com</a></td>
+<td>yms-fengsh</td>
+<td>active</td>
+<td>29.0</td>
+</tr>
+<tr>
+<td><a href="mailto:zhouyp@xxx.com" target="_blank" rel="noopener">zhouyp@xxx.com</a></td>
+<td>ydbc-test-b-yoperlog</td>
+<td>active</td>
+<td>29.0</td>
+</tr>
+<tr>
+<td><a href="mailto:zhouyp@xxx.com" target="_blank" rel="noopener">zhouyp@xxx.com</a></td>
+<td>ydbc-test-elasticsearch-1</td>
+<td>active</td>
+<td>29.0</td>
+</tr>
+<tr>
+<td><a href="mailto:zhouyp@xxx.com" target="_blank" rel="noopener">zhouyp@xxx.com</a></td>
+<td>opsbase-test-zhouyp</td>
+<td>active</td>
+<td><code>forever</code></td>
+</tr>
+<tr>
+<td><a href="mailto:zhouyp@xxx.com" target="_blank" rel="noopener">zhouyp@xxx.com</a></td>
+<td>ydbc-test-pgxa-1</td>
+<td>active</td>
+<td><code>forever</code></td>
+</tr>
+<tr>
+<td><a href="mailto:zhouyp@xxx.com" target="_blank" rel="noopener">zhouyp@xxx.com</a></td>
+<td>ydbc-test-pgxa-2</td>
+<td>active</td>
+<td><code>forever</code></td>
+</tr>
+<tr>
+<td><a href="mailto:zhouyp@xxx.com" target="_blank" rel="noopener">zhouyp@xxx.com</a></td>
+<td>ydbc-test-pgxa-3</td>
+<td>active</td>
+<td><code>forever</code></td>
+</tr>
+<tr>
+<td><a href="mailto:zhouyp@xxx.com" target="_blank" rel="noopener">zhouyp@xxx.com</a></td>
+<td>ydbc-test-pgxa-4</td>
+<td>active</td>
+<td><code>forever</code></td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/openstack/" rel="tag"># openstack</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/09/gitbook-document/" rel="next" title="使用gitbook+gitlab构建文档中心">
+                <i class="fa fa-chevron-left"></i> 使用gitbook+gitlab构建文档中心
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实现原理"><span class="nav-number">1.</span> <span class="nav-text">实现原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现脚本"><span class="nav-number">2.</span> <span class="nav-text">实现脚本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现效果"><span class="nav-number">3.</span> <span class="nav-text">实现效果</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#邮件提醒"><span class="nav-number">3.1.</span> <span class="nav-text">邮件提醒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成报表"><span class="nav-number">3.2.</span> <span class="nav-text">生成报表</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
