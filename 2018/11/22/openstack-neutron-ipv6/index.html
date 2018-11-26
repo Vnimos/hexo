@@ -85,7 +85,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="openstack,kvm," />
+  <meta name="keywords" content="openstack,neutron,ipv6," />
 
 
 
@@ -101,18 +101,22 @@
 
 
 
-<meta name="description" content="检查系统是否支持nested nested参数值为N，表示内核支持虚拟机嵌套，但未启用。  12345678# lsmod|grep kvmkvm_intel             204800  0 kvm                   626688  1 kvm_intelirqbypass              16384  1 kvm# systool -m kvm_intel">
-<meta name="keywords" content="openstack,kvm">
+<meta name="description" content="IPv6地址格式一个IPv6地址可以分为如下两部分：  网络前缀：n比特，相当于IPv4地址中的网络ID 接口标识：(128-n)比特，相当于IPv4地址中的主机ID接口标识可通过三种方法生成：手工配置、系统通过软件自动生成或IEEE EUI-64规范生成。其中EUI-64规范自动生成最为常用。">
+<meta name="keywords" content="openstack,neutron,ipv6">
 <meta property="og:type" content="article">
-<meta property="og:title" content="openstack中启用虚拟机嵌套">
-<meta property="og:url" content="http://www.vnimos.cn/2018/10/16/openstack-nova-nested/index.html">
+<meta property="og:title" content="openstack支持IPv6">
+<meta property="og:url" content="http://www.vnimos.cn/2018/11/22/openstack-neutron-ipv6/index.html">
 <meta property="og:site_name" content="Vnimos&#39;s blog">
-<meta property="og:description" content="检查系统是否支持nested nested参数值为N，表示内核支持虚拟机嵌套，但未启用。  12345678# lsmod|grep kvmkvm_intel             204800  0 kvm                   626688  1 kvm_intelirqbypass              16384  1 kvm# systool -m kvm_intel">
+<meta property="og:description" content="IPv6地址格式一个IPv6地址可以分为如下两部分：  网络前缀：n比特，相当于IPv4地址中的网络ID 接口标识：(128-n)比特，相当于IPv4地址中的主机ID接口标识可通过三种方法生成：手工配置、系统通过软件自动生成或IEEE EUI-64规范生成。其中EUI-64规范自动生成最为常用。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-10-16T10:24:32.000Z">
+<meta property="og:image" content="http://www.vnimos.cn/images/openstack/EUI-64.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/openstack/neutron-ipv6-subnet1.png">
+<meta property="og:image" content="http://www.vnimos.cn/images/openstack/neutron-ipv6-subnet2.png">
+<meta property="og:updated_time" content="2018-11-26T02:50:41.132Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="openstack中启用虚拟机嵌套">
-<meta name="twitter:description" content="检查系统是否支持nested nested参数值为N，表示内核支持虚拟机嵌套，但未启用。  12345678# lsmod|grep kvmkvm_intel             204800  0 kvm                   626688  1 kvm_intelirqbypass              16384  1 kvm# systool -m kvm_intel">
+<meta name="twitter:title" content="openstack支持IPv6">
+<meta name="twitter:description" content="IPv6地址格式一个IPv6地址可以分为如下两部分：  网络前缀：n比特，相当于IPv4地址中的网络ID 接口标识：(128-n)比特，相当于IPv4地址中的主机ID接口标识可通过三种方法生成：手工配置、系统通过软件自动生成或IEEE EUI-64规范生成。其中EUI-64规范自动生成最为常用。">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/openstack/EUI-64.png">
 
 
 
@@ -141,13 +145,13 @@
 
 
 
-  <link rel="canonical" href="http://www.vnimos.cn/2018/10/16/openstack-nova-nested/"/>
+  <link rel="canonical" href="http://www.vnimos.cn/2018/11/22/openstack-neutron-ipv6/"/>
 
 
 
 
 
-	  <title>openstack中启用虚拟机嵌套 | Vnimos's blog</title>
+	  <title>openstack支持IPv6 | Vnimos's blog</title>
   
 
 
@@ -314,7 +318,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/10/16/openstack-nova-nested/">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/11/22/openstack-neutron-ipv6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Vnimos">
@@ -331,7 +335,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">openstack中启用虚拟机嵌套</h1>
+          <h1 class="post-title" itemprop="name headline">openstack支持IPv6</h1>
         
 
         <div class="post-meta">
@@ -343,8 +347,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-16T18:20:24+08:00">
-                2018-10-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-22T11:25:24+08:00">
+                2018-11-22
               </time>
             
 
@@ -385,8 +389,8 @@
                 <i class="fa fa-comment-o"></i>
               </span>
               
-                <a href="/2018/10/16/openstack-nova-nested/#SOHUCS" itemprop="discussionUrl">
-                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/10/16/openstack-nova-nested/" itemprop="commentsCount"></span>
+                <a href="/2018/11/22/openstack-neutron-ipv6/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/11/22/openstack-neutron-ipv6/" itemprop="commentsCount"></span>
                 </a>
               
             
@@ -394,7 +398,7 @@
 
           
           
-             <span id="/2018/10/16/openstack-nova-nested/" class="leancloud_visitors" data-flag-title="openstack中启用虚拟机嵌套">
+             <span id="/2018/11/22/openstack-neutron-ipv6/" class="leancloud_visitors" data-flag-title="openstack支持IPv6">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -425,28 +429,53 @@
       
 
       
-        <h1 id="检查系统是否支持nested"><a href="#检查系统是否支持nested" class="headerlink" title="检查系统是否支持nested"></a>检查系统是否支持nested</h1><blockquote>
-<p><code>nested</code>参数值为N，表示内核支持虚拟机嵌套，但未启用。</p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> lsmod|grep kvm</span><br><span class="line">kvm_intel             204800  0 </span><br><span class="line">kvm                   626688  1 kvm_intel</span><br><span class="line">irqbypass              16384  1 kvm</span><br><span class="line"><span class="meta">#</span> systool -m kvm_intel -A nested</span><br><span class="line">Module = "kvm_intel"</span><br><span class="line"></span><br><span class="line">    nested              = "N"</span><br></pre></td></tr></table></figure>
+        <h1 id="IPv6地址格式"><a href="#IPv6地址格式" class="headerlink" title="IPv6地址格式"></a>IPv6地址格式</h1><p>一个IPv6地址可以分为如下两部分：</p>
+<ul>
+<li>网络前缀：n比特，相当于IPv4地址中的网络ID</li>
+<li>接口标识：(128-n)比特，相当于IPv4地址中的主机ID<br>接口标识可通过三种方法生成：手工配置、系统通过软件自动生成或<code>IEEE EUI-64</code>规范生成。其中EUI-64规范自动生成最为常用。</li>
+</ul>
 <a id="more"></a>
-<blockquote>
-<p>未启用nested情况下创建的虚拟机不包含vmx指令集</p>
+<h2 id="EUI-64-地址规范"><a href="#EUI-64-地址规范" class="headerlink" title="EUI-64 地址规范"></a><strong><code>EUI-64</code></strong> 地址规范</h2><blockquote>
+<p>以<code>fa:16:3e:b3:4f:5a</code>的MAC地址为例<br>注：MAC地址第7位称为U/L位，表示此地址是全球管理还是本地管理。如果为0就为全球管理，为1就为本地管理。</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cat /proc/cpuinfo |grep flags</span><br><span class="line">flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault invpcid_single pti fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap xsaveopt arat arch_capabilities</span><br></pre></td></tr></table></figure>
-<h1 id="内核模块启用nested特性"><a href="#内核模块启用nested特性" class="headerlink" title="内核模块启用nested特性"></a>内核模块启用nested特性</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> echo "options kvm-intel nested=1" &gt; /etc/modprobe.d/kvm-intel.conf</span><br><span class="line"><span class="meta">#</span> modprobe -r kvm_intel</span><br><span class="line"><span class="meta">#</span> modprobe kvm_intel</span><br><span class="line"><span class="meta">#</span> cat /sys/module/kvm_intel/parameters/nested</span><br><span class="line">Y</span><br></pre></td></tr></table></figure>
-<h1 id="KVM中启用nested"><a href="#KVM中启用nested" class="headerlink" title="KVM中启用nested"></a>KVM中启用nested</h1><blockquote>
-<p>KVM下CPU配置模式有<code>custom</code>、<code>host-model</code>（默认）和<code>host-passthough</code>3种<br><strong>host-model</strong>：libvirt会根据物理CPU的型号，从规定的CPU中选择一种最接近的CPU信号，<br><strong>host-passthrough</strong>：直接将物理CPU暴露给虚拟机使用</p>
+<ol>
+<li>先将MAC一分为二,中间填入0xff 0xfe,得到EUI-64：<code>fa:16:3e:ff:fe:b3:4f:5a</code></li>
+<li>将U/L位取反,得到EUI-64规范的64位IPV6接口标识符：<code>f8:16:3e:ff:fe:b3:4f:5a</code></li>
+<li>加上IPv6前缀，最终得到IPv6地址：<code>2112:1:1:1:f816:3eff:feb3:4f5a</code></li>
+</ol>
+<p><img src="/images/openstack/EUI-64.png" alt=""></p>
+<h1 id="OpenStack支持的三种IPv6地址配置模式"><a href="#OpenStack支持的三种IPv6地址配置模式" class="headerlink" title="OpenStack支持的三种IPv6地址配置模式"></a>OpenStack支持的三种IPv6地址配置模式</h1><ul>
+<li>无状态地址自动配置（SLAAC）:使用路由器通告（RA）进行地址配置<br>其中又分成通过外部路由器和OpenStack路由器</li>
+<li>有状态的DHCPv6：地址配置和可选信息均使用DHCPv6</li>
+<li>无状态的DHCPv6：使用路由器通告（RA）进行地址配置，可选信息使用DHCPv6</li>
+</ul>
+<h2 id="使用-SLAAC"><a href="#使用-SLAAC" class="headerlink" title="使用 SLAAC"></a>使用 <strong><code>SLAAC</code></strong></h2><blockquote>
+<p>当使用SLAAC时，<code>ipv6_ra_mode</code>和<code>ipv6_address_mode</code>当前支持的组合如下。<br>且必须激活DHCP（<code>enable_dhcp=true</code>）</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># virsh edit centos7</span><br><span class="line">&lt;cpu mode=&apos;host-passthrough&apos;&gt;</span><br></pre></td></tr></table></figure>
-<h1 id="OpenStack中启用nested"><a href="#OpenStack中启用nested" class="headerlink" title="OpenStack中启用nested"></a>OpenStack中启用nested</h1><blockquote>
-<p>需要重启nova-compute服务</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># vi /etc/nova/nova.conf</span><br><span class="line">[libvirt]</span><br><span class="line">cpu_mode=host-passthrough</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>启用nested情况下创建的虚拟机包含vmx指令集</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># grep vmx /proc/cpuinfo</span><br><span class="line">flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon rep_good nopl xtopology eagerfpu pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch tpr_shadow vnmi flexpriority ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm rdseed adx smap xsaveopt arat arch_capabilities</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>ipv6_ra_mode</th>
+<th>ipv6_address_mode</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>未指定</td>
+<td>SLAAC</td>
+<td>地址使用EUI-64分配，外部路由器将提供路由</td>
+</tr>
+<tr>
+<td>SLAAC</td>
+<td>SLAAC</td>
+<td>地址使用EUI-64分配，OpenStack网络提供路由</td>
+</tr>
+</tbody>
+</table>
+<h1 id="配置OpenStack-IPv6网络"><a href="#配置OpenStack-IPv6网络" class="headerlink" title="配置OpenStack IPv6网络"></a>配置OpenStack IPv6网络</h1><p><img src="/images/openstack/neutron-ipv6-subnet1.png" alt=""><br><img src="/images/openstack/neutron-ipv6-subnet2.png" alt=""></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> openstack subnet show subnet_ipv6</span><br><span class="line">+-------------------+----------------------------------------------+</span><br><span class="line">| Field             | Value                                        |</span><br><span class="line">+-------------------+----------------------------------------------+</span><br><span class="line">| allocation_pools  | 2112:1:1:1::2-2112:1:1:1:ffff:ffff:ffff:ffff |</span><br><span class="line">| cidr              | 2112:1:1:1::/64                              |</span><br><span class="line">| created_at        | 2018-11-20T06:50:07Z                         |</span><br><span class="line">| description       |                                              |</span><br><span class="line">| dns_nameservers   |                                              |</span><br><span class="line">| enable_dhcp       | True                                         |</span><br><span class="line">| gateway_ip        | None                                         |</span><br><span class="line">| host_routes       |                                              |</span><br><span class="line">| id                | 5a60049c-4413-48ee-8911-0b67a744c4d4         |</span><br><span class="line">| ip_version        | 6                                            |</span><br><span class="line">| ipv6_address_mode | slaac                                        |</span><br><span class="line">| ipv6_ra_mode      | None                                         |</span><br><span class="line">| name              | subnet_ipv6                                  |</span><br><span class="line">| network_id        | a6d7a3f7-e3f8-4dbe-8fb9-01dfc96a68d5         |</span><br><span class="line">| project_id        | 6621c54fb0254cbda7e628faf2848971             |</span><br><span class="line">| revision_number   | 1                                            |</span><br><span class="line">| segment_id        | None                                         |</span><br><span class="line">| service_types     |                                              |</span><br><span class="line">| subnetpool_id     | None                                         |</span><br><span class="line">| tags              |                                              |</span><br><span class="line">| updated_at        | 2018-11-21T02:34:28Z                         |</span><br><span class="line">+-------------------+----------------------------------------------+</span><br></pre></td></tr></table></figure>
+<h2 id="虚拟机IPv6配置信息"><a href="#虚拟机IPv6配置信息" class="headerlink" title="虚拟机IPv6配置信息"></a>虚拟机IPv6配置信息</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> ip ad show eth0</span><br><span class="line">2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000</span><br><span class="line">    link/ether fa:16:3e:b3:4f:5a brd ff:ff:ff:ff:ff:ff</span><br><span class="line">    inet 10.200.112.57/24 brd 10.200.112.255 scope global eth0</span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line">    inet6 2112:1:1:1:f816:3eff:feb3:4f5a/64 scope global </span><br><span class="line">       valid_lft 2591996sec preferred_lft 604796sec</span><br><span class="line">    inet6 fe80::f816:3eff:feb3:4f5a/64 scope link </span><br><span class="line">       valid_lft forever preferred_lft forever</span><br><span class="line"><span class="meta">#</span> ip -6 route</span><br><span class="line">2112:1:1:1::/64 dev eth0 proto kernel metric 256 expires 2591978sec pref medium</span><br><span class="line">fe80::/64 dev eth0 proto kernel metric 256 pref medium</span><br><span class="line">default via fe80::a223:9fff:fed6:98bf dev eth0 proto ra metric 1024 expires 1778sec hoplimit 64 pref medium</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -495,7 +524,9 @@
           
             <a href="/tags/openstack/" rel="tag"># openstack</a>
           
-            <a href="/tags/kvm/" rel="tag"># kvm</a>
+            <a href="/tags/neutron/" rel="tag"># neutron</a>
+          
+            <a href="/tags/ipv6/" rel="tag"># ipv6</a>
           
         </div>
       
@@ -508,8 +539,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/29/openstack-cinder-lvm/" rel="next" title="Openstack使用LVM作为后端存储">
-                <i class="fa fa-chevron-left"></i> Openstack使用LVM作为后端存储
+              <a href="/2018/11/20/openstack-resource-recycle/" rel="next" title="OpenStack资源回收">
+                <i class="fa fa-chevron-left"></i> OpenStack资源回收
               </a>
             
           </div>
@@ -517,10 +548,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/10/19/k8s-ha-kubeadm/" rel="prev" title="使用kubeadm部署Kubernetes1.11.3 HA">
-                使用kubeadm部署Kubernetes1.11.3 HA <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -669,7 +696,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#检查系统是否支持nested"><span class="nav-number">1.</span> <span class="nav-text">检查系统是否支持nested</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内核模块启用nested特性"><span class="nav-number">2.</span> <span class="nav-text">内核模块启用nested特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#KVM中启用nested"><span class="nav-number">3.</span> <span class="nav-text">KVM中启用nested</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenStack中启用nested"><span class="nav-number">4.</span> <span class="nav-text">OpenStack中启用nested</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#IPv6地址格式"><span class="nav-number">1.</span> <span class="nav-text">IPv6地址格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EUI-64-地址规范"><span class="nav-number">1.1.</span> <span class="nav-text">EUI-64 地址规范</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenStack支持的三种IPv6地址配置模式"><span class="nav-number">2.</span> <span class="nav-text">OpenStack支持的三种IPv6地址配置模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-SLAAC"><span class="nav-number">2.1.</span> <span class="nav-text">使用 SLAAC</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置OpenStack-IPv6网络"><span class="nav-number">3.</span> <span class="nav-text">配置OpenStack IPv6网络</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟机IPv6配置信息"><span class="nav-number">3.1.</span> <span class="nav-text">虚拟机IPv6配置信息</span></a></li></ol></li></ol></div>
             
 
           </div>

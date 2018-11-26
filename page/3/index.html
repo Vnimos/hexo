@@ -314,6 +314,174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/05/10/gitlab/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/05/10/gitlab/" itemprop="url">Gitlab安装配置管理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-10T14:21:29+08:00">
+                2018-05-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/cicd/" itemprop="url" rel="index">
+                    <span itemprop="name">cicd</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/05/10/gitlab/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/05/10/gitlab/" class="cy_cmt_count" data-xid="2018/05/10/gitlab/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/05/10/gitlab/" class="leancloud_visitors" data-flag-title="Gitlab安装配置管理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> vim /etc/yum.repos.d/gitlab-ce.repo</span><br><span class="line">[gitlab-ce] </span><br><span class="line">name=Gitlab CE Repository</span><br><span class="line">baseurl=https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el$releasever/</span><br><span class="line">gpgcheck=0</span><br><span class="line">enabled=1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> yum makecache</span><br><span class="line"><span class="meta">#</span> EXTERNAL_URL="http://172.16.100.99"</span><br><span class="line"><span class="meta">#</span> yum install -y gitlab-ce</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> gitlab-ctl reconfigure</span><br><span class="line"><span class="meta">#</span> gitlab-ctl status</span><br><span class="line">run: gitaly: (pid 3627) 9s; run: log: (pid 3287) 40s</span><br><span class="line">run: gitlab-monitor: (pid 3667) 8s; run: log: (pid 3493) 28s</span><br><span class="line">run: gitlab-workhorse: (pid 3653) 9s; run: log: (pid 3315) 39s</span><br><span class="line">run: logrotate: (pid 3387) 36s; run: log: (pid 3386) 36s</span><br><span class="line">run: nginx: (pid 3361) 38s; run: log: (pid 3360) 38s</span><br><span class="line">run: node-exporter: (pid 3475) 30s; run: log: (pid 3474) 30s</span><br><span class="line">run: postgres-exporter: (pid 3726) 7s; run: log: (pid 3565) 19s</span><br><span class="line">run: postgresql: (pid 3111) 90s; run: log: (pid 3110) 90s</span><br><span class="line">run: prometheus: (pid 3710) 8s; run: log: (pid 3537) 21s</span><br><span class="line">run: redis: (pid 3051) 96s; run: log: (pid 3050) 96s</span><br><span class="line">run: redis-exporter: (pid 3521) 22s; run: log: (pid 3520) 22s</span><br><span class="line">run: sidekiq: (pid 3268) 46s; run: log: (pid 3267) 46s</span><br><span class="line">run: unicorn: (pid 3230) 48s; run: log: (pid 3229) 48s</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/05/10/gitlab/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/05/08/smtp_verify/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1873,174 +2041,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/07/11/dubbo-provider-in-docker/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Vnimos">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/vnimos.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Vnimos's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/07/11/dubbo-provider-in-docker/" itemprop="url">dubbo提供者注册容器IP问题</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-11T09:01:53+08:00">
-                2017-07-11
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-comment-o"></i>
-              </span>
-              
-                <a href="/2017/07/11/dubbo-provider-in-docker/#SOHUCS" itemprop="discussionUrl">
-                  <span id="url::http://www.vnimos.cn/2017/07/11/dubbo-provider-in-docker/" class="cy_cmt_count" data-xid="2017/07/11/dubbo-provider-in-docker/" itemprop="commentsCount" ></span>
-                </a>
-              
-            
-          
-
-          
-          
-             <span id="/2017/07/11/dubbo-provider-in-docker/" class="leancloud_visitors" data-flag-title="dubbo提供者注册容器IP问题">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="dubbo架构"><a href="#dubbo架构" class="headerlink" title="dubbo架构"></a>dubbo架构</h1><p><img src="http://omwvh44qw.bkt.clouddn.com/dubbo/architecture.jpg" alt=""></p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/07/11/dubbo-provider-in-docker/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2091,7 +2091,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">48</span>
+                <span class="site-state-item-count">49</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2113,7 +2113,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-count">30</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
