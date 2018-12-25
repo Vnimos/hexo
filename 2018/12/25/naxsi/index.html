@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="NAXSI（Nginx Anti XSS &amp;amp; SQL Injection）是一个第三方的nginx模块。Naxsi管理员的职责是将合法行为的特定规则列入白名单。  编译nginx+naxsi123# ./auto/configure --add-module=./modules/naxsi-0.56/naxsi_src# make# make install 配置nginx1234567">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Naxsi搭建WAF">
+<meta property="og:url" content="http://www.vnimos.cn/2018/12/25/naxsi/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="NAXSI（Nginx Anti XSS &amp;amp; SQL Injection）是一个第三方的nginx模块。Naxsi管理员的职责是将合法行为的特定规则列入白名单。  编译nginx+naxsi123# ./auto/configure --add-module=./modules/naxsi-0.56/naxsi_src# make# make install 配置nginx1234567">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.vnimos.cn/images/other/naxsi.png">
+<meta property="og:updated_time" content="2018-12-25T10:59:43.803Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Naxsi搭建WAF">
+<meta name="twitter:description" content="NAXSI（Nginx Anti XSS &amp;amp; SQL Injection）是一个第三方的nginx模块。Naxsi管理员的职责是将合法行为的特定规则列入白名单。  编译nginx+naxsi123# ./auto/configure --add-module=./modules/naxsi-0.56/naxsi_src# make# make install 配置nginx1234567">
+<meta name="twitter:image" content="http://www.vnimos.cn/images/other/naxsi.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2018/12/25/naxsi/"/>
+
+
+
+
+
+	  <title>使用Naxsi搭建WAF | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/12/25/naxsi/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Naxsi搭建WAF</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-25T19:01:19+08:00">
+                2018-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/12/25/naxsi/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2018/12/25/naxsi/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/12/25/naxsi/" class="leancloud_visitors" data-flag-title="使用Naxsi搭建WAF">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p><code>NAXSI</code>（Nginx Anti XSS &amp; SQL Injection）是一个第三方的nginx模块。Naxsi管理员的职责是将合法行为的特定规则列入白名单。</p>
+</blockquote>
+<h1 id="编译nginx-naxsi"><a href="#编译nginx-naxsi" class="headerlink" title="编译nginx+naxsi"></a>编译nginx+naxsi</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> ./auto/configure --add-module=./modules/naxsi-0.56/naxsi_src</span><br><span class="line"><span class="meta">#</span> make</span><br><span class="line"><span class="meta">#</span> make install</span><br></pre></td></tr></table></figure>
+<h1 id="配置nginx"><a href="#配置nginx" class="headerlink" title="配置nginx"></a>配置nginx</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    include naxsi/naxsi_core.rules;</span><br><span class="line">    server &#123;</span><br><span class="line">        location / &#123;</span><br><span class="line">            SecRulesEnabled;</span><br><span class="line">            #LearningMode;</span><br><span class="line">            include naxsi/whitelist.conf;</span><br><span class="line"></span><br><span class="line">            DeniedUrl &quot;/RequestDenied&quot;;</span><br><span class="line">            CheckRule &quot;$SQL &gt;= 8&quot; BLOCK;</span><br><span class="line">            CheckRule &quot;$RFI &gt;= 8&quot; BLOCK;</span><br><span class="line">            CheckRule &quot;$TRAVERSAL &gt;= 4&quot; BLOCK;</span><br><span class="line">            CheckRule &quot;$EVADE &gt;= 4&quot; BLOCK;</span><br><span class="line">            CheckRule &quot;$XSS &gt;= 8&quot; BLOCK;</span><br><span class="line">            error_log logs/naxsi.log;</span><br><span class="line">        &#125;</span><br><span class="line">        location = /RequestDenied &#123;</span><br><span class="line">            return 403;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="naxsi工作流程"><a href="#naxsi工作流程" class="headerlink" title="naxsi工作流程"></a>naxsi工作流程</h1><blockquote>
+<p>Naxsi的行为类似于<code>Drop by default</code>的防火墙，唯一任务是为目标网站添加所需的Accept规则（<code>whitelist</code>）以使其正常工作，可通过分析nginx的错误日志手动添加白名单，或者（推荐）通过自动学习阶段自动生成有关网站行为的白名单规则。</p>
+</blockquote>
+<p>Naxsi在学习模式下不会拒绝被拦截的请求，但被拦截的请求会被写入naxsi指定的日志文件中。因此在部署完成naxsi之后需要打开学习模式，再对网站进行完整测试，测试完成后可将naxsi拦截的正常请求日志导入到elasticsearch，再通过nxapi自动生成白名单。待白名单配置完成后需要关闭学习模式，则违反白名单规则的非法请求将自动被拦截。<br><img src="/images/other/naxsi.png" alt=""></p>
+<h1 id="安装ELK"><a href="#安装ELK" class="headerlink" title="安装ELK"></a>安装ELK</h1><h2 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> curl -XPUT 'http://localhost:9200/nxapi/'</span><br></pre></td></tr></table></figure>
+<h1 id="配置nxapi"><a href="#配置nxapi" class="headerlink" title="配置nxapi"></a>配置nxapi</h1><blockquote>
+<p>由于nxapi为python程序，依赖elasticsearch，通过pip安装Python Elasticsearch 模块默认版本为6，但nxapi仅支持elasticsearch 1、2、5版本，为防止出现兼容性问题， 选择安装 elasticsearch5 模块</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cd /path/nxapi/</span><br><span class="line"><span class="meta">#</span> pip install elasticsearch5</span><br><span class="line"><span class="meta">#</span> sed -i 's/import elasticsearch/import elasticsearch5 as elasticsearch/' nxtool.py</span><br><span class="line"><span class="meta">#</span> sed -i 's/elasticsearch/elasticsearch5/' nxapi/nxparse.py</span><br><span class="line"><span class="meta">#</span> sed -i 's/elasticsearch/elasticsearch5/' nxapi/nxtypificator.py</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> vi nxapi.json</span><br><span class="line">&#123;</span><br><span class="line">    "elastic": &#123;</span><br><span class="line">        "host": "127.0.0.1:9200",</span><br><span class="line">        "use_ssl": false,</span><br><span class="line">        "index": "nxapi",</span><br><span class="line">        "number_of_shards": "4",</span><br><span class="line">        "number_of_replicas": "0",</span><br><span class="line">        "doctype": "events",</span><br><span class="line">        "default_ttl": "7200",</span><br><span class="line">        "max_size": "1000",</span><br><span class="line">        "version": "2"</span><br><span class="line">    &#125;,</span><br><span class="line">    "syslogd": &#123;</span><br><span class="line">        "host": "0.0.0.0",</span><br><span class="line">        "port": "51400"</span><br><span class="line">    &#125;,</span><br><span class="line">    "global_filters": &#123;</span><br><span class="line">        "whitelisted": "false"</span><br><span class="line">    &#125;,</span><br><span class="line">    "global_warning_rules": &#123;</span><br><span class="line">        "rule_ip": ["&lt;=", 10],</span><br><span class="line">        "global_rule_ip_ratio": ["&lt;", 5]</span><br><span class="line">    &#125;,</span><br><span class="line">    "global_success_rules": &#123;</span><br><span class="line">        "global_rule_ip_ratio": ["&gt;=", 10],</span><br><span class="line">        "rule_ip": ["&gt;=", 10]</span><br><span class="line">    &#125;,</span><br><span class="line">    "global_deny_rules": &#123;</span><br><span class="line">        "global_rule_ip_ratio": ["&lt;", 2]</span><br><span class="line">    &#125;,</span><br><span class="line">    "naxsi": &#123;</span><br><span class="line">        "rules_path": "/usr/local/yealink/nginx/conf/naxsi/naxsi_core.rules",</span><br><span class="line">        "template_path" : [ "/usr/local/nxapi/tpl/"],</span><br><span class="line">        "geoipdb_path" : "/usr/local/nxapi/country2coords.txt"</span><br><span class="line">    &#125;,</span><br><span class="line">    "output": &#123;</span><br><span class="line">        "colors": "true",</span><br><span class="line">        "verbosity": "5"</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">Usage: nxtool.py [options]</span><br><span class="line"></span><br><span class="line">Options:</span><br><span class="line">  -h, --help            show this help message and exit</span><br><span class="line"></span><br><span class="line">  Configuration options:</span><br><span class="line">    -c CFG_PATH, --config=CFG_PATH</span><br><span class="line">                        Path to nxapi.json (config).</span><br><span class="line">    --colors            Disable output colorz.</span><br><span class="line"></span><br><span class="line">  Input options (log acquisition):</span><br><span class="line">    --files=FILES_IN    Path to log files to parse.</span><br><span class="line">    --fifo=FIFO_IN      Path to a FIFO to be created &amp; read from. [infinite]</span><br><span class="line">    --stdin             Read from stdin.</span><br><span class="line">    --no-timeout        Disable timeout on read operations (stdin/fifo).</span><br><span class="line">    --syslog            Listen on tcp port for syslog logging.</span><br><span class="line"></span><br><span class="line">  Filtering options (for whitelist generation):</span><br><span class="line">    -s SERVER, --server=SERVER</span><br><span class="line">                        FQDN to which we should restrict operations.</span><br><span class="line">    --filter=FILTER     This option specify a filter for each type of filter,</span><br><span class="line">                        filter are merge with existing templates/filters.</span><br><span class="line">                        (--filter &apos;uri /foobar&apos;)</span><br><span class="line"></span><br><span class="line">  Tagging options (tag existing events in database):</span><br><span class="line">    -w WL_FILE, --whitelist-path=WL_FILE</span><br><span class="line">                        A path to whitelist file, will find matching events in</span><br><span class="line">                        DB.</span><br><span class="line">    -i IPS, --ip-path=IPS</span><br><span class="line">                        A path to IP list file, will find matching events in</span><br><span class="line">                        DB.</span><br><span class="line">    --tag               Actually tag matching items in DB.</span><br><span class="line"></span><br><span class="line">  Whitelist Generation:</span><br><span class="line">    -f, --full-auto     Attempt fully automatic whitelist generation process.</span><br><span class="line">    -t TEMPLATE, --template=TEMPLATE</span><br><span class="line">                        Path to template to apply.</span><br><span class="line">    --slack             Enables less strict mode.</span><br><span class="line">    --type              Generate whitelists based on param type</span><br><span class="line"></span><br><span class="line">  Statistics Generation:</span><br><span class="line">    -x, --stats         Generate statistics about current&apos;s db content.</span><br><span class="line"></span><br><span class="line">  Interactive Whitelists Generation:</span><br><span class="line">    -g, --interactive-generation</span><br><span class="line">                        Use your favorite text editor for whitelist</span><br><span class="line">                        generation.</span><br></pre></td></tr></table></figure>
+<h2 id="查看导入ES的naxsi日志"><a href="#查看导入ES的naxsi日志" class="headerlink" title="查看导入ES的naxsi日志"></a>查看导入ES的naxsi日志</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> nxtool.py -x</span><br><span class="line"><span class="meta">#</span> size :1000</span><br><span class="line"><span class="meta">#</span> Whitelist(ing) ratio :</span><br><span class="line"><span class="meta">#</span> false 50.0% (total:581/1162)</span><br><span class="line"><span class="meta">#</span> Top servers :</span><br><span class="line"><span class="meta">#</span> 10.200.112.78 100.0% (total:581/581)</span><br><span class="line"><span class="meta">#</span> Top URI(s) :</span><br><span class="line"><span class="meta">#</span> static 23.06% (total:134/581)</span><br><span class="line"><span class="meta">#</span> js 13.08% (total:76/581)</span><br><span class="line"><span class="meta">#</span> yms 12.91% (total:75/581)</span><br><span class="line"><span class="meta">#</span> passwd 11.7% (total:68/581)</span><br><span class="line"><span class="meta">#</span> etc 10.84% (total:63/581)</span><br><span class="line"><span class="meta">#</span> gemfile 8.61% (total:50/581)</span><br><span class="line"><span class="meta">#</span> fileserver 8.26% (total:48/581)</span><br><span class="line"><span class="meta">#</span> 1 5.68% (total:33/581)</span><br><span class="line"><span class="meta">#</span> html 5.51% (total:32/581)</span><br><span class="line"><span class="meta">#</span> php 4.82% (total:28/581)</span><br><span class="line"><span class="meta">#</span> phpthumb.php 4.82% (total:28/581)</span><br><span class="line"><span class="meta">#</span> Top Zone(s) :</span><br><span class="line"><span class="meta">#</span> url 40.1% (total:233/581)</span><br><span class="line"><span class="meta">#</span> args 33.91% (total:197/581)</span><br><span class="line"><span class="meta">#</span> body 19.97% (total:116/581)</span><br><span class="line"><span class="meta">#</span> headers 6.02% (total:35/581)</span><br><span class="line"><span class="meta">#</span> Top Peer(s) :</span><br><span class="line"><span class="meta">#</span> 10.86.4.4 82.96% (total:482/581)</span><br><span class="line"><span class="meta">#</span> 10.200.112.21 11.02% (total:64/581)</span><br><span class="line"><span class="meta">#</span> 10.86.4.10 5.16% (total:30/581)</span><br><span class="line"><span class="meta">#</span> 10.200.110.119 0.86% (total:5/581)</span><br></pre></td></tr></table></figure>
+<h2 id="生成-whitelist"><a href="#生成-whitelist" class="headerlink" title="生成 whitelist"></a>生成 whitelist</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># nxtool.py -s 10.200.112.78 --filter &apos;ip 10.86.4.10&apos; -f --slack</span><br></pre></td></tr></table></figure>
+<p><code>--filter</code>支持的参数包含<code>server, uri, zone, var_name, ip, id, content, country, date,?server, ?uri, ?var_name, ?content</code>。（?开头的参数为支持正则表达式）</p>
+<blockquote>
+<p>若出现以下报错，则需要将text类型的 fields fielddata置为 true</p>
+</blockquote>
+<p><code>Fielddata is disabled on text fields by default. Set fielddata=true on [id] in order to load fielddata in memory by uninverting the inverted index. Note that this can however use significant memory. Alternatively use a keyword field instead.</code><br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PUT /nxapi/_mapping/&lt;text_field_name&gt;?update_all_types</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"properties"</span>: &#123;</span><br><span class="line">        <span class="attr">"&lt;text_field_name&gt;"</span>: &#123;</span><br><span class="line">        <span class="attr">"type"</span>: <span class="string">"text"</span>,</span><br><span class="line">        <span class="attr">"fielddata"</span>: <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="naxsi日志"><a href="#naxsi日志" class="headerlink" title="naxsi日志"></a>naxsi日志</h1><p>NAXSI_FMT由以下字段组成：</p>
+<ul>
+<li>ip：客户端的ip</li>
+<li>server：请求的server</li>
+<li>uri：请求的URI</li>
+<li>learning：是否处于学习模式（0/1）</li>
+<li>vers：Naxsi版本</li>
+<li>total_processed：nginx worker处理的请求总数</li>
+<li>total_blocked：被naxsi阻止的请求总数</li>
+<li>zoneN：发生匹配的区域</li>
+<li>idN：匹配的规则ID</li>
+<li>var_nameN：匹配发生的变量名称</li>
+<li>cscoreN：命名分数标记</li>
+<li>scoreN：关联的命名分数值<br>几个zone，id，var_name，cscore和score组可以出现在一行中。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2018/12/25 07:28:12 [error] 1536#0: *23078 NAXSI_FMT: ip=117.28.234.34&amp;server=cloud-pressure.yealinkops.com&amp;uri=/&amp;learning=1&amp;vers=0.56&amp;total_processed=1&amp;total_blocked=1&amp;block=1&amp;cscore0=$XSS&amp;score0=48&amp;zone0=HEADERS&amp;id0=1315&amp;var_name0=cookie, client: 117.28.234.34, server: cloud-pressure.yealinkops.com, request: &quot;GET / HTTP/1.1&quot;, host: &quot;cloud-pressure.yealinkops.com&quot;</span><br></pre></td></tr></table></figure>
+<h2 id="NAXSI-EXLOG"><a href="#NAXSI-EXLOG" class="headerlink" title="NAXSI_EXLOG"></a>NAXSI_EXLOG</h2><blockquote>
+<p>NAXSI_EXLOG是naxsilogs的补充。 它还包含匹配请求的实际内容。</p>
+</blockquote>
+<p>需要在nginx配置的server{}中启用。<br><code>set $naxsi_extensive_log 1;</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2018/12/25 08:09:01 [error] 6292#0: *23096 NAXSI_EXLOG: ip=117.28.234.34&amp;server=cloud-pressure.yealinkops.com&amp;uri=%2Fmeeting%2Fmeeting%2Fstatic%2Fcss%2Fapp.7043a8b74bcb93be14f7685967598f92.css&amp;id=1315&amp;zone=HEADERS&amp;var_name=cookie&amp;content=UM_distinctid%3D164ab24940a558-0989f1192f4877-444a022e-1fa400-164ab24940c439%3B%20JSESSIONID%3Ds%253A5iM7C8jbXREu-s8FCJbIhpMPaqEgMQEV.gQhJLU0jWitOu2yP0wt6rAJyjSzJpS6aaSOncQd1ooU, client: 117.28.234.34, server: cloud-pressure.yealinkops.com, request: &quot;GET /meeting/meeting/static/css/app.7043a8b74bcb93be14f7685967598f92.css HTTP/1.1&quot;, host: &quot;cloud-pressure.yealinkops.com&quot;, referrer: &quot;https://cloud-pressure.yealinkops.com/&quot;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/22/openstack-neutron-ipv6/" rel="next" title="openstack支持IPv6">
+                <i class="fa fa-chevron-left"></i> openstack支持IPv6
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">30</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#编译nginx-naxsi"><span class="nav-number">1.</span> <span class="nav-text">编译nginx+naxsi</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置nginx"><span class="nav-number">2.</span> <span class="nav-text">配置nginx</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#naxsi工作流程"><span class="nav-number">3.</span> <span class="nav-text">naxsi工作流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装ELK"><span class="nav-number">4.</span> <span class="nav-text">安装ELK</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建索引"><span class="nav-number">4.1.</span> <span class="nav-text">创建索引</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置nxapi"><span class="nav-number">5.</span> <span class="nav-text">配置nxapi</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#查看导入ES的naxsi日志"><span class="nav-number">5.1.</span> <span class="nav-text">查看导入ES的naxsi日志</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生成-whitelist"><span class="nav-number">5.2.</span> <span class="nav-text">生成 whitelist</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#naxsi日志"><span class="nav-number">6.</span> <span class="nav-text">naxsi日志</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NAXSI-EXLOG"><span class="nav-number">6.1.</span> <span class="nav-text">NAXSI_EXLOG</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
