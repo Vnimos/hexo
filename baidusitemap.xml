@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://www.vnimos.cn/2018/12/26/openstack-kolla-add-compute-node/</loc>
+    <lastmod>2018-12-26T11:54:35.055Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/12/25/naxsi/</loc>
+    <lastmod>2018-12-25T11:04:30.650Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/11/09/gitbook-document/</loc>
+    <lastmod>2018-11-26T02:54:05.566Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/11/22/openstack-neutron-ipv6/</loc>
+    <lastmod>2018-11-26T02:50:41.132Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/11/20/openstack-resource-recycle/</loc>
+    <lastmod>2018-11-26T02:46:56.267Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/10/19/k8s-ha-kubeadm/</loc>
+    <lastmod>2018-11-09T08:30:12.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/10/16/openstack-nova-nested/</loc>
+    <lastmod>2018-10-16T10:24:32.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/19/openstack-kolla-deploy/</loc>
+    <lastmod>2018-10-10T06:27:46.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/29/openstack-cinder-lvm/</loc>
+    <lastmod>2018-09-29T09:08:15.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/25/openstack-glance-image-format/</loc>
+    <lastmod>2018-09-29T03:31:40.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/28/vmware-mirgate-to-openstack/</loc>
+    <lastmod>2018-09-28T10:14:50.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/27/openstack-nova-metadata-userdata/</loc>
+    <lastmod>2018-09-27T10:35:01.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/27/openstack-nova-action/</loc>
+    <lastmod>2018-09-27T09:32:07.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/26/openstack-nova-migrate/</loc>
+    <lastmod>2018-09-26T09:24:32.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/21/openstack-nova-reset-password/</loc>
+    <lastmod>2018-09-26T09:06:47.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/20/openstack-glance-image-make/</loc>
+    <lastmod>2018-09-25T09:07:18.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/19/openstack-neutron-linuxbridge-vxlan/</loc>
+    <lastmod>2018-09-25T09:06:44.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/17/openstack-keystone-ad/</loc>
+    <lastmod>2018-09-25T09:06:34.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/11/openstack-keystone-auth/</loc>
+    <lastmod>2018-09-25T09:06:23.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/07/27/nginx/</loc>
+    <lastmod>2018-07-27T07:16:32.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/05/10/gitlab/</loc>
+    <lastmod>2018-07-13T00:53:00.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/06/06/vpc-aliyun-aws/</loc>
+    <lastmod>2018-06-07T09:01:51.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/05/15/gitlab-ci.yml/</loc>
+    <lastmod>2018-06-01T08:25:13.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/19/jenkins-user-priv/</loc>
+    <lastmod>2018-05-31T04:13:50.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/20/jenkins-parameter-publish/</loc>
+    <lastmod>2018-05-31T04:13:43.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/18/jenkins-install/</loc>
+    <lastmod>2018-05-31T04:13:33.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/31/jenkins-publish2product/</loc>
+    <lastmod>2018-05-31T04:13:25.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/20/jenkins-parameter-build/</loc>
+    <lastmod>2018-05-31T04:13:15.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/20/jenkins-ext-mail/</loc>
+    <lastmod>2018-05-31T04:13:03.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/05/08/smtp_verify/</loc>
+    <lastmod>2018-05-31T02:58:33.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/04/28/ansible-playbook-ext/</loc>
+    <lastmod>2018-03-30T00:35:37.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/05/14/ansible-sysinit/</loc>
+    <lastmod>2018-03-28T02:45:59.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/04/04/ansible-loops/</loc>
+    <lastmod>2018-03-26T08:00:46.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/14/ansible-general-module/</loc>
+    <lastmod>2018-03-26T08:00:37.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/04/11/ansible-filters/</loc>
+    <lastmod>2018-03-26T08:00:27.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/24/ansible-files-module/</loc>
+    <lastmod>2018-03-26T08:00:17.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/08/15/swarm-mode-service/</loc>
+    <lastmod>2018-03-21T07:33:25.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/08/07/swarm-mode-loadbalance/</loc>
+    <lastmod>2018-03-21T07:33:14.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/08/06/swarm-mode-overview/</loc>
+    <lastmod>2018-03-21T07:30:21.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/08/05/swarm-mode-deploy/</loc>
+    <lastmod>2018-03-21T07:30:14.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/04/06/url-check/</loc>
+    <lastmod>2018-03-17T09:05:42.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/29/appctl/</loc>
+    <lastmod>2018-03-13T07:40:28.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/12/21/k8s-kubeadm/</loc>
+    <lastmod>2017-12-21T09:10:02.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/12/14/docker-http-proxy/</loc>
+    <lastmod>2017-12-21T08:45:49.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/08/23/k8s-deploy/</loc>
+    <lastmod>2017-12-21T08:34:50.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/08/03/docker-machine/</loc>
+    <lastmod>2017-08-10T05:58:24.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/07/11/dubbo-provider-in-docker/</loc>
+    <lastmod>2017-07-29T02:21:07.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/06/09/dockerfile/</loc>
+    <lastmod>2017-06-09T00:11:54.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/23/Hudson-to-Jenkins/</loc>
+    <lastmod>2017-03-31T00:40:21.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/21/tomcat-startup/</loc>
+    <lastmod>2017-03-21T06:02:45.000Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2017/03/16/hexo/</loc>
+    <lastmod>2017-03-16T08:46:55.000Z</lastmod>
+  </url>
+</urlset>

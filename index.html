@@ -314,6 +314,177 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/12/26/openstack-kolla-add-compute-node/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/26/openstack-kolla-add-compute-node/" itemprop="url">openstack kolla添加计算节点</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-26T19:59:24+08:00">
+                2018-12-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/openstack/" itemprop="url" rel="index">
+                    <span itemprop="name">openstack</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2018/12/26/openstack-kolla-add-compute-node/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2018/12/26/openstack-kolla-add-compute-node/" class="cy_cmt_count" data-xid="2018/12/26/openstack-kolla-add-compute-node/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2018/12/26/openstack-kolla-add-compute-node/" class="leancloud_visitors" data-flag-title="openstack kolla添加计算节点">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="相关配置初始化"><a href="#相关配置初始化" class="headerlink" title="相关配置初始化"></a>相关配置初始化</h1><h2 id="修改网卡名称-可选"><a href="#修改网卡名称-可选" class="headerlink" title="修改网卡名称[可选]"></a>修改网卡名称[可选]</h2><blockquote>
+<p>由于通过kolla-ansible部署OpenStack时指定了网卡名称，若对应的网卡名称不一致，则需要修改。<code>网卡只需配置管理网段</code></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> vi /etc/sysconfig/grub</span><br><span class="line">GRUB_CMDLINE_LINUX="rd.lvm.lv=centos/root net.ifnames=0 biosdevname=0 rd.lvm.lv=centos/swap rhgb quiet"</span><br><span class="line"><span class="meta">#</span> grub2-mkconfig -o /boot/grub2/grub.cfg</span><br><span class="line">Generating grub configuration file ...</span><br><span class="line">Found linux image: /boot/vmlinuz-3.10.0-862.el7.x86_64</span><br><span class="line">Found initrd image: /boot/initramfs-3.10.0-862.el7.x86_64.img</span><br><span class="line">Found linux image: /boot/vmlinuz-0-rescue-0211e330c7fa475e87b5be8bb60fd7c4</span><br><span class="line">Found initrd image: /boot/initramfs-0-rescue-0211e330c7fa475e87b5be8bb60fd7c4.img</span><br><span class="line">done</span><br><span class="line"><span class="meta">#</span> vi /etc/udev/rules.d/70-persistent-net.rules </span><br><span class="line">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR&#123;address&#125;=="0c:c4:7a:2b:71:86", ATTR&#123;type&#125;=="1", KERNEL=="eth*", NAME="enp4s0f0"</span><br><span class="line">SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR&#123;address&#125;=="0c:c4:7a:2b:71:87", ATTR&#123;type&#125;=="1", KERNEL=="eth*", NAME="enp4s0f1"</span><br><span class="line"><span class="meta">#</span> vi /etc/sysconfig/network-scripts/ifcfg-enp4s0f0</span><br><span class="line">NAME=enp4s0f0</span><br><span class="line">DEVICE=enp4s0f0</span><br><span class="line">IPADDR=10.200.111.17</span><br><span class="line">PREFIX=24</span><br><span class="line">GATEWAY=10.200.111.254</span><br><span class="line">DNS1=10.100.1.10</span><br><span class="line">DNS2=114.114.114.114</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/12/26/openstack-kolla-add-compute-node/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/12/25/naxsi/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1887,192 +2058,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2018/09/27/openstack-nova-action/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Vnimos">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/vnimos.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Vnimos's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/09/27/openstack-nova-action/" itemprop="url">Openstack实例操作</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-27T15:43:10+08:00">
-                2018-09-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/openstack/" itemprop="url" rel="index">
-                    <span itemprop="name">openstack</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-comment-o"></i>
-              </span>
-              
-                <a href="/2018/09/27/openstack-nova-action/#SOHUCS" itemprop="discussionUrl">
-                  <span id="url::http://www.vnimos.cn/2018/09/27/openstack-nova-action/" class="cy_cmt_count" data-xid="2018/09/27/openstack-nova-action/" itemprop="commentsCount" ></span>
-                </a>
-              
-            
-          
-
-          
-          
-             <span id="/2018/09/27/openstack-nova-action/" class="leancloud_visitors" data-flag-title="Openstack实例操作">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="snapshot（快照）"><a href="#snapshot（快照）" class="headerlink" title="snapshot（快照）"></a>snapshot（快照）</h1><blockquote>
-<p><strong><code>Snapshot</code></strong> 的工作原理是对实例的镜像文件（backing_file + instance_disk）进行全量备份，生成一个类型为 snapshot的image，然后将其保存到Glance上。</p>
-</blockquote>
-<p>目前OpenStack支持cold snapshot和live snapshot。创建cold snapshot之前会关闭实例，创建完成后开启实例。</p>
-<ul>
-<li><p>创建snapshot</p>
-<blockquote>
-<p>创建snapshot是通过<code>qemu-img convert -f qcow2 -O qcow2</code>命令完成</p>
-</blockquote>
-</li>
-<li><p>上传image到glance</p>
-</li>
-</ul>
-<p>若创建的实例是<code>boot from volume</code>，则可以利用块设备提供的基于指针的 volume snapshot 功能，不会真正拷贝数据（快照大小为0），通常一瞬间就完成，对业务几乎没有影响。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/09/27/openstack-nova-action/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2118,7 +2108,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

@@ -314,6 +314,183 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/03/29/appctl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/03/29/appctl/" itemprop="url">Tomcat统一管理脚本</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-29T14:38:39+08:00">
+                2017-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/03/29/appctl/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2017/03/29/appctl/" class="cy_cmt_count" data-xid="2017/03/29/appctl/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/03/29/appctl/" class="leancloud_visitors" data-flag-title="Tomcat统一管理脚本">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <blockquote>
+<p>由于公司所用的服务大多都是Tomcat，且同时有几十个跑，为了统一进行管理，专门写了如下脚本，通过该脚本可以对Tomcat进行状态查询、代码版本号查询、启动、停止、重启、备份、回滚、发布更新。</p>
+</blockquote>
+<p>当然前提必须是有如下规范的格式：</p>
+<ol>
+<li>通过一个version.txt文件在首行声明当前代码的版本</li>
+<li>war包的文件名与业务名称一致（且大小写一致）</li>
+<li>若要通过curl检测对应的http状态码，则需要统一端口号，否则需要另外通过一个文本指定每个业务的端口号进行一一对应。</li>
+</ol>
+<p><code>分享出来仅供参考，如有不足之处，欢迎指出</code><br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/03/29/appctl/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/03/24/ansible-files-module/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1828,190 +2005,11 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/03/14/ansible-general-module/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Vnimos">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/vnimos.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Vnimos's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/03/14/ansible-general-module/" itemprop="url">Ansible 常用模块</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-14T18:22:29+08:00">
-                2017-03-14
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ops/" itemprop="url" rel="index">
-                    <span itemprop="name">ops</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-comment-o"></i>
-              </span>
-              
-                <a href="/2017/03/14/ansible-general-module/#SOHUCS" itemprop="discussionUrl">
-                  <span id="url::http://www.vnimos.cn/2017/03/14/ansible-general-module/" class="cy_cmt_count" data-xid="2017/03/14/ansible-general-module/" itemprop="commentsCount" ></span>
-                </a>
-              
-            
-          
-
-          
-          
-             <span id="/2017/03/14/ansible-general-module/" class="leancloud_visitors" data-flag-title="Ansible 常用模块">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <a id="more"></a>
-<h1 id="Utilities"><a href="#Utilities" class="headerlink" title="Utilities"></a>Utilities</h1><h2 id="fail"><a href="#fail" class="headerlink" title="fail"></a>fail</h2><blockquote>
-<p>必须配合when语句，当匹配到when条件时则退出并打印msg中指定的信息</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  vars:</span><br><span class="line">  - location: xxx</span><br><span class="line">  - service: xxx</span><br><span class="line">  tasks:</span><br><span class="line">  - name: determine if variable is defined</span><br><span class="line">    fail: msg=&quot;The variable location or service is not defined&quot;</span><br><span class="line">    when: location == &quot;xxx&quot; or service == &quot;xxx&quot;</span><br></pre></td></tr></table></figure>
-<h2 id="debug"><a href="#debug" class="headerlink" title="debug"></a>debug</h2><blockquote>
-<p>与<code>fail</code>模块类似，但是仅打印信息而不会退出程序。一般与when语句结合使用，打印出msg参数中指定的信息(var参数可指定一个变量)</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  vars:</span><br><span class="line">  - location: xxx</span><br><span class="line">  - service: xxx</span><br><span class="line">  tasks:</span><br><span class="line">  - name: determine if variable is defined</span><br><span class="line">    debug: msg=&quot;The variable location or service is not defined&quot;</span><br><span class="line">    when: location == &quot;xxx&quot; or service == &quot;xxx&quot;</span><br></pre></td></tr></table></figure>
-<hr>
-<h1 id="Packaging"><a href="#Packaging" class="headerlink" title="Packaging"></a>Packaging</h1><h2 id="apt-key："><a href="#apt-key：" class="headerlink" title="apt-key："></a>apt-key：</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- name:</span> <span class="string">Add</span> <span class="string">apt-keys</span></span><br><span class="line"><span class="attr">  apt_key:</span></span><br><span class="line"><span class="attr">    id:</span> <span class="string">"<span class="template-variable">&#123;&#123; item.hash_id &#125;&#125;</span>"</span></span><br><span class="line"><span class="attr">    keyserver:</span> <span class="string">"<span class="template-variable">&#123;&#123; item.keyserver | default(omit) &#125;&#125;</span>"</span></span><br><span class="line"><span class="attr">    data:</span> <span class="string">"<span class="template-variable">&#123;&#123; item.data | default(omit) &#125;&#125;</span>"</span></span><br><span class="line"><span class="attr">    url:</span> <span class="string">"<span class="template-variable">&#123;&#123; item.url | default(omit) &#125;&#125;</span>"</span></span><br><span class="line"><span class="attr">    state:</span> <span class="string">"present"</span></span><br><span class="line"><span class="attr">  register:</span> <span class="string">add_keys</span></span><br><span class="line"><span class="attr">  until:</span> <span class="string">add_keys|success</span></span><br><span class="line"><span class="attr">  ignore_errors:</span> <span class="literal">True</span></span><br><span class="line"><span class="attr">  retries:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">  delay:</span> <span class="number">2</span></span><br><span class="line"><span class="attr">  with_items:</span> <span class="string">gpg_keys</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    gpg_keys:</span></span><br><span class="line"><span class="attr">      - key_name:</span> <span class="string">'ceph'</span></span><br><span class="line"><span class="attr">        keyserver:</span> <span class="string">'hkp://keyserver.ubuntu.com:80'</span></span><br><span class="line"><span class="attr">        hash_id:</span> <span class="string">'0xe84ac2c0460f3994'</span></span><br><span class="line"><span class="attr">- name:</span> <span class="string">Remove</span> <span class="string">revoked</span> <span class="string">apt-keys</span></span><br><span class="line"><span class="attr">  apt_key:</span></span><br><span class="line"><span class="attr">    id:</span> <span class="string">"17ED316D"</span></span><br><span class="line"><span class="attr">    state:</span> <span class="string">"absent"</span></span><br><span class="line"><span class="attr">  register:</span> <span class="string">revoke_keys</span></span><br></pre></td></tr></table></figure>
-<h2 id="apt-repository"><a href="#apt-repository" class="headerlink" title="apt_repository"></a>apt_repository</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- name:</span> <span class="string">Add</span> <span class="string">repo(s)</span></span><br><span class="line"><span class="attr">  apt_repository:</span></span><br><span class="line"><span class="attr">    repo:</span> <span class="string">"<span class="template-variable">&#123;&#123; ceph_apt_repo.repo &#125;&#125;</span>"</span></span><br><span class="line"><span class="attr">    state:</span> <span class="string">"<span class="template-variable">&#123;&#123; ceph_apt_repo.state &#125;&#125;</span>"</span></span><br><span class="line"><span class="attr">  register:</span> <span class="string">add_repos</span></span><br><span class="line"><span class="attr">  until:</span> <span class="string">add_repos|success</span></span><br><span class="line"><span class="attr">  retries:</span> <span class="number">5</span></span><br><span class="line"><span class="attr">  delay:</span> <span class="number">2</span></span><br><span class="line"><span class="attr">  tags:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">ceph-repos</span></span><br><span class="line"><span class="attr">  vars:</span></span><br><span class="line"><span class="attr">    ceph_apt_repo:</span></span><br><span class="line"><span class="attr">      repo:</span> <span class="string">"deb http://download.ceph.com/debian-/ <span class="template-variable">&#123;&#123; ansible_lsb.codename &#125;&#125;</span> main"</span></span><br><span class="line"><span class="attr">      state:</span> <span class="string">"present"</span></span><br></pre></td></tr></table></figure>
-<h2 id="yum-repository"><a href="#yum-repository" class="headerlink" title="yum_repository"></a>yum_repository</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> ansible-playbook add_repo.yaml</span><br><span class="line"><span class="meta">#</span> cat /etc/yum.repos.d/epel.repo</span><br><span class="line">[epel]</span><br><span class="line">baseurl = https://download.fedoraproject.org/pub/epel/$releasever/$basearch/</span><br><span class="line">name = EPEL YUM repo</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> cat /etc/yum.repos.d/external_repos.repo</span><br><span class="line">[epel]</span><br><span class="line">baseurl = https://download.fedoraproject.org/pub/epel/$releasever/$basearch/</span><br><span class="line">gpgcheck = 0</span><br><span class="line">name = EPEL YUM repo</span><br><span class="line"></span><br><span class="line">[rpmforge]</span><br><span class="line">baseurl = http://apt.sw.be/redhat/el7/en/$basearch/rpmforge</span><br><span class="line">enabled = 0</span><br><span class="line">mirrorlist = http://mirrorlist.repoforge.org/el7/mirrors-rpmforge</span><br><span class="line">name = RPMforge YUM repo</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> ansible-playbook rm_repo.yaml</span><br><span class="line"><span class="meta">#</span> cat /etc/yum.repos.d/external_repos.repo</span><br><span class="line">[rpmforge]</span><br><span class="line">baseurl = http://apt.sw.be/redhat/el7/en/$basearch/rpmforge</span><br><span class="line">enabled = 0</span><br><span class="line">mirrorlist = http://mirrorlist.repoforge.org/el7/mirrors-rpmforge</span><br><span class="line">name = RPMforge YUM repo</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  tasks:</span><br><span class="line">  - name: Add repository</span><br><span class="line">    yum_repository:</span><br><span class="line">      name: epel</span><br><span class="line">      description: EPEL YUM repo</span><br><span class="line">      baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/</span><br><span class="line"></span><br><span class="line">  - name: Add multiple repositories into the same file (1/2)</span><br><span class="line">    yum_repository:</span><br><span class="line">      name: epel</span><br><span class="line">      description: EPEL YUM repo</span><br><span class="line">      file: external_repos</span><br><span class="line">      baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/</span><br><span class="line">      gpgcheck: no</span><br><span class="line"></span><br><span class="line">  - name: Add multiple repositories into the same file (2/2)</span><br><span class="line">    yum_repository:</span><br><span class="line">      name: rpmforge</span><br><span class="line">      description: RPMforge YUM repo</span><br><span class="line">      file: external_repos</span><br><span class="line">      baseurl: http://apt.sw.be/redhat/el7/en/$basearch/rpmforge</span><br><span class="line">      mirrorlist: http://mirrorlist.repoforge.org/el7/mirrors-rpmforge</span><br><span class="line">      enabled: no</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- hosts: localhost</span><br><span class="line">  tasks:</span><br><span class="line">  - name: Remove repository</span><br><span class="line">    yum_repository:</span><br><span class="line">      name: epel</span><br><span class="line">      state: absent</span><br><span class="line"></span><br><span class="line">  - name: Remove repository from a specific repo file</span><br><span class="line">    yum_repository:</span><br><span class="line">      name: epel</span><br><span class="line">      file: external_repos</span><br><span class="line">      state: absent</span><br></pre></td></tr></table></figure>
-<h2 id="yum"><a href="#yum" class="headerlink" title="yum"></a>yum</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">- name:</span> <span class="string">install</span> <span class="string">the</span> <span class="string">latest</span> <span class="string">version</span> <span class="string">of</span> <span class="string">Apache</span></span><br><span class="line"><span class="attr">  yum:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">    state:</span> <span class="string">latest</span></span><br><span class="line"></span><br><span class="line"><span class="attr">- name:</span> <span class="string">remove</span> <span class="string">the</span> <span class="string">Apache</span> <span class="string">package</span></span><br><span class="line"><span class="attr">  yum:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">httpd</span></span><br><span class="line"><span class="attr">    state:</span> <span class="string">absent</span></span><br><span class="line"></span><br><span class="line"><span class="attr">- name:</span> <span class="string">install</span> <span class="string">one</span> <span class="string">specific</span> <span class="string">version</span> <span class="string">of</span> <span class="string">Apache</span></span><br><span class="line"><span class="attr">  yum:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">httpd-2.2.15-60.el6.centos.6</span></span><br><span class="line"><span class="attr">    state:</span> <span class="string">present</span></span><br><span class="line"></span><br><span class="line"><span class="attr">- name:</span> <span class="string">upgrade</span> <span class="string">all</span> <span class="string">packages,</span> <span class="string">excluding</span> <span class="string">kernel</span> <span class="string">&amp;</span> <span class="string">foo</span> <span class="string">related</span> <span class="string">packages</span></span><br><span class="line"><span class="attr">  yum:</span></span><br><span class="line"><span class="attr">    name:</span> <span class="string">'*'</span></span><br><span class="line"><span class="attr">    state:</span> <span class="string">latest</span></span><br><span class="line"><span class="attr">    exclude:</span> <span class="string">kernel*,foo*</span></span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2057,7 +2055,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">50</span>
+                <span class="site-state-item-count">51</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
