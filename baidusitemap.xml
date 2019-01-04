@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://www.vnimos.cn/2018/11/20/openstack-resource-recycle/</loc>
-    <lastmod>2019-01-04T00:35:22.889Z</lastmod>
-  </url>  <url>
     <loc>http://www.vnimos.cn/2019/01/03/packer/</loc>
-    <lastmod>2019-01-03T06:23:37.371Z</lastmod>
+    <lastmod>2019-01-04T00:43:04.856Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/11/20/openstack-resource-recycle/</loc>
+    <lastmod>2019-01-04T00:42:01.155Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/12/27/mongodb-deploy/</loc>
     <lastmod>2018-12-28T10:57:12.583Z</lastmod>
