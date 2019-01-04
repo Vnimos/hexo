@@ -104,16 +104,16 @@
 <meta name="description" content="Packer Packer是一个开源工具，用于从单个源配置为多个平台创建相同的机器镜像。">
 <meta name="keywords" content="packer">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Packer生成vmware ova镜像">
+<meta property="og:title" content="Packer自动构建虚拟机镜像">
 <meta property="og:url" content="http://www.vnimos.cn/2019/01/03/packer/index.html">
 <meta property="og:site_name" content="Vnimos&#39;s blog">
 <meta property="og:description" content="Packer Packer是一个开源工具，用于从单个源配置为多个平台创建相同的机器镜像。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://www.vnimos.cn/images/devops/packer-build.png">
 <meta property="og:image" content="http://www.vnimos.cn/images/devops/packer-ova.png">
-<meta property="og:updated_time" content="2019-01-04T00:43:04.856Z">
+<meta property="og:updated_time" content="2019-01-04T03:33:30.976Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Packer生成vmware ova镜像">
+<meta name="twitter:title" content="Packer自动构建虚拟机镜像">
 <meta name="twitter:description" content="Packer Packer是一个开源工具，用于从单个源配置为多个平台创建相同的机器镜像。">
 <meta name="twitter:image" content="http://www.vnimos.cn/images/devops/packer-build.png">
 
@@ -150,7 +150,7 @@
 
 
 
-	  <title>Packer生成vmware ova镜像 | Vnimos's blog</title>
+	  <title>Packer自动构建虚拟机镜像 | Vnimos's blog</title>
   
 
 
@@ -334,7 +334,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Packer生成vmware ova镜像</h1>
+          <h1 class="post-title" itemprop="name headline">Packer自动构建虚拟机镜像</h1>
         
 
         <div class="post-meta">
@@ -397,7 +397,7 @@
 
           
           
-             <span id="/2019/01/03/packer/" class="leancloud_visitors" data-flag-title="Packer生成vmware ova镜像">
+             <span id="/2019/01/03/packer/" class="leancloud_visitors" data-flag-title="Packer自动构建虚拟机镜像">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -432,8 +432,8 @@
 <p>Packer是一个开源工具，用于从单个源配置为多个平台创建相同的机器镜像。</p>
 </blockquote>
 <a id="more"></a>
-<h2 id="Builders（必须）"><a href="#Builders（必须）" class="headerlink" title="Builders（必须）"></a>Builders（必须）</h2><p><code>Builders</code>用于为指定平台创建集群并生成镜像</p>
-<h3 id="相关参数"><a href="#相关参数" class="headerlink" title="相关参数"></a>相关参数</h3><blockquote>
+<h1 id="Builders（必须）"><a href="#Builders（必须）" class="headerlink" title="Builders（必须）"></a>Builders（必须）</h1><p><code>Builders</code>用于为指定平台创建集群并生成镜像</p>
+<h2 id="相关参数"><a href="#相关参数" class="headerlink" title="相关参数"></a>相关参数</h2><blockquote>
 <p>以下以<code>vmware-vmx</code>的builder为例</p>
 </blockquote>
 <table>
@@ -502,10 +502,10 @@
 </tr>
 </tbody>
 </table>
-<h2 id="Provisioners"><a href="#Provisioners" class="headerlink" title="Provisioners"></a>Provisioners</h2><p><code>Provisioners</code>用于通过内置和第三方软件在机器启动后为镜像执行相关的安装、配置</p>
+<h1 id="Provisioners"><a href="#Provisioners" class="headerlink" title="Provisioners"></a>Provisioners</h1><p><code>Provisioners</code>用于通过内置和第三方软件在机器启动后为镜像执行相关的安装、配置</p>
 <h2 id="Post-Processors"><a href="#Post-Processors" class="headerlink" title="Post-Processors"></a>Post-Processors</h2><p><code>Post-Processors</code>用于在镜像生成后执行相关操作</p>
 <hr>
-<h2 id="通过vmware-vmx生成ova镜像"><a href="#通过vmware-vmx生成ova镜像" class="headerlink" title="通过vmware-vmx生成ova镜像"></a>通过vmware-vmx生成ova镜像</h2><ul>
+<h1 id="通过vmware-vmx生成ova镜像"><a href="#通过vmware-vmx生成ova镜像" class="headerlink" title="通过vmware-vmx生成ova镜像"></a>通过vmware-vmx生成ova镜像</h1><ul>
 <li>yms-deploy-vmware-ova.json</li>
 </ul>
 <blockquote>
@@ -527,6 +527,10 @@
 </blockquote>
 <figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> /f tokens^=<span class="number">4</span>^ delims^=^"  <span class="variable">%%i</span> <span class="keyword">in</span> ('<span class="built_in">type</span> yms-deploy-vmware-ova.json^|<span class="built_in">find</span> /i "yms_rom_version"^|<span class="built_in">find</span> /v "yms-"') <span class="keyword">do</span> <span class="built_in">set</span> yms_rom_version=<span class="variable">%%i</span></span><br><span class="line">"D:\Program Files (x86)\VMware\VMware Workstation\OVFTool\ovftool.exe" yms-rom\<span class="variable">%yms_rom_version%</span>\yms-<span class="variable">%yms_rom_version%</span>.vmx yms-rom\<span class="variable">%yms_rom_version%</span>\yms-<span class="variable">%yms_rom_version%</span>.ova</span><br></pre></td></tr></table></figure>
 <p><img src="/images/devops/packer-build.png" alt=""><br><img src="/images/devops/packer-ova.png" alt=""></p>
+<h1 id="通过openstack生成glance镜像"><a href="#通过openstack生成glance镜像" class="headerlink" title="通过openstack生成glance镜像"></a>通过openstack生成glance镜像</h1><ul>
+<li>yms-deploy-openstack.json</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"variables"</span>: &#123;</span><br><span class="line">      <span class="attr">"ssh_username"</span>: <span class="string">"root"</span>,</span><br><span class="line">      <span class="attr">"ssh_password"</span>: <span class="string">"xxxxxx"</span>,</span><br><span class="line">      <span class="attr">"ssh_timeout"</span>: <span class="string">"1h"</span>,</span><br><span class="line">      <span class="attr">"yms_rom_url"</span>: <span class="string">"https://10.200.110.68/publish/enterprise/download/YMS"</span>,</span><br><span class="line">      <span class="attr">"yms_rom_version"</span>: <span class="string">"21.0.0.12"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"builders"</span>: [&#123;</span><br><span class="line">      <span class="attr">"type"</span>: <span class="string">"openstack"</span>,</span><br><span class="line">      <span class="attr">"identity_endpoint"</span>: <span class="string">"http://10.200.111.250:35357/v3"</span>,</span><br><span class="line">      <span class="attr">"tenant_name"</span>: <span class="string">"Operation"</span>,</span><br><span class="line">      <span class="attr">"domain_name"</span>: <span class="string">"Default"</span>,</span><br><span class="line">      <span class="attr">"username"</span>: <span class="string">"openstack"</span>,</span><br><span class="line">      <span class="attr">"password"</span>: <span class="string">"xxxxxx"</span>,</span><br><span class="line">      <span class="attr">"region"</span>: <span class="string">"RegionOne"</span>,</span><br><span class="line">      <span class="attr">"image_name"</span>: <span class="string">"YMS_&#123;&#123; user `yms_rom_version` &#125;&#125;"</span>,</span><br><span class="line">      <span class="attr">"source_image_name"</span>: <span class="string">"Centos7.5_new"</span>,</span><br><span class="line">      <span class="attr">"flavor"</span>: <span class="string">"m5.medium"</span>,</span><br><span class="line">      <span class="attr">"insecure"</span>: <span class="string">"true"</span>,</span><br><span class="line">      <span class="attr">"instance_name"</span>: <span class="string">"YMS_&#123;&#123; user `yms_rom_version` &#125;&#125;"</span>,</span><br><span class="line">      <span class="attr">"networks"</span>: <span class="string">"a6d7a3f7-e3f8-4dbe-8fb9-01dfc96a68d5"</span>,</span><br><span class="line">      <span class="attr">"ssh_username"</span>: <span class="string">"&#123;&#123; user `ssh_username` &#125;&#125;"</span>,</span><br><span class="line">      <span class="attr">"ssh_password"</span>: <span class="string">"&#123;&#123; user `ssh_password` &#125;&#125;"</span>,</span><br><span class="line">      <span class="attr">"ssh_timeout"</span>: <span class="string">"&#123;&#123; user `ssh_timeout` &#125;&#125;"</span></span><br><span class="line">  &#125;],</span><br><span class="line">  <span class="attr">"provisioners"</span>: [&#123;</span><br><span class="line">    <span class="attr">"type"</span>:  <span class="string">"shell"</span>,</span><br><span class="line">    <span class="attr">"environment_vars"</span>: [</span><br><span class="line">      <span class="string">"YMS_ROM_URL=&#123;&#123; user `yms_rom_url` &#125;&#125;"</span>,</span><br><span class="line">      <span class="string">"YMS_ROM_VERSION=&#123;&#123; user `yms_rom_version` &#125;&#125;"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"script"</span>: <span class="string">"scripts/apollo_install.sh"</span></span><br><span class="line">  &#125;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -743,7 +747,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Packer"><span class="nav-number">1.</span> <span class="nav-text">Packer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Builders（必须）"><span class="nav-number">1.1.</span> <span class="nav-text">Builders（必须）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相关参数"><span class="nav-number">1.1.1.</span> <span class="nav-text">相关参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Provisioners"><span class="nav-number">1.2.</span> <span class="nav-text">Provisioners</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Post-Processors"><span class="nav-number">1.3.</span> <span class="nav-text">Post-Processors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通过vmware-vmx生成ova镜像"><span class="nav-number">1.4.</span> <span class="nav-text">通过vmware-vmx生成ova镜像</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Packer"><span class="nav-number">1.</span> <span class="nav-text">Packer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Builders（必须）"><span class="nav-number">2.</span> <span class="nav-text">Builders（必须）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#相关参数"><span class="nav-number">2.1.</span> <span class="nav-text">相关参数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Provisioners"><span class="nav-number">3.</span> <span class="nav-text">Provisioners</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Post-Processors"><span class="nav-number">3.1.</span> <span class="nav-text">Post-Processors</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过vmware-vmx生成ova镜像"><span class="nav-number">4.</span> <span class="nav-text">通过vmware-vmx生成ova镜像</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过openstack生成glance镜像"><span class="nav-number">5.</span> <span class="nav-text">通过openstack生成glance镜像</span></a></li></ol></div>
             
 
           </div>
