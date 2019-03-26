@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://www.vnimos.cn/2018/05/15/gitlab-ci.yml/</loc>
+    <lastmod>2019-03-26T11:16:00.489Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/11/09/gitbook-document/</loc>
+    <lastmod>2019-02-28T07:56:24.492Z</lastmod>
+  </url>  <url>
+    <loc>http://www.vnimos.cn/2018/09/20/openstack-glance-image-make/</loc>
+    <lastmod>2019-01-16T06:26:34.359Z</lastmod>
+  </url>  <url>
     <loc>http://www.vnimos.cn/2019/01/03/packer/</loc>
     <lastmod>2019-01-09T07:30:05.282Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/11/20/openstack-resource-recycle/</loc>
-    <lastmod>2019-01-04T00:42:01.155Z</lastmod>
+    <lastmod>2019-01-04T00:42:01.156Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/12/27/mongodb-deploy/</loc>
-    <lastmod>2018-12-28T10:57:12.583Z</lastmod>
+    <lastmod>2018-12-28T10:57:12.584Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/12/26/openstack-kolla-add-compute-node/</loc>
     <lastmod>2018-12-27T01:32:58.719Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/12/25/naxsi/</loc>
-    <lastmod>2018-12-25T11:04:30.650Z</lastmod>
-  </url>  <url>
-    <loc>http://www.vnimos.cn/2018/11/09/gitbook-document/</loc>
-    <lastmod>2018-11-26T02:54:05.566Z</lastmod>
+    <lastmod>2018-12-25T11:04:30.651Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/11/22/openstack-neutron-ipv6/</loc>
-    <lastmod>2018-11-26T02:50:41.132Z</lastmod>
+    <lastmod>2018-11-26T02:50:41.133Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/10/19/k8s-ha-kubeadm/</loc>
     <lastmod>2018-11-09T08:30:12.000Z</lastmod>
@@ -52,9 +58,6 @@
     <loc>http://www.vnimos.cn/2018/09/21/openstack-nova-reset-password/</loc>
     <lastmod>2018-09-26T09:06:47.000Z</lastmod>
   </url>  <url>
-    <loc>http://www.vnimos.cn/2018/09/20/openstack-glance-image-make/</loc>
-    <lastmod>2018-09-25T09:07:18.000Z</lastmod>
-  </url>  <url>
     <loc>http://www.vnimos.cn/2018/09/19/openstack-neutron-linuxbridge-vxlan/</loc>
     <lastmod>2018-09-25T09:06:44.000Z</lastmod>
   </url>  <url>
@@ -72,9 +75,6 @@
   </url>  <url>
     <loc>http://www.vnimos.cn/2018/06/06/vpc-aliyun-aws/</loc>
     <lastmod>2018-06-07T09:01:51.000Z</lastmod>
-  </url>  <url>
-    <loc>http://www.vnimos.cn/2018/05/15/gitlab-ci.yml/</loc>
-    <lastmod>2018-06-01T08:25:13.000Z</lastmod>
   </url>  <url>
     <loc>http://www.vnimos.cn/2017/03/19/jenkins-user-priv/</loc>
     <lastmod>2018-05-31T04:13:50.000Z</lastmod>

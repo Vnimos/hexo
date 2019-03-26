@@ -117,7 +117,7 @@
 <meta property="og:image" content="http://www.vnimos.cn/images/openstack/glance-cloudbase-finish.png">
 <meta property="og:image" content="http://www.vnimos.cn/images/openstack/glance-windows-slmgr.png">
 <meta property="og:image" content="http://www.vnimos.cn/images/openstack/glance-windows-sysprep.png">
-<meta property="og:updated_time" content="2018-09-25T09:07:18.000Z">
+<meta property="og:updated_time" content="2019-01-16T06:26:34.359Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Openstack制作glance镜像(Linux&#x2F;Windows)">
 <meta name="twitter:description" content="Linux：虚拟机中执行安装ACPI服务 虚拟机需要根据接收的信号执行指定的操作，比如关机、重启等。需要开启acpid服务（Advanced Configuration and Power Interface event daemon）  123# yum install acpid# systemctl enable acpid# systemctl start acpid">
@@ -451,13 +451,6 @@
 <li>开启允许root用户以ssh方式登录</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># vi /etc/cloud/cloud.cfg</span><br><span class="line">disable_root: 0</span><br><span class="line">ssh_pwauth: 1</span><br></pre></td></tr></table></figure>
-<ul>
-<li>禁用cloud-init接管网络<blockquote>
-<p>当Cloud-init版本等于高于0.7.9版本时，需要禁用Cloud-init接管网络</p>
-</blockquote>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># vi /etc/cloud/cloud.cfg</span><br><span class="line">network:</span><br><span class="line">    config: disabled</span><br></pre></td></tr></table></figure>
 <ul>
 <li>去除云主机不带<code>.novalocal</code>后缀的主机名</li>
 </ul>
