@@ -111,7 +111,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://www.vnimos.cn/images/develop/doc_elasticsearch.png">
 <meta property="og:image" content="http://www.vnimos.cn/images/develop/doc_search.png">
-<meta property="og:updated_time" content="2019-02-28T07:56:24.492Z">
+<meta property="og:updated_time" content="2019-03-26T11:48:57.162Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用gitbook+gitlab构建文档中心">
 <meta name="twitter:description" content="文档中心实现要求 在gitlab上创建一个project gitbook，用于指定需要通过gitbook构建的project文档，实现自动拉取gitlab上需要构建的project，并通过gitbook对每个project文档生成一本书。同时由于每个project单独生成一本书，无法支持所有文档的全文检索，需要引入ealsticsearch，将所有文档内容保存到elasticsearch中，并通过">
@@ -431,6 +431,7 @@
         <h1 id="文档中心"><a href="#文档中心" class="headerlink" title="文档中心"></a>文档中心</h1><h2 id="实现要求"><a href="#实现要求" class="headerlink" title="实现要求"></a>实现要求</h2><blockquote>
 <p>在gitlab上创建一个project <code>gitbook</code>，用于指定需要通过gitbook构建的project文档，实现自动拉取gitlab上需要构建的project，并通过gitbook对每个project文档生成一本书。同时由于每个project单独生成一本书，无法支持所有文档的全文检索，需要引入ealsticsearch，将所有文档内容保存到elasticsearch中，并通过elasticsearch实现全文检索。</p>
 </blockquote>
+<a id="more"></a>
 <h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><blockquote>
 <p>通过shell脚本获取所有project对应的相关配置（git参考地址、生成文档名称、文档分类），并自动循环拉取gitlab中的指定文档，若文档有更新则自动通过<code>gitbook build</code>构建成一本书，并通过<code>rsync</code>同步到”文档分类路径”中指定的路径下，通过<code>nginx</code>发布web页面（避免build过程中导致页面无法访问）。同时，在构建每一本书的时候会自动按照文档分类将该书的链接添加到<code>summary/README.md</code>文件中，用于生成首页。</p>
 </blockquote>
