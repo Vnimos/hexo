@@ -314,6 +314,174 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/08/15/swarm-mode-service/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/08/15/swarm-mode-service/" itemprop="url">Swarm Mode服务管理</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-15T15:11:29+08:00">
+                2017-08-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2017/08/15/swarm-mode-service/#SOHUCS" itemprop="discussionUrl">
+                  <span id="url::http://www.vnimos.cn/2017/08/15/swarm-mode-service/" class="cy_cmt_count" data-xid="2017/08/15/swarm-mode-service/" itemprop="commentsCount" ></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2017/08/15/swarm-mode-service/" class="leancloud_visitors" data-flag-title="Swarm Mode服务管理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@swarm-manager ~]# cat &gt; ./sources.list &lt;&lt;END</span><br><span class="line">&gt; deb http://mirrors.aliyun.com/debian stretch main contrib non-free</span><br><span class="line">&gt; deb http://mirrors.aliyun.com/debian stretch-proposed-updates main contrib non-free</span><br><span class="line">&gt; deb http://mirrors.aliyun.com/debian stretch-updates main contrib non-free</span><br><span class="line">&gt; deb http://mirrors.aliyun.com/debian-security/ stretch/updates main non-free contrib</span><br><span class="line">&gt; END</span><br><span class="line">[root@swarm-manager ~]# cat Dockerfile</span><br><span class="line">FROM nginx:latest</span><br><span class="line">ADD sources.list /etc/apt/sources.list</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y dnsutils iproute2 net-tools curl &amp;&amp; apt-get clean</span><br><span class="line">ADD index.html /usr/share/nginx/html/index.html</span><br><span class="line"></span><br><span class="line">[root@swarm-manager ~]# echo &quot;nginx:v1&quot; &gt; index.html</span><br><span class="line">[root@swarm-manager ~]# docker build -t registry.cn-hangzhou.aliyuncs.com/vnimos/nginx:v1 .</span><br><span class="line">[root@swarm-manager ~]# echo &quot;nginx:v2&quot; &gt; index.html</span><br><span class="line">[root@swarm-manager ~]# docker build -t registry.cn-hangzhou.aliyuncs.com/vnimos/nginx:v2 .</span><br><span class="line"></span><br><span class="line">[root@swarm-manager ~]# docker push registry.cn-hangzhou.aliyuncs.com/vnimos/nginx:v1</span><br><span class="line">[root@swarm-manager ~]# docker push registry.cn-hangzhou.aliyuncs.com/vnimos/nginx:v2</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/08/15/swarm-mode-service/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/08/07/swarm-mode-loadbalance/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1852,174 +2020,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2017/04/06/url-check/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Vnimos">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/vnimos.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Vnimos's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/04/06/url-check/" itemprop="url">通过shell监控URL</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-06T10:51:29+08:00">
-                2017-04-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/ops/" itemprop="url" rel="index">
-                    <span itemprop="name">ops</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-comment-o"></i>
-              </span>
-              
-                <a href="/2017/04/06/url-check/#SOHUCS" itemprop="discussionUrl">
-                  <span id="url::http://www.vnimos.cn/2017/04/06/url-check/" class="cy_cmt_count" data-xid="2017/04/06/url-check/" itemprop="commentsCount" ></span>
-                </a>
-              
-            
-          
-
-          
-          
-             <span id="/2017/04/06/url-check/" class="leancloud_visitors" data-flag-title="通过shell监控URL">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="Jenkins-Job-Tomcat-check"><a href="#Jenkins-Job-Tomcat-check" class="headerlink" title="Jenkins Job(Tomcat_check)"></a>Jenkins Job(Tomcat_check)</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">######</span><br><span class="line">#used for jenkins job:Tomcat_check</span><br><span class="line">######</span><br><span class="line"></span><br><span class="line">ATTEMPTS=20</span><br><span class="line">FAILED=0</span><br><span class="line">file=$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/check</span><br><span class="line">log=$JENKINS_HOME/jobs/$JOB_NAME/builds/$BUILD_NUMBER/log</span><br><span class="line"></span><br><span class="line">check()&#123;</span><br><span class="line">    echo \&lt;h3\&gt; `date` &gt;&gt; $file</span><br><span class="line">    #check函数必须指定参数（URL），否则退出函数（检测结束）</span><br><span class="line">    while [ $# != 0 ]</span><br><span class="line">    do</span><br><span class="line">        env=`grep &quot;$1&quot; /data/ztjy/$NAME/url | grep -v &quot;^#&quot; | awk &apos;&#123;print $1&#125;&apos;`</span><br><span class="line">        IP=`echo $1 | awk -F &quot;/&quot; &apos;&#123;print $3&#125;&apos; |awk -F &apos;:&apos; &apos;&#123;print $1&#125;&apos;`</span><br><span class="line">        curl -skf -m 1 $1 &gt; /dev/null</span><br><span class="line"></span><br><span class="line">        #如果返回正常，则显示对应的版本号</span><br><span class="line">        if [ $? -eq 0 ];then</span><br><span class="line">            ver=`curl -skf -m 1 $1 |grep -i &quot;v&quot; |head -1|dos2unix`</span><br><span class="line">            echo \&lt;br\&gt; $env: \&lt;a href=$1\&gt;$IP\&lt;\/a\&gt; ++ $ver &gt;&gt; $file</span><br><span class="line">            echo $1 is OK! &gt;&gt; $log</span><br><span class="line">            FAILED=0</span><br><span class="line">            shift</span><br><span class="line">            continue</span><br><span class="line"></span><br><span class="line">        #如果返回异常，则标注版本号为ERROR并以红色显示</span><br><span class="line">        else</span><br><span class="line">            FAILED=$(($FAILED + 1))</span><br><span class="line">            TIMES=$(($ATTEMPTS - $FAILED + 1))</span><br><span class="line">            echo &quot;Waiting for check the URL: $1, retrying after 10 seconds for $TIMES times...&quot; &gt;&gt; $log</span><br><span class="line">            sleep 10</span><br><span class="line">            if [ $ATTEMPTS -gt $FAILED ];then</span><br><span class="line">                continue</span><br><span class="line">            else</span><br><span class="line">                echo &quot;Failed to check the web-$1&quot; &gt;&gt; $log</span><br><span class="line">            fi</span><br><span class="line"></span><br><span class="line">            echo \&lt;br\&gt; $env: \&lt;a href=$1\&gt;$IP\&lt;\/a\&gt; ++ \&lt;font color=&apos;Red&apos;\&gt;Error\&lt;\/font\&gt; &gt;&gt; $file</span><br><span class="line">            FAILED=0</span><br><span class="line">            shift</span><br><span class="line">            continue</span><br><span class="line">        fi</span><br><span class="line">    done</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/04/06/url-check/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2070,7 +2070,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">53</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2092,7 +2092,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">34</span>
+                <span class="site-state-item-count">37</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

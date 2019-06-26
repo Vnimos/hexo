@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+	  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-flash.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="ceph,crush_rule,osd," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="移除OSD123456789101112131415161718192021222324252627282930313233343536373839404142[root@ceph-node1 ~]# ceph osd tree   ID CLASS WEIGHT    TYPE NAME           STATUS REWEIGHT PRI-AFF -1       120.07668 r">
+<meta name="keywords" content="ceph,crush_rule,osd">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph添加删除OSD并做磁盘智能分组">
+<meta property="og:url" content="http://www.vnimos.cn/2019/06/25/ceph-osd/index.html">
+<meta property="og:site_name" content="Vnimos&#39;s blog">
+<meta property="og:description" content="移除OSD123456789101112131415161718192021222324252627282930313233343536373839404142[root@ceph-node1 ~]# ceph osd tree   ID CLASS WEIGHT    TYPE NAME           STATUS REWEIGHT PRI-AFF -1       120.07668 r">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-06-26T08:58:55.455Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ceph添加删除OSD并做磁盘智能分组">
+<meta name="twitter:description" content="移除OSD123456789101112131415161718192021222324252627282930313233343536373839404142[root@ceph-node1 ~]# ceph osd tree   ID CLASS WEIGHT    TYPE NAME           STATUS REWEIGHT PRI-AFF -1       120.07668 r">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.vnimos.cn/2019/06/25/ceph-osd/"/>
+
+
+
+
+
+	  <title>Ceph添加删除OSD并做磁盘智能分组 | Vnimos's blog</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?007f6f5653352aec25603978e3f007f7";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Vnimos's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">The way to DevOps</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-anchor"></i> <br />
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-openstack">
+          <a href="/categories/openstack/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-dashcube"></i> <br />
+            
+            Openstack
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cicd">
+          <a href="/categories/cicd/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-gitlab"></i> <br />
+            
+            持续集成
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ops">
+          <a href="/categories/ops/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-linux"></i> <br />
+            
+            自动化运维
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.vnimos.cn/2019/06/25/ceph-osd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Vnimos">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/vnimos.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Vnimos's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ceph添加删除OSD并做磁盘智能分组</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-25T17:12:33+08:00">
+                2019-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ops/" itemprop="url" rel="index">
+                    <span itemprop="name">ops</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-comment-o"></i>
+              </span>
+              
+                <a href="/2019/06/25/ceph-osd/#SOHUCS" itemprop="discussionUrl">
+                  <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2019/06/25/ceph-osd/" itemprop="commentsCount"></span>
+                </a>
+              
+            
+          
+
+          
+          
+             <span id="/2019/06/25/ceph-osd/" class="leancloud_visitors" data-flag-title="Ceph添加删除OSD并做磁盘智能分组">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数 </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="移除OSD"><a href="#移除OSD" class="headerlink" title="移除OSD"></a>移除OSD</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# ceph osd tree   </span><br><span class="line">ID CLASS WEIGHT    TYPE NAME           STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       120.07668 root default                                </span><br><span class="line">-3        40.02556     host ceph-node1                         </span><br><span class="line"> 0   hdd   3.63869         osd.0           up  1.00000 1.00000 </span><br><span class="line"> 1   hdd   3.63869         osd.1           up  1.00000 1.00000 </span><br><span class="line"> 2   hdd   3.63869         osd.2           up  1.00000 1.00000 </span><br><span class="line"> 3   hdd   3.63869         osd.3           up  1.00000 1.00000 </span><br><span class="line"> 4   hdd   3.63869         osd.4           up  1.00000 1.00000 </span><br><span class="line"> 5   hdd   3.63869         osd.5           up  1.00000 1.00000 </span><br><span class="line"> 6   hdd   3.63869         osd.6           up  1.00000 1.00000 </span><br><span class="line"> 7   hdd   3.63869         osd.7           up  1.00000 1.00000 </span><br><span class="line"> 8   hdd   3.63869         osd.8           up  1.00000 1.00000 </span><br><span class="line"> 9   hdd   3.63869         osd.9           up  1.00000 1.00000 </span><br><span class="line">10   hdd   3.63869         osd.10          up  1.00000 1.00000 </span><br><span class="line">-5        40.02556     host ceph-node2                         </span><br><span class="line">11   hdd   3.63869         osd.11          up  1.00000 1.00000 </span><br><span class="line">12   hdd   3.63869         osd.12          up  1.00000 1.00000 </span><br><span class="line">13   hdd   3.63869         osd.13          up  1.00000 1.00000 </span><br><span class="line">14   hdd   3.63869         osd.14          up  1.00000 1.00000 </span><br><span class="line">15   hdd   3.63869         osd.15          up  1.00000 1.00000 </span><br><span class="line">16   hdd   3.63869         osd.16          up  1.00000 1.00000 </span><br><span class="line">17   hdd   3.63869         osd.17          up  1.00000 1.00000 </span><br><span class="line">18   hdd   3.63869         osd.18          up  1.00000 1.00000 </span><br><span class="line">19   hdd   3.63869         osd.19          up  1.00000 1.00000 </span><br><span class="line">20   hdd   3.63869         osd.20          up  1.00000 1.00000 </span><br><span class="line">21   hdd   3.63869         osd.21          up  1.00000 1.00000 </span><br><span class="line">-7        40.02556     host ceph-node3                         </span><br><span class="line">22   hdd   3.63869         osd.22          up  1.00000 1.00000 </span><br><span class="line">23   hdd   3.63869         osd.23          up  1.00000 1.00000 </span><br><span class="line">24   hdd   3.63869         osd.24          up  1.00000 1.00000 </span><br><span class="line">25   hdd   3.63869         osd.25          up  1.00000 1.00000 </span><br><span class="line">26   hdd   3.63869         osd.26          up  1.00000 1.00000 </span><br><span class="line">27   hdd   3.63869         osd.27          up  1.00000 1.00000 </span><br><span class="line">28   hdd   3.63869         osd.28          up  1.00000 1.00000 </span><br><span class="line">29   hdd   3.63869         osd.29          up  1.00000 1.00000 </span><br><span class="line">30   hdd   3.63869         osd.30          up  1.00000 1.00000 </span><br><span class="line">31   hdd   3.63869         osd.31          up  1.00000 1.00000 </span><br><span class="line">32   hdd   3.63869         osd.32          up  1.00000 1.00000 </span><br><span class="line">[root@ceph-node1 ~]# ceph osd crush reweight osd.10 0</span><br><span class="line">reweighted item id 10 name 'osd.10' to 0 in crush map</span><br><span class="line">&lt;!-- more --&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>该阶段 ceph 会自动将处于osd.10 中的数据迁移到其他状态正常的 OSD 上，所以在执行完成后，需要使用 ceph -w 查看数据迁移流程。等到不再有输出后，数据迁移完毕。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# ceph -w</span><br><span class="line">  cluster:</span><br><span class="line">    id:     9d734902-fd68-4943-b263-11b515918ed4</span><br><span class="line">    health: HEALTH_WARN</span><br><span class="line">            35959/1031274 objects misplaced (3.487%)</span><br><span class="line">            application not enabled on 1 pool(s)</span><br><span class="line"> </span><br><span class="line">  services:</span><br><span class="line">    mon: 3 daemons, quorum ceph-node1,ceph-node2,ceph-node3</span><br><span class="line">    mgr: ceph-node1(active)</span><br><span class="line">    osd: 33 osds: 33 up, 33 in; 58 remapped pgs</span><br><span class="line">    rgw: 1 daemon active</span><br><span class="line"> </span><br><span class="line">  data:</span><br><span class="line">    pools:   15 pools, 1232 pgs</span><br><span class="line">    objects: 343.8 k objects, 1.3 TiB</span><br><span class="line">    usage:   3.8 TiB used, 116 TiB / 120 TiB avail</span><br><span class="line">    pgs:     35959/1031274 objects misplaced (3.487%)</span><br><span class="line">             1174 active+clean</span><br><span class="line">             48   active+remapped+backfill_wait</span><br><span class="line">             10   active+remapped+backfilling</span><br><span class="line"> </span><br><span class="line">  io:</span><br><span class="line">    client:   2.2 MiB/s rd, 6.4 MiB/s wr, 37 op/s rd, 414 op/s wr</span><br><span class="line">    recovery: 129 MiB/s, 0 keys/s, 29 objects/s</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">2019-06-19 14:40:02.973752 mon.ceph-node1 [WRN] Health check update: 36020/1031271 objects misplaced (3.493%) (OBJECT_MISPLACED)</span><br><span class="line">2019-06-19 15:05:49.970861 mon.ceph-node1 [WRN] Health check update: 2472/1032033 objects misplaced (0.240%) (OBJECT_MISPLACED)</span><br><span class="line">2019-06-19 15:11:44.998352 mon.ceph-node1 [WRN] Health check update: 815/1032162 objects misplaced (0.079%) (OBJECT_MISPLACED)</span><br><span class="line">2019-06-19 15:17:00.165353 mon.ceph-node1 [INF] Health check cleared: OBJECT_MISPLACED (was: 12/1032399 objects misplaced (0.001%))</span><br><span class="line">[root@ceph-node1 ~]# ceph -s</span><br><span class="line">  cluster:</span><br><span class="line">    id:     9d734902-fd68-4943-b263-11b515918ed4</span><br><span class="line">    health: HEALTH_OK</span><br><span class="line"> </span><br><span class="line">  services:</span><br><span class="line">    mon: 3 daemons, quorum ceph-node1,ceph-node2,ceph-node3</span><br><span class="line">    mgr: ceph-node1(active)</span><br><span class="line">    osd: 33 osds: 33 up, 33 in</span><br><span class="line">    rgw: 1 daemon active</span><br><span class="line"> </span><br><span class="line">  data:</span><br><span class="line">    pools:   15 pools, 1232 pgs</span><br><span class="line">    objects: 344.2 k objects, 1.3 TiB</span><br><span class="line">    usage:   3.8 TiB used, 116 TiB / 120 TiB avail</span><br><span class="line">    pgs:     1232 active+clean</span><br><span class="line"> </span><br><span class="line">  io:</span><br><span class="line">    client:   68 KiB/s rd, 14 MiB/s wr, 45 op/s rd, 572 op/s wr</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# systemctl stop ceph-osd@10</span><br><span class="line">[root@ceph-node1 ~]# ceph osd tree|grep osd.10</span><br><span class="line">10   hdd         0         osd.10        down  1.00000 1.00000</span><br><span class="line">[root@ceph-node1 ~]# ceph osd out osd.10</span><br><span class="line">marked out osd.10.</span><br><span class="line">[root@ceph-node1 ~]#  ceph osd tree|grep osd.10</span><br><span class="line">10   hdd         0         osd.10        down        0 1.00000</span><br><span class="line">[root@ceph-node1 ~]# ceph osd crush remove osd.10</span><br><span class="line">removed item id 10 name 'osd.10' from crush map</span><br><span class="line">[root@ceph-node1 ~]# ceph auth del osd.10</span><br><span class="line">updated</span><br><span class="line">[root@ceph-node1 ~]# ceph osd rm 10</span><br><span class="line">removed osd.10</span><br><span class="line">[root@ceph-node1 ~]# ceph osd tree </span><br><span class="line">ID CLASS WEIGHT    TYPE NAME           STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       116.43799 root default                                </span><br><span class="line">-3        36.38687     host ceph-node1                         </span><br><span class="line"> 0   hdd   3.63869         osd.0           up  1.00000 1.00000 </span><br><span class="line"> 1   hdd   3.63869         osd.1           up  1.00000 1.00000 </span><br><span class="line"> 2   hdd   3.63869         osd.2           up  1.00000 1.00000 </span><br><span class="line"> 3   hdd   3.63869         osd.3           up  1.00000 1.00000 </span><br><span class="line"> 4   hdd   3.63869         osd.4           up  1.00000 1.00000 </span><br><span class="line"> 5   hdd   3.63869         osd.5           up  1.00000 1.00000 </span><br><span class="line"> 6   hdd   3.63869         osd.6           up  1.00000 1.00000 </span><br><span class="line"> 7   hdd   3.63869         osd.7           up  1.00000 1.00000 </span><br><span class="line"> 8   hdd   3.63869         osd.8           up  1.00000 1.00000 </span><br><span class="line"> 9   hdd   3.63869         osd.9           up  1.00000 1.00000 </span><br><span class="line">-5        40.02556     host ceph-node2                         </span><br><span class="line">11   hdd   3.63869         osd.11          up  1.00000 1.00000 </span><br><span class="line">12   hdd   3.63869         osd.12          up  1.00000 1.00000 </span><br><span class="line">13   hdd   3.63869         osd.13          up  1.00000 1.00000 </span><br><span class="line">14   hdd   3.63869         osd.14          up  1.00000 1.00000 </span><br><span class="line">15   hdd   3.63869         osd.15          up  1.00000 1.00000 </span><br><span class="line">16   hdd   3.63869         osd.16          up  1.00000 1.00000 </span><br><span class="line">17   hdd   3.63869         osd.17          up  1.00000 1.00000 </span><br><span class="line">18   hdd   3.63869         osd.18          up  1.00000 1.00000 </span><br><span class="line">19   hdd   3.63869         osd.19          up  1.00000 1.00000 </span><br><span class="line">20   hdd   3.63869         osd.20          up  1.00000 1.00000 </span><br><span class="line">21   hdd   3.63869         osd.21          up  1.00000 1.00000 </span><br><span class="line">-7        40.02556     host ceph-node3                         </span><br><span class="line">22   hdd   3.63869         osd.22          up  1.00000 1.00000 </span><br><span class="line">23   hdd   3.63869         osd.23          up  1.00000 1.00000 </span><br><span class="line">24   hdd   3.63869         osd.24          up  1.00000 1.00000 </span><br><span class="line">25   hdd   3.63869         osd.25          up  1.00000 1.00000 </span><br><span class="line">26   hdd   3.63869         osd.26          up  1.00000 1.00000 </span><br><span class="line">27   hdd   3.63869         osd.27          up  1.00000 1.00000 </span><br><span class="line">28   hdd   3.63869         osd.28          up  1.00000 1.00000 </span><br><span class="line">29   hdd   3.63869         osd.29          up  1.00000 1.00000 </span><br><span class="line">30   hdd   3.63869         osd.30          up  1.00000 1.00000 </span><br><span class="line">31   hdd   3.63869         osd.31          up  1.00000 1.00000 </span><br><span class="line">32   hdd   3.63869         osd.32          up  1.00000 1.00000</span><br></pre></td></tr></table></figure>
+<h2 id="定位硬盘槽位"><a href="#定位硬盘槽位" class="headerlink" title="定位硬盘槽位"></a>定位硬盘槽位</h2><ul>
+<li><p>查询服务器RAID阵列卡型号</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> cat /proc/scsi/scsi</span><br><span class="line">Host: scsi0 Channel: 02 Id: 00 Lun: 00</span><br><span class="line">  Vendor: AVAGO    Model: **MR9361-8i **       Rev: 4.68</span><br><span class="line">  Type:   Direct-Access                    ANSI  SCSI revision: 05</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下载、安装阵列卡管理工具</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# wget https://docs.broadcom.com/docs-and-downloads/raid-controllers/raid-controllers-common-files/MR_SAS_Unified_StorCLI_007.1017.0000.0000.zip</span><br><span class="line">[root@ceph-node1 ~]# unzip MR_SAS_Unified_StorCLI_007.1017.0000.0000.zip</span><br><span class="line">[root@ceph-node1 ~]# rpm -ivh Linux/storcli-007.1017.0000.0000-1.noarch.rpm</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>查询磁盘对应的序列号</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# smartctl -a /dev/sdl|grep "Serial Number"</span><br><span class="line">Serial Number:    ZC1AC3KZ</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>导出阵列卡配置信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# cd /opt/MegaRAID/storcli</span><br><span class="line">[root@ceph-node1 ~]# ./storcli64 /call/eall/sall show all &gt; slot.txt</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>定位磁盘对应的槽位</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# grep -2 ZC1AC3KZ slot.txt</span><br><span class="line">Drive /c0/e8/s5 Device attributes :</span><br><span class="line">=================================</span><br><span class="line">SN = ZC1AC3KZ</span><br><span class="line">Manufacturer Id = ATA</span><br><span class="line">Model Number = ST4000NM0035-1V4107</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>点亮硬盘定位指示灯</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# storcli64 /c0/e8/s5 start locate</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>关闭硬盘定位指示灯</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# storcli64 /c0/e8/s5 stop locate</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="添加OSD"><a href="#添加OSD" class="headerlink" title="添加OSD"></a>添加OSD</h1><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# ceph-deploy --ceph-conf /etc/ceph/ceph.conf disk zap ceph-node1 /dev/sde</span><br><span class="line">[root@ceph-node1 ~]# ceph-deploy --ceph-conf /etc/ceph/ceph.conf --overwrite-conf osd create --data /dev/sde ceph-node1</span><br></pre></td></tr></table></figure>
+<h1 id="crush-class分组"><a href="#crush-class分组" class="headerlink" title="crush class分组"></a>crush class分组</h1><ul>
+<li><p>对ssd磁盘设置crush class为ssd</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# ceph osd crush rm-device-class osd.10</span><br><span class="line">done removing class of osd(s): 10</span><br><span class="line">[root@ceph-node1 ~]# ceph osd tree|grep osd.10</span><br><span class="line">10         3.63869         osd.10          up  1.00000 1.00000</span><br><span class="line">[root@ceph-node1 ~]# ceph osd crush set-device-class ssd osd.10</span><br><span class="line">set osd(s) 10 to class 'ssd'</span><br><span class="line">[root@ceph-node1 ~]# ceph osd tree|grep osd.10</span><br><span class="line">10   ssd   3.63869         osd.10          up  1.00000 1.00000</span><br><span class="line">[root@ceph-node1 ~]# ceph osd crush class ls</span><br><span class="line">[</span><br><span class="line">    "hdd",</span><br><span class="line">    "ssd"</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建crush rule并分别指定class为hdd和ssd</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# ceph osd crush rule create-replicated replicated_hdd_rule default host hdd</span><br><span class="line">[root@ceph-node1 ~]# ceph osd crush rule create-replicated replicated_ssd_rule default host ssd</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        "rule_id": 0,</span><br><span class="line">        "rule_name": "replicated_rule",</span><br><span class="line">        "ruleset": 0,</span><br><span class="line">        "type": 1,</span><br><span class="line">        "min_size": 1,</span><br><span class="line">        "max_size": 10,</span><br><span class="line">        "steps": [</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "take",</span><br><span class="line">                "item": -1,</span><br><span class="line">                "item_name": "default"</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "chooseleaf_firstn",</span><br><span class="line">                "num": 0,</span><br><span class="line">                "type": "host"</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "emit"</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        "rule_id": 2,</span><br><span class="line">        "rule_name": "replicated_ssd_rule",</span><br><span class="line">        "ruleset": 2,</span><br><span class="line">        "type": 1,</span><br><span class="line">        "min_size": 1,</span><br><span class="line">        "max_size": 10,</span><br><span class="line">        "steps": [</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "take",</span><br><span class="line">                "item": -12,</span><br><span class="line">                "item_name": "default~ssd"</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "chooseleaf_firstn",</span><br><span class="line">                "num": 0,</span><br><span class="line">                "type": "host"</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "emit"</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        "rule_id": 3,</span><br><span class="line">        "rule_name": "replicated_hdd_rule",</span><br><span class="line">        "ruleset": 3,</span><br><span class="line">        "type": 1,</span><br><span class="line">        "min_size": 1,</span><br><span class="line">        "max_size": 10,</span><br><span class="line">        "steps": [</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "take",</span><br><span class="line">                "item": -2,</span><br><span class="line">                "item_name": "default~hdd"</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "chooseleaf_firstn",</span><br><span class="line">                "num": 0,</span><br><span class="line">                "type": "host"</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                "op": "emit"</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>指定crush_rule创建pool</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# ceph osd pool create test_hdd_rule 12 12 replicated_hdd_rule</span><br><span class="line">[root@ceph-node1 ~]# ceph osd pool create test_ssd_rule 12 12 replicated_ssd_rule</span><br><span class="line">[root@ceph-node1 ~]# ceph osd pool set test_ssd_rule size 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>修改pool的crush_rule</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph-node1 ~]# ceph osd pool set pool_name crush_rule replicated_hdd_rule</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>参考资料：</p>
+<ul>
+<li><a href="https://ceph.com/community/new-luminous-crush-device-classes/" target="_blank" rel="noopener">https://ceph.com/community/new-luminous-crush-device-classes/</a></li>
+<li><a href="http://www.xuxiaopang.com/2016/11/08/easy-ceph-CRUSH/" target="_blank" rel="noopener">http://www.xuxiaopang.com/2016/11/08/easy-ceph-CRUSH/</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>Donate</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechat.jpg" alt="Vnimos WeChat Pay"/>
+        <p>WeChat Pay</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Vnimos Alipay"/>
+        <p>Alipay</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+            <a href="/tags/crush-rule/" rel="tag"># crush_rule</a>
+          
+            <a href="/tags/osd/" rel="tag"># osd</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/03/packer/" rel="next" title="Packer自动构建虚拟机镜像">
+                <i class="fa fa-chevron-left"></i> Packer自动构建虚拟机镜像
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="SOHUCS"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/vnimos.png"
+               alt="Vnimos" />
+          <p class="site-author-name" itemprop="name">Vnimos</p>
+           
+              <p class="site-description motion-element" itemprop="description">openstack docker devops</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">54</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/Vnimos/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#移除OSD"><span class="nav-number">1.</span> <span class="nav-text">移除OSD</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定位硬盘槽位"><span class="nav-number">1.1.</span> <span class="nav-text">定位硬盘槽位</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加OSD"><span class="nav-number">2.</span> <span class="nav-text">添加OSD</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#crush-class分组"><span class="nav-number">3.</span> <span class="nav-text">crush class分组</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Vnimos</span>
+
+  <span id="busuanzi_container_site_pv">
+  　| 本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+
+</div>
+
+<div class="theme-info">
+  <p>Hosted by <a href="https://pages.coding.me" style="font-weight: bold">Coding Pages</a></p>
+</div>
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+    <script type="text/javascript">
+    (function(){
+      var appid = 'cyt9Ylqyn';
+      var conf = '1a184eb9663f7547da215663de2ab920';
+      var width = window.innerWidth || document.documentElement.clientWidth;
+      if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>'); } else { var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){
+        window.changyan.api.config({appid:appid,conf:conf})});
+      }
+    })();
+    </script>
+    <script type="text/javascript" src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+  
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("1QWsAoK87e2YhnbJTstlfrBa-gzGzoHsz", "iBYrGLBSRYwF5zMMA8s6YBQ5");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
